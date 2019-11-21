@@ -1,6 +1,3 @@
-import * as fs from 'fs'
-import * as _ from 'underscore'
-import * as path from 'path'
 import {
 	Mappings,
 	TSRTimeline,
@@ -10,7 +7,6 @@ import {
 	DeviceContainer,
 	TimelineContentTypeCasparCg
 } from 'timeline-state-resolver'
-
 
 export class TSRController {
 
