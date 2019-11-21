@@ -3,14 +3,15 @@
 ## For Developers
 ### Installation
 
-* `npm install -no-optional`
+* `npm install --no-optional`
 * TEMPORARY: go to ./node_modules/osc/src/platforms/osc-node.js:38
   and replace line with `require("./osc-node-serialport-loader.js")`
 
 
 ### Usage
 
-`npm run start`
+Run app locally (for development purposes)
+`npm run watch`
 
 ## Pack into executable
 
