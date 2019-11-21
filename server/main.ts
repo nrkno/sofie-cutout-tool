@@ -1,17 +1,21 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow } from 'electron'
+import { TSRController } from './TSRController'
 
 export default class Main {
   static mainWindow: Electron.BrowserWindow|null
   static application: Electron.App
   static BrowserWindow: typeof BrowserWindow
-  
+
+  static tsrController: TSRController
+
   private static onWindowAllClosed() {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== "darwin") {
+    if (process.platform !== 'darwin') {
       Main.application.quit();
     }
   }
+
 
   private static onClose () {
     // Dereference the window object, usually you would store windows
@@ -26,10 +30,12 @@ export default class Main {
       height: 600,
       webPreferences: {
         nodeIntegration: true
-      }  
+      }
     })
-    Main.mainWindow.loadFile("index.html")
+    Main.mainWindow.loadFile('index.html')
     Main.mainWindow.on('closed', Main.onClose)
+
+    Main.tsrController.init().catch(console.error)
   }
 
   // On macOS it's common to re-create a window in the app when the
@@ -46,5 +52,7 @@ export default class Main {
     Main.application.on('window-all-closed', Main.onWindowAllClosed)
     Main.application.on('ready', Main.onReady)
     Main.application.on('activate', Main.onActivate)
+
+    Main.tsrController = new TSRController()
   }
 }
