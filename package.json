@@ -16,7 +16,6 @@
     "timeline-state-resolver": "^3.15.0"
   },
   "devDependencies": {
-    "@types/underscore": "^1.9.4",
     "electron": "^7.1.1",
     "electron-rebuild": "^1.8.8",
     "nodemon": "^2.0.0",
