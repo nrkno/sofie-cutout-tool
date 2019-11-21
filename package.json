@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "prestart": "npm run build",
-    "watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron\"",
+    "watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "electron-rebuild"
   },
@@ -21,6 +21,7 @@
     "@types/underscore": "^1.9.4",
     "electron": "^7.1.1",
     "electron-rebuild": "^1.8.8",
+    "nodemon": "^2.0.0",
     "typescript": "^3.7.2"
   },
   "resolutions": {
