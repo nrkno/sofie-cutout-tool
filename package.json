@@ -10,7 +10,7 @@
     "watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
     "watch-server": "nodemon serverOnly.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "electron-rebuild"
+    "postinstall": "trash node_modules/@serialport node_modules/serialport && electron-rebuild"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +24,7 @@
     "@types/underscore": "^1.9.4",
     "electron": "^7.1.1",
     "electron-rebuild": "^1.8.8",
+    "trash-cli": "^3.0.0",
     "nodemon": "^2.0.0",
     "typescript": "^3.7.2"
   },
