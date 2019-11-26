@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import { TSRController } from './TSRController'
 
 export default class Main {
@@ -36,6 +36,16 @@ export default class Main {
     Main.mainWindow.on('closed', Main.onClose)
 
     Main.tsrController.init().catch(console.error)
+
+    ipcMain.on('whatever', (event, arg) => {
+      console.log('got whatever', arg)
+      event.returnValue = 'return!'
+      event.reply('whatevz', 'pong')
+    })
+    
+    setTimeout(() => {
+      Main.mainWindow.webContents.send('whatevz', 'manual whatevz')
+    }, 2000)
   }
 
   // On macOS it's common to re-create a window in the app when the

@@ -1,0 +1,30 @@
+@import "../../client/styles/colorscheme.css";
+
+.video-cropper {
+  border: 1px solid  var(--frame-light);
+
+  --src-width: 480px;
+  --src-height: 270px;
+}
+
+.video-cropper--src {
+  background: red;
+  
+  height: var(--src-height);
+  width: var(--src-width);
+  
+  margin: 0 auto;
+  position: relative;
+}
+
+.video-cropper--cutout-window {
+  background: blue;
+  border: 1px solid var(--frame-dark);
+
+  height: 100%;
+  width: calc(var(--src-height) / 16 * 9);
+
+  position: absolute;
+  top: 0;
+  left: calc(calc(100% / 2) - calc(var(--src-height) / 16 * 9 / 2));
+}

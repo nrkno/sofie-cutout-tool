@@ -1,4 +1,4 @@
-import {hello} from './included.js'
+import {hello} from './scripts/included.js'
 
 console.log('Client scripts loaded.')
 hello()
