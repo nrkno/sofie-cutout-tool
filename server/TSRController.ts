@@ -17,7 +17,11 @@ import {
 	DeviceContainer,
 	TimelineContentTypeCasparCg,
 	Mixer,
-	TimelineObjCasparCGAny
+	TimelineObjCasparCGAny,
+	TimelineObjCCGMedia,
+	TimelineObjCCGInput,
+	ChannelFormat,
+	TimelineObjCCGRoute
 } from 'timeline-state-resolver'
 import {
 	Sources,
@@ -40,9 +44,11 @@ export class TSRController {
 	private timeline: TSRTimeline = []
 	private mappings: any = {}
 
+	private ccg: CasparReferrer
+
 	constructor () {
 
-
+		this.ccg = new CasparReferrer()
 		this.tsr = new Conductor({
 			initializeAsClear: true,
 			multiThreadedResolver: true,
@@ -154,18 +160,6 @@ export class TSRController {
 				}
 			},
 			{
-				type: OutputType.CUTOUT,
-				casparChannel: 3,
-				width: 1280,
-				height: 720,
-				cutout: {
-					cutoutId: 'casparzoom',
-					x: 0,
-					y: 0,
-					scale: 1
-				}
-			},
-			{
 				type: OutputType.MULTIVIEW,
 				cutouts: [
 					{
@@ -202,6 +196,12 @@ export class TSRController {
 		this.mappings = {}
 		this.timeline = []
 
+		tmpOutputs.sort((a,b) => {
+
+			if (a.type === OutputType.MULTIVIEW && b.type !== OutputType.MULTIVIEW) return -1
+			if (a.type !== OutputType.MULTIVIEW && b.type === OutputType.MULTIVIEW) return 1
+		})
+
 		_.each(tmpOutputs, (output: OutputAny, outputi: number) => {
 
 			if (output.type === OutputType.CUTOUT) {
@@ -229,16 +229,16 @@ export class TSRController {
 					rotateDEG(cutout.outputRotation, 0.5, 0.5),
 				)
 
-				const mixer = this._casparTransform(
+				const mixerPosition = this._casparTransformPosition(
 					source,
 					outputTransform
 				)
 
 				if (source.input.type === SourceInputType.MEDIA) {
-					this.timeline.push(Caspar.media(
+					this.timeline.push(this.ccg.media(
 						layer,
 						source.input.file,
-						mixer
+						mixerPosition
 					))
 
 				} else if (source.input.type === SourceInputType.DECKLINK) {
@@ -256,7 +256,7 @@ export class TSRController {
 					channel: output.casparChannel,
 					layer: 10
 				}
-				this.timeline.push(Caspar.media(
+				this.timeline.push(this.ccg.media(
 					layerMultiviewBg,
 					'multiview_bg'
 				))
@@ -302,11 +302,11 @@ export class TSRController {
 							scale( cutoutOutput.scale )
 						)
 
-						const mixer = this._casparTransform(
+						const mixerPosition = this._casparTransformPosition(
 							source,
 							outputTransform
 						)
-						const mixerClip = this._casparClip(
+						const mixerClipping = this._casparTransformClip(
 							output,
 							cutout,
 							viewportTransform
@@ -314,22 +314,22 @@ export class TSRController {
 
 						// Black background behind clip:
 						this.timeline.push(
-							Caspar.media(
+							this.ccg.media(
 								layerBg,
 								'black',
-								mixerClip
+								mixerClipping
 							)
 						)
 
 						if (source.input.type === SourceInputType.MEDIA) {
 							// The clip in multiviewer
 							this.timeline.push(
-								Caspar.media(
+								this.ccg.media(
 									layer,
 									source.input.file,
 									{
-										...mixer,
-										...mixerClip
+										...mixerPosition,
+										...mixerClipping
 									}
 								)
 							)
@@ -356,6 +356,8 @@ export class TSRController {
 		// Send mappings and timeline to TSR:
 		this.tsr.setMapping(this.mappings)
 		this.tsr.timeline = this.timeline
+
+		console.log(JSON.stringify(this.timeline, null, 2))
 	}
 
 	private _addTSRDevice (deviceId: string, options: DeviceOptionsAny): void {
@@ -418,7 +420,7 @@ export class TSRController {
 			sourceTransform,
 		)
 	}
-	private _casparTransform (
+	private _casparTransformPosition (
 		source: { width: number, height: number},
 		outputTransform: Matrix,
 	): Mixer {
@@ -436,6 +438,7 @@ export class TSRController {
 		const bottomRight	= applyToPoint(outputTransform, {x: x1,	y: y1})
 
 		const mixer: Mixer = {
+			...this._casparTransformTransition(),
 			perspective: {
 				topLeftX: topLeft.x,
 				topLeftY: topLeft.y,
@@ -449,7 +452,7 @@ export class TSRController {
 		}
 		return mixer
 	}
-	private _casparClip (
+	private _casparTransformClip (
 		output: OutputMultiview,
 		cutout: Cutout,
 		outputTransform: Matrix,
@@ -479,6 +482,7 @@ export class TSRController {
 		}
 
 		const mixer: Mixer = {
+			...this._casparTransformTransition(),
 			clip: {
 				x: topLeft.x,
 				y: topLeft.y,
@@ -488,11 +492,35 @@ export class TSRController {
 		}
 		return mixer
 	}
+	private _casparTransformTransition (): Mixer {
+		return {
+			inTransition: {
+				easing: 'EASEINOUTQUAD',
+				duration: 0.5
+			},
+			changeTransition: {
+				easing: 'EASEINOUTQUAD',
+				duration: 0.5
+			},
+		}
+	}
 }
 
-namespace Caspar {
-	export function media (layer: string, file: string, mixer?: Mixer): TimelineObjCasparCGAny {
-		return {
+class CasparReferrer {
+	decklingInputRefs: DecklinkInputRefs = {}
+
+	reset () {
+		this.decklingInputRefs = {}
+	}
+	mediaRef (file: string): string {
+		return 'media_' + file
+	}
+	media (layer: string, file: string, mixer?: Mixer): TimelineObjCCGMedia | TimelineObjCCGRoute {
+
+		const refId = this.mediaRef(file)
+		const ref = this.getRef(refId, layer, mixer)
+		if (ref) return ref
+		const o: TimelineObjCCGMedia = {
 			id:  '',
 			layer: layer,
 			enable: { while: 1 },
@@ -504,5 +532,54 @@ namespace Caspar {
 				mixer: mixer
 			}
 		}
+		this.setRef(refId, layer)
+		return o
 	}
+	inputRef (inputType: string, device: number, deviceFormat: ChannelFormat): string {
+		return 'input_' + inputType + '_' + device + '_' + deviceFormat
+	}
+	input (layer: string, inputType: string, device: number, deviceFormat: ChannelFormat, mixer?: Mixer): TimelineObjCCGInput | TimelineObjCCGRoute {
+		const refId = this.inputRef (inputType, device, deviceFormat)
+		const ref = this.getRef(refId, layer, mixer)
+		if (ref) return ref
+		const o: TimelineObjCCGInput = {
+			id:  '',
+			layer: layer,
+			enable: { while: 1 },
+			content: {
+				deviceType: DeviceType.CASPARCG,
+				type: TimelineContentTypeCasparCg.INPUT,
+				device: device,
+				deviceFormat: deviceFormat,
+				inputType: inputType,
+
+				mixer: mixer
+			}
+		}
+		this.setRef(refId, layer)
+		return o
+	}
+	private getRef (refId: string, layer: string, mixer?: Mixer): TimelineObjCCGRoute | null {
+		const ref = this.decklingInputRefs[refId]
+		if (ref) {
+			return {
+				id:  '',
+				layer: layer,
+				enable: { while: 1 },
+				content: {
+					deviceType: DeviceType.CASPARCG,
+					type: TimelineContentTypeCasparCg.ROUTE,
+					mappedLayer: ref,
+
+					mixer: mixer
+				}
+			}
+		}
+	}
+	private setRef(refId, layer) {
+		this.decklingInputRefs[refId] = layer
+	}
+}
+interface DecklinkInputRefs {
+	[refId: string]: string
 }
