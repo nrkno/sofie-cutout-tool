@@ -55,8 +55,8 @@ class VideoCropper extends HTMLElement {
   connectedCallback () {
     this.cropTool.addEventListener("touchmove", event => {
       console.log('touchmove')
-      if (event.target.isSameNode(this.cropTool)) { // shadow dom da...
-        console.table("mm", event);
+      if (event.target.isSameNode(this.cropTool)) {
+        this.moveCropFromTouch(event)
       }
     });
     
