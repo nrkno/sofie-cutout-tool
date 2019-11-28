@@ -37,15 +37,9 @@ export default class Main {
 
     Main.tsrController.init().catch(console.error)
 
-    ipcMain.on('whatever', (event, arg) => {
-      console.log('got whatever', arg)
-      event.returnValue = 'return!'
-      event.reply('whatevz', 'pong')
+    ipcMain.on('cutout-move', (event, move) => {
+      console.log(move)
     })
-    
-    setTimeout(() => {
-      Main.mainWindow.webContents.send('whatevz', 'manual whatevz')
-    }, 2000)
   }
 
   // On macOS it's common to re-create a window in the app when the

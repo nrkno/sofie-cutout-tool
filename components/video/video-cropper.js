@@ -18,8 +18,13 @@ class VideoCropper extends HTMLElement {
     this.cropTool = shadowRoot.querySelector(`.${cropToolClassname}`)
   }
 
+  emitMoveEvent ({width, height, x, y}) {
+    document.dispatchEvent(new CustomEvent('cutout-move', {
+      detail: {source: null, width, height, x, y}
+    }))
+  }
+
   moveCrop(x, y) {
-    console.log(`moveCrop(${x}, ${y})`)
     const {width: cropWidth, height: cropHeight } = this.cropTool.getBoundingClientRect();
     // center movable at click
     const cx = x - cropWidth / 2;
@@ -31,6 +36,8 @@ class VideoCropper extends HTMLElement {
     const calculatedLeft = clamp(cx, 0, maxX);
     const calculatedTop = clamp(cy, 0, maxY);
   
+    this.emitMoveEvent({width: cropWidth, height: cropHeight, x: calculatedLeft, y: calculatedTop})
+
     this.cropTool.style.left = `${calculatedLeft}px`;
     this.cropTool.style.top = `${calculatedTop}px`;
   }
@@ -50,11 +57,10 @@ class VideoCropper extends HTMLElement {
     const y = touch.pageY + window.scrollY - this.containerRect.top;
 
     this.moveCrop(x, y);
-}
+  }
 
   connectedCallback () {
     this.cropTool.addEventListener("touchmove", event => {
-      console.log('touchmove')
       if (event.target.isSameNode(this.cropTool)) {
         this.moveCropFromTouch(event)
       }

@@ -51,7 +51,7 @@ export class TSRController {
 		this.ccg = new CasparReferrer()
 		this.tsr = new Conductor({
 			initializeAsClear: true,
-			multiThreadedResolver: true,
+			multiThreadedResolver: false,
 			proActiveResolve: true
 		})
 
@@ -59,7 +59,7 @@ export class TSRController {
 			console.error('Error: TSR', e, ...args)
 		})
 		this.tsr.on('info', (msg, ...args) => {
-			console.log('TSR', msg, ...args)
+			// console.log('TSR', msg, ...args)
 		})
 		this.tsr.on('warning', (msg, ...args) => {
 			console.log('Warning: TSR', msg, ...args)
@@ -96,7 +96,7 @@ export class TSRController {
 				rotation: 0,
 				input: {
 					type: SourceInputType.MEDIA,
-					file: 'amb2'
+					file: 'amb'
 				}
 			},
 			'head': {
@@ -106,7 +106,7 @@ export class TSRController {
 				rotation: 90,
 				input: {
 					type: SourceInputType.MEDIA,
-					file: 'head0'
+					file: 'go1080p25'
 				}
 			}
 		}
@@ -377,7 +377,7 @@ export class TSRController {
 				console.log(`Device ${device.deviceId}: status changed: ${status}`)
 			})
 			await device.device.on('slowCommand', (msg: string) => {
-				console.log(`Device ${device.deviceId}: slow command: ${msg}`)
+				// console.log(`Device ${device.deviceId}: slow command: ${msg}`)
 			})
 
 			console.log(`Device ${device.deviceId}: status`, await device.device.getStatus())

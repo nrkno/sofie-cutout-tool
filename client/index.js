@@ -1,4 +1,4 @@
-import {hello} from './scripts/included.js'
+import {init} from './scripts/cutout-move-listener.js'
 
 console.log('Client scripts loaded.')
-hello()
+init()
