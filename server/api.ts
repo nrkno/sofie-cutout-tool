@@ -1,4 +1,16 @@
 
+export interface FullConfig {
+	cutouts: Cutouts
+	outputs: Outputs
+	sources: Sources
+}
+export interface FullConfigClient extends FullConfig {
+	sourceReferenceLayers: {[sourceId: string]: {
+		channel: number
+		layer: number
+	}}
+}
+
 export interface Sources {
 	[sourceId: string]: Source
 }
@@ -67,7 +79,6 @@ export interface CutoutInOutput {
 	/** Scaling of cutout in output */
 	scale: number
 }
-
 export type Outputs = OutputAny[]
 
 export type OutputAny = OutputCutout | OutputMultiview
@@ -90,4 +101,7 @@ export interface OutputCutout extends OutputBase {
 export interface OutputMultiview extends OutputBase {
 	type: OutputType.MULTIVIEW
 	cutouts: CutoutInOutput[]
+
+	/** Background to put behind the multiview */
+	background?: string
 }

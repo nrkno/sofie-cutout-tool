@@ -1,0 +1,21 @@
+{
+    "note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
+    "cutouts": {
+        "casparfull": {
+            "source": "caspar",
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 720,
+            "outputRotation": 0
+        },
+        "head": {
+            "source": "head",
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 720,
+            "outputRotation": 90
+        }
+    }
+}

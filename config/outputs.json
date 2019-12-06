@@ -1,0 +1,37 @@
+{
+    "outputs": [
+        {
+            "type": "cutout",
+            "casparChannel": 0,
+            "width": 1280,
+            "height": 720,
+            "cutout": {
+                "cutoutId": "head",
+                "x": 0,
+                "y": 0,
+                "scale": 1
+            }
+        },
+        {
+            "type": "multiview",
+            "cutouts": [
+                {
+                    "cutoutId": "casparfull",
+                    "x": -400,
+                    "y": -200,
+                    "scale": 0.25
+                },
+                {
+                    "cutoutId": "head",
+                    "x": -400,
+                    "y": 100,
+                    "scale": 0.25
+                }
+            ],
+            "background": "",
+            "casparChannel": 2,
+            "width": 1280,
+            "height": 720
+        }
+    ]
+}

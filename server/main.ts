@@ -1,5 +1,9 @@
 import { BrowserWindow, ipcMain } from 'electron'
+import * as chokidar from 'chokidar'
+import * as _ from 'underscore'
 import { TSRController } from './TSRController'
+import { DataHandler } from './dataHandler'
+import { SourceInputType, FullConfig, FullConfigClient } from './api'
 
 export default class Main {
   static mainWindow: Electron.BrowserWindow|null
@@ -7,6 +11,7 @@ export default class Main {
   static BrowserWindow: typeof BrowserWindow
 
   static tsrController: TSRController
+  static dataHandler: DataHandler
 
   private static onWindowAllClosed() {
     // On macOS it is common for applications and their menu bar
@@ -22,12 +27,14 @@ export default class Main {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     Main.mainWindow = null
+
+    Main.tsrController.destroy().catch(console.error)
   }
 
   private static onReady () {
     Main.mainWindow = new Main.BrowserWindow({
-      width: 800,
-      height: 600,
+      width: 1280,
+      height: 720,
       webPreferences: {
         nodeIntegration: true
       }
@@ -35,10 +42,63 @@ export default class Main {
     Main.mainWindow.loadFile('index.html')
     Main.mainWindow.on('closed', Main.onClose)
 
+
+    chokidar.watch('/config.json').on('all', (event, path) => {
+      console.log(event, path);
+    });
+
     Main.tsrController.init().catch(console.error)
 
     ipcMain.on('cutout-move', (event, move) => {
       console.log(move)
+    })
+    ipcMain.on('initialize', (event, move) => {
+
+      console.log('Initializing...')
+
+      Main.dataHandler.onConfigChanged(() => {
+        console.log('config changed, reloading..')
+
+
+        Main.dataHandler.requestConfig()
+        .then((fullConfig: FullConfig) => {
+
+          Main.tsrController.updateTimeline(
+            fullConfig.sources,
+            fullConfig.cutouts, // TODO: tmp! this should come from the user instead
+            fullConfig.outputs
+          )
+
+          const fullConfigClient: FullConfigClient = _.extend({
+            sourceReferenceLayers: {}
+          },fullConfig)
+
+          // Find where the sources have been mapped up in CasparCG, so we know which layers to fetch the images from in the UI:
+          _.each(fullConfig.sources, (source, sourceId) => {
+            if (source.input.type === SourceInputType.MEDIA) {
+              const refId = Main.tsrController.refer.mediaRef(source.input.file)
+              const ref = Main.tsrController.refer.getRef(refId, '')
+              if (ref) {
+                const mapping = Main.tsrController.mappings[ref.content.mappedLayer]
+                if (mapping) {
+                  fullConfigClient.sourceReferenceLayers[sourceId] = {
+                    channel: mapping.channel,
+                    layer: mapping.layer
+                  }
+                }
+
+              }
+            }
+          })
+
+          event.reply('new-config', fullConfigClient)
+
+        },console.error)
+
+      })
+
+
+
     })
   }
 
@@ -58,5 +118,6 @@ export default class Main {
     Main.application.on('activate', Main.onActivate)
 
     Main.tsrController = new TSRController()
+    Main.dataHandler = new DataHandler()
   }
 }

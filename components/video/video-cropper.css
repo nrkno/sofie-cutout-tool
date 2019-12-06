@@ -3,28 +3,40 @@
 .video-cropper {
   border: 1px solid  var(--frame-light);
 
-  --src-width: 480px;
-  --src-height: 270px;
+  margin: 15px;
+
+  /* --src-width: 480px;
+  --src-height: 270px; */
 }
 
 .video-cropper--src {
   background: red;
-  
-  height: var(--src-height);
-  width: var(--src-width);
-  
+
+  /* height: var(--src-height);
+  width: var(--src-width); */
+
   margin: 0 auto;
   position: relative;
 }
 
+.video-cropper--img {
+  z-index: 1;
+}
 .video-cropper--cutout-window {
-  background: blue;
-  border: 1px solid var(--frame-dark);
+  z-index: 2;
 
-  height: 100%;
-  width: calc(var(--src-height) / 16 * 9);
+  /* background: blue; */
+  border: 5px solid var(--frame-dark);
+  box-sizing: border-box;
+
 
   position: absolute;
+
+  touch-action: none;
+  /*
+  height: 100%;
+  width: calc(var(--src-height) / 16 * 9);
   top: 0;
   left: calc(calc(100% / 2) - calc(var(--src-height) / 16 * 9 / 2));
+  */
 }

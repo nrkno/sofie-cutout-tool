@@ -41,14 +41,14 @@ export class TSRController {
 	private tsr: Conductor
 	private _tsrDevices: {[deviceId: string]: DeviceContainer} = {}
 
-	private timeline: TSRTimeline = []
-	private mappings: any = {}
+	public timeline: TSRTimeline = []
+	public mappings: any = {}
 
-	private ccg: CasparReferrer
+	public refer: CasparReferrer
 
 	constructor () {
 
-		this.ccg = new CasparReferrer()
+		this.refer = new CasparReferrer()
 		this.tsr = new Conductor({
 			initializeAsClear: true,
 			multiThreadedResolver: false,
@@ -82,127 +82,28 @@ export class TSRController {
 		})
 
 
-		this.updateTimeline()
+		// this.updateTimeline()
+	}
+	async destroy () {
+		await this.tsr.destroy()
 	}
 	/** Calculate new timeline and send it into TSR */
-	updateTimeline() {
-
-		// Note: these hard-coded values are temporary, and will later be provided by the user or config files.
-		const tmpSources: Sources = {
-			'caspar': {
-				title: 'Source A',
-				width: 1280,
-				height: 720,
-				rotation: 0,
-				input: {
-					type: SourceInputType.MEDIA,
-					file: 'amb'
-				}
-			},
-			'head': {
-				title: 'Source B',
-				width: 1280,
-				height: 720,
-				rotation: 90,
-				input: {
-					type: SourceInputType.MEDIA,
-					file: 'go1080p25'
-				}
-			}
-		}
-
-		const tmpCutouts: Cutouts = {
-			'casparfull': {
-				source: 'caspar',
-				x: 0,
-				y: 0,
-				width: 1280,
-				height: 720,
-				outputRotation: 0,
-			},
-			'casparzoom': {
-				source: 'caspar',
-				x: 250,
-				y: 150,
-				width: 720,
-				height: 405,
-				outputRotation: 0,
-			},
-			'head': {
-				source: 'head',
-				x: 0,
-				y: 0,
-				width: 1280,
-				height: 720,
-				outputRotation: 90,
-			},
-			'headsquare': {
-				source: 'head',
-				x: 0,
-				y: 0,
-				width: 1280,
-				height: 720,
-				outputRotation: 0,
-			}
-		}
-
-		const tmpOutputs: Outputs = [
-			{
-				type: OutputType.CUTOUT,
-				casparChannel: 0,
-				width: 1280,
-				height: 720,
-				cutout: {
-					cutoutId: 'head',
-					x: 0,
-					y: 0,
-					scale: 1
-				}
-			},
-			{
-				type: OutputType.MULTIVIEW,
-				cutouts: [
-					{
-						cutoutId: 'casparfull',
-						x: -400,
-						y: -200,
-						scale: 0.25
-					},
-					{
-						cutoutId: 'casparzoom',
-						x: 0,
-						y: -200,
-						scale: 0.25
-					},
-					{
-						cutoutId: 'head',
-						x: -400,
-						y: 100,
-						scale: 0.25
-					},
-					{
-						cutoutId: 'headsquare',
-						x: 0,
-						y: 100,
-						scale: 0.25
-					}
-				],
-				casparChannel: 2,
-				width: 1280,
-				height: 720
-			}
-		]
+	updateTimeline(
+		sources: Sources,
+		cutouts: Cutouts,
+		outputs: Outputs
+	) {
 
 		this.mappings = {}
 		this.timeline = []
 
-		tmpOutputs.sort((a,b) => {
+		outputs.sort((a,b) => {
 
 			if (a.type === OutputType.MULTIVIEW && b.type !== OutputType.MULTIVIEW) return -1
 			if (a.type !== OutputType.MULTIVIEW && b.type === OutputType.MULTIVIEW) return 1
 		})
 
-		_.each(tmpOutputs, (output: OutputAny, outputi: number) => {
+		_.each(outputs, (output: OutputAny, outputi: number) => {
 
 			if (output.type === OutputType.CUTOUT) {
 
@@ -214,9 +115,9 @@ export class TSRController {
 					layer: 10
 				}
 
-				const cutout = tmpCutouts[output.cutout.cutoutId]
+				const cutout = cutouts[output.cutout.cutoutId]
 				if (!cutout) throw Error(`cutout "${output.cutout.cutoutId} not found!`)
-				const source = tmpSources[cutout.source]
+				const source = sources[cutout.source]
 				if (!source) throw Error(`source "${cutout.source} not found!`)
 
 				let sourceTransform = this._sourceTransform(source)
@@ -235,7 +136,7 @@ export class TSRController {
 				)
 
 				if (source.input.type === SourceInputType.MEDIA) {
-					this.timeline.push(this.ccg.media(
+					this.timeline.push(this.refer.media(
 						layer,
 						source.input.file,
 						mixerPosition
@@ -249,17 +150,20 @@ export class TSRController {
 				}
 			} else if (output.type === OutputType.MULTIVIEW) {
 
-				const layerMultiviewBg = 'output' + outputi + '_mvbg'
-				this.mappings[layerMultiviewBg] = {
-					device: DeviceType.CASPARCG,
-					deviceId: 'casparcg0',
-					channel: output.casparChannel,
-					layer: 10
+				if (output.background) {
+
+					const layerMultiviewBg = 'output' + outputi + '_mvbg'
+					this.mappings[layerMultiviewBg] = {
+						device: DeviceType.CASPARCG,
+						deviceId: 'casparcg0',
+						channel: output.casparChannel,
+						layer: 10
+					}
+					this.timeline.push(this.refer.media(
+						layerMultiviewBg,
+						output.background
+					))
 				}
-				this.timeline.push(this.ccg.media(
-					layerMultiviewBg,
-					'multiview_bg'
-				))
 
 				if (output.cutouts.length) {
 
@@ -280,9 +184,9 @@ export class TSRController {
 							layer: layerBase + 1
 						}
 
-						const cutout = tmpCutouts[cutoutOutput.cutoutId]
+						const cutout = cutouts[cutoutOutput.cutoutId]
 						if (!cutout) throw Error(`cutout "${cutoutOutput.cutoutId} not found!`)
-						const source = tmpSources[cutout.source]
+						const source = sources[cutout.source]
 						if (!source) throw Error(`source "${cutout.source} not found!`)
 
 						let sourceTransform = this._sourceTransform(source)
@@ -314,7 +218,7 @@ export class TSRController {
 
 						// Black background behind clip:
 						this.timeline.push(
-							this.ccg.media(
+							this.refer.media(
 								layerBg,
 								'black',
 								mixerClipping
@@ -324,7 +228,7 @@ export class TSRController {
 						if (source.input.type === SourceInputType.MEDIA) {
 							// The clip in multiviewer
 							this.timeline.push(
-								this.ccg.media(
+								this.refer.media(
 									layer,
 									source.input.file,
 									{
@@ -357,11 +261,11 @@ export class TSRController {
 		this.tsr.setMapping(this.mappings)
 		this.tsr.timeline = this.timeline
 
-		console.log(JSON.stringify(this.timeline, null, 2))
+		// console.log(JSON.stringify(this.timeline, null, 2))
 	}
 
 	private _addTSRDevice (deviceId: string, options: DeviceOptionsAny): void {
-		console.log('Adding device ' + deviceId)
+		// console.log('Adding device ' + deviceId)
 
 		if (!options.limitSlowSentCommand)		options.limitSlowSentCommand = 40
 		if (!options.limitSlowFulfilledCommand)	options.limitSlowFulfilledCommand = 100
@@ -496,11 +400,11 @@ export class TSRController {
 		return {
 			inTransition: {
 				easing: 'EASEINOUTQUAD',
-				duration: 0.5
+				duration: 500
 			},
 			changeTransition: {
 				easing: 'EASEINOUTQUAD',
-				duration: 0.5
+				duration: 500
 			},
 		}
 	}
@@ -559,7 +463,7 @@ class CasparReferrer {
 		this.setRef(refId, layer)
 		return o
 	}
-	private getRef (refId: string, layer: string, mixer?: Mixer): TimelineObjCCGRoute | null {
+	getRef (refId: string, layer: string, mixer?: Mixer): TimelineObjCCGRoute | null {
 		const ref = this.decklingInputRefs[refId]
 		if (ref) {
 			return {
