@@ -8,7 +8,7 @@
     "prestart": "npm run build",
     "start": "npm run prestart && electron .",
     "watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
-    "watch-server": "nodemon serverOnly.ts",
+    "watch-server": "nodemon serverOnly.ts --ignore \"config/**\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "trash node_modules/@serialport node_modules/serialport && electron-rebuild"
   },

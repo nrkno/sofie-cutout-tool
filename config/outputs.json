@@ -6,7 +6,7 @@
             "width": 1280,
             "height": 720,
             "cutout": {
-                "cutoutId": "head",
+                "cutoutId": "ambfull",
                 "x": 0,
                 "y": 0,
                 "scale": 1
@@ -16,16 +16,16 @@
             "type": "multiview",
             "cutouts": [
                 {
-                    "cutoutId": "casparfull",
-                    "x": -400,
-                    "y": -200,
-                    "scale": 0.25
+                    "cutoutId": "ambfull",
+                    "x": -310,
+                    "y": 0,
+                    "scale": 0.333
                 },
                 {
-                    "cutoutId": "head",
-                    "x": -400,
-                    "y": 100,
-                    "scale": 0.25
+                    "cutoutId": "go0",
+                    "x": 320,
+                    "y": 0,
+                    "scale": 0.333
                 }
             ],
             "background": "",

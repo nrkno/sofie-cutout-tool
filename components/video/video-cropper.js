@@ -1,3 +1,4 @@
+const {ipcRenderer} = require('electron')
 const containerClassname = 'video-cropper--src'
 const cropToolClassname = 'video-cropper--cutout-window'
 const imgClassname = 'video-cropper--img'
@@ -35,6 +36,7 @@ class VideoCropper extends HTMLElement {
   }
   attributeChangedCallback (name, oldValue, newValue) {
     if (name === 'id') {
+      this.cutoutId = newValue
       this.cutout = Object.assign({}, document.fullConfig.cutouts[newValue]) // shallow clone
       this.source = document.fullConfig.sources[this.cutout.source]
       this.sourceReferenceLayer = document.fullConfig.sourceReferenceLayers[this.cutout.source]
@@ -62,14 +64,20 @@ class VideoCropper extends HTMLElement {
       this.img.style.backgroundColor = `#333` // the png:s have opacity, make them black instead
       this.img.style.width = `${this.source.width * this.scale}px`
       this.img.style.height = `${this.source.height * this.scale}px`
-      const w = this.source.width * this.scale / 2
-      this.img.style.transformOrigin = `${w}px ${w}px`
+      const wImg = this.source.width * this.scale / 2
+      this.img.style.transformOrigin = `${wImg}px ${wImg}px`
       this.img.style.transform = `rotate(${-this.source.rotation}deg)`
 
-      this.cropTool.style.left   = `${this.cutout.x * this.scale }px`;
-      this.cropTool.style.top    = `${this.cutout.y * this.scale}px`;
-      this.cropTool.style.width  = `${this.cutout.width * this.scale}px`;
-      this.cropTool.style.height = `${this.cutout.height * this.scale}px`;
+      const x = this.cutout.x * this.scale
+      const y = this.cutout.y * this.scale
+      const width = this.cutout.width * this.scale
+      const height = this.cutout.height * this.scale
+
+      this.cropTool.style.left   = `${x }px`;
+      this.cropTool.style.top    = `${y}px`;
+      this.cropTool.style.width  = `${width}px`;
+      this.cropTool.style.height = `${height}px`;
+      this.cropTool.style.marginLeft = `calc(50% - ${width/2}px)`;
     }
 
   }
@@ -80,7 +88,7 @@ class VideoCropper extends HTMLElement {
       const pathToCasparCGImageProvider = 'http://127.0.0.1:3020'
       fetch(pathToCasparCGImageProvider + `/layer/${this.sourceReferenceLayer.channel}/${this.sourceReferenceLayer.layer}/image?hash=${Date.now()}`)
       .then((response) => {
-        console.log(response)
+        // console.log(response)
         response.arrayBuffer().then((buffer) => {
           if (this.hasBeenRemoved) return
 
@@ -94,7 +102,12 @@ class VideoCropper extends HTMLElement {
             this.updateImage()
           }, 1000)
         });
-      }, console.error)
+      }, (e) => {
+        console.error(e)
+        setTimeout(() => {
+          this.updateImage()
+        }, 5000)
+      })
     } else {
       setTimeout(() => {
         this.updateImage()
@@ -116,9 +129,9 @@ class VideoCropper extends HTMLElement {
     const sourceDimensions = this.getSourceDimensions()
 
     // set bounds for movable to avoid placing it outside the container
-    const minX = 0
+    const minX = -(sourceDimensions.width - this.cutout.width) / 2
     const minY = 0
-    const maxX = sourceDimensions.width  - this.cutout.width;
+    const maxX = (sourceDimensions.width  - this.cutout.width) / 2;
     const maxY = sourceDimensions.height - this.cutout.height;
 
     this.cutout.x += deltaX / this.scale
@@ -128,6 +141,8 @@ class VideoCropper extends HTMLElement {
     this.cutout.y = clamp(this.cutout.y, minY, maxY )
 
     this.updateStyle()
+
+    this.triggerSendUpdate()
   }
 
   moveCropFromTouch (event) {
@@ -177,22 +192,6 @@ class VideoCropper extends HTMLElement {
     } else {
       delete this.activeTouch
     }
-
-    /*const {
-      left,
-      top,
-      width,
-      height
-    } = this.srcContainer.getBoundingClientRect()
-    this.containerRect = {left, top, width, height}
-
-    const touch = touchEvent.touches[0];
-
-    const x = touch.pageX + window.scrollX - this.containerRect.left;
-    const y = touch.pageY + window.scrollY - this.containerRect.top;
-
-    this.moveCrop(x, y);
-    */
   }
 
   connectedCallback () {
@@ -238,6 +237,18 @@ class VideoCropper extends HTMLElement {
   }
   disconnectedCallback() {
     this.hasBeenRemoved = true
+  }
+  triggerSendUpdate () {
+    if (!this.sendUpdateTimeout) {
+      this.sendUpdateTimeout = setTimeout(() => {
+        this.sendUpdateTimeout = null
+
+        this.sendUpdate()
+      }, 500)
+    }
+  }
+  sendUpdate () {
+    ipcRenderer.send('update-cutout', this.cutoutId, this.cutout)
   }
 }
 

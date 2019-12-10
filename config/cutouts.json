@@ -1,21 +1,21 @@
 {
-    "note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
-    "cutouts": {
-        "casparfull": {
-            "source": "caspar",
-            "x": 0,
-            "y": 0,
-            "width": 720,
-            "height": 720,
-            "outputRotation": 0
-        },
-        "head": {
-            "source": "head",
-            "x": 0,
-            "y": 0,
-            "width": 720,
-            "height": 720,
-            "outputRotation": 90
-        }
+  "note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
+  "cutouts": {
+    "ambfull": {
+      "height": 720,
+      "outputRotation": 90,
+      "source": "amb",
+      "width": 405,
+      "x": -202,
+      "y": 0
+    },
+    "go0": {
+      "height": 720,
+      "outputRotation": 90,
+      "source": "go1080p25",
+      "width": 405,
+      "x": 78.5,
+      "y": 0
     }
+  }
 }

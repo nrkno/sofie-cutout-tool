@@ -1,23 +1,25 @@
 {
     "sources": {
-        "caspar": {
+        "amb": {
             "title": "Source A",
             "width": 1280,
             "height": 720,
             "rotation": 0,
             "input": {
                 "type": "media",
-                "file": "amb"
+                "file": "amb",
+                "loop": true
             }
         },
-        "head": {
+        "go1080p25": {
             "title": "Source B",
             "width": 1280,
             "height": 720,
-            "rotation": 90,
+            "rotation": 0,
             "input": {
                 "type": "media",
-                "file": "go1080p25"
+                "file": "go1080p25",
+                "loop": true
             }
         }
     }

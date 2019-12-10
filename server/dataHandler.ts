@@ -1,14 +1,14 @@
 import * as fs from 'fs'
 import * as util from 'util'
 import * as path from 'path'
-import { app } from 'electron'
 import * as _ from 'underscore'
 import * as chokidar from 'chokidar'
 import {
 	Cutouts,
 	Outputs,
 	Sources,
-	FullConfig
+	FullConfig,
+	Cutout
 } from './api'
 import { TSRController } from './TSRController'
 
@@ -19,7 +19,9 @@ export class DataHandler {
 
 	private _onConfigChangedTimeout?: NodeJS.Timeout
 
-	constructor () {
+	constructor (
+		private _basePath: string
+	) {
 		this._getConfigCutouts().catch(console.error)
 	}
 	public async requestConfig (): Promise<FullConfig> {
@@ -29,7 +31,7 @@ export class DataHandler {
 			sources: await this._getConfigSources()
 		}
 	}
-	public onConfigChanged (callback: () => void) {
+	public onConfigChanged (callback: () => void, monitorCutouts?: boolean) {
 		const triggerCallback = () => {
 			if (this._onConfigChangedTimeout) {
 				clearTimeout(this._onConfigChangedTimeout)
@@ -44,9 +46,22 @@ export class DataHandler {
 		chokidar.watch(this._getConfigPath('sources.json')).on('all', (event, path) => {
 			triggerCallback()
 		});
+		if (monitorCutouts) {
+			chokidar.watch(this._getConfigPath('cutouts.json')).on('all', (event, path) => {
+				triggerCallback()
+			});
+		}
 	}
 
+	async setConfigCutout (cutoutId: string, cutout: Cutout) {
+		const cutouts = await this._getConfigCutouts()
+		cutouts[cutoutId] = cutout
+		await this._storeConfig('cutouts.json', {
+			note: 'This file is not intended to be manually edited, it will update when the user makes changes in the UI',
+			cutouts: cutouts
+		})
 
+	}
 	private async _getConfigCutouts (): Promise<Cutouts> {
 		// TODO: add data verifications here..
 		return (await this._getConfig('cutouts.json')).cutouts as Cutouts
@@ -59,6 +74,7 @@ export class DataHandler {
 		// TODO: add data verifications here..
 		return (await this._getConfig('sources.json')).sources as Sources
 	}
+
 	private async _getConfig (fileName: string): Promise<any> {
 		const text = await fsReadFile(this._getConfigPath(fileName), {
 			encoding: 'utf-8'
@@ -71,9 +87,6 @@ export class DataHandler {
 		})
 	}
 	private _getConfigPath (fileName: string): string {
-		return path.join(this._basePath(), '/config', fileName)
-	}
-	private _basePath (): string {
-		return app.getAppPath();
+		return path.join(this._basePath, '/config', fileName)
 	}
 }

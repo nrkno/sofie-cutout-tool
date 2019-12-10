@@ -1,9 +1,9 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, ipcMain, app } from 'electron'
 import * as chokidar from 'chokidar'
 import * as _ from 'underscore'
 import { TSRController } from './TSRController'
 import { DataHandler } from './dataHandler'
-import { SourceInputType, FullConfig, FullConfigClient } from './api'
+import { SourceInputType, FullConfig, FullConfigClient, Cutout } from './api'
 
 export default class Main {
   static mainWindow: Electron.BrowserWindow|null
@@ -93,11 +93,26 @@ export default class Main {
 
           event.reply('new-config', fullConfigClient)
 
-        },console.error)
+        }).catch(console.error)
 
       })
 
 
+
+    })
+    ipcMain.on('update-cutout', (event, cutoutId: string, cutout: Cutout) => {
+      Main.dataHandler.setConfigCutout(cutoutId, cutout)
+      .then(() => {
+        return Main.dataHandler.requestConfig()
+        .then((fullConfig: FullConfig) => {
+
+          Main.tsrController.updateTimeline(
+            fullConfig.sources,
+            fullConfig.cutouts,
+            fullConfig.outputs
+          )
+        })
+      }).catch(console.error)
 
     })
   }
@@ -118,6 +133,8 @@ export default class Main {
     Main.application.on('activate', Main.onActivate)
 
     Main.tsrController = new TSRController()
-    Main.dataHandler = new DataHandler()
+    Main.dataHandler = new DataHandler(
+      app.getAppPath()
+    )
   }
 }
