@@ -21,7 +21,9 @@ import {
 	TimelineObjCCGMedia,
 	TimelineObjCCGInput,
 	ChannelFormat,
-	TimelineObjCCGRoute
+	TimelineObjCCGRoute,
+	TSRTimelineObj,
+	TimelineObjCCGHTMLPage
 } from 'timeline-state-resolver'
 import {
 	Sources,
@@ -31,7 +33,8 @@ import {
 	OutputType,
 	OutputAny,
 	Source,
-	Cutout
+	Cutout,
+	SourceInputAny
 } from './api'
 
 export class TSRController {
@@ -78,7 +81,8 @@ export class TSRController {
 			options: {
 				host: '127.0.0.1',
 				port: 5250
-			}
+			},
+			isMultiThreaded: false
 
 		})
 
@@ -161,23 +165,16 @@ export class TSRController {
 					viewportTransform
 				)
 
-				if (source.input.type === SourceInputType.MEDIA) {
-					this.timeline.push(this.refer.media(
+				this.timeline.push(
+					this.refer.getSource(
+						source.input,
 						layer,
-						source.input.file,
 						{
-
 							...mixerPosition,
 							...mixerClipping
 						}
-					))
-
-				} else if (source.input.type === SourceInputType.DECKLINK) {
-					throw new Error('Not implemented yet')
-				} else {
-					// @ts-ignore never
-					throw new Error(`Unknown source.input.type "${source.input.type}"`)
-				}
+					)
+				)
 			} else if (output.type === OutputType.MULTIVIEW) {
 
 				if (output.background) {
@@ -254,26 +251,16 @@ export class TSRController {
 								mixerClippingBg
 							)
 						)
-
-						if (source.input.type === SourceInputType.MEDIA) {
-							// The clip in multiviewer
-							this.timeline.push(
-								this.refer.media(
-									layer,
-									source.input.file,
-									{
-										...mixerPosition,
-										...mixerClipping
-									}
-								)
+						this.timeline.push(
+							this.refer.getSource(
+								source.input,
+								layer,
+								{
+									...mixerPosition,
+									...mixerClipping
+								}
 							)
-
-						} else if (source.input.type === SourceInputType.DECKLINK) {
-							throw new Error('Not implemented yet')
-						} else {
-							// @ts-ignore
-							throw new Error(`Unknown source.input.type "${source.input.type}"`)
-						}
+						)
 					})
 				}
 			}
@@ -430,6 +417,46 @@ class CasparReferrer {
 	reset () {
 		this.decklingInputRefs = {}
 	}
+	
+	getSourceRef (input: SourceInputAny): string {
+		if (input.type === SourceInputType.MEDIA) {
+			return this.mediaRef(input.file)
+		} else if (input.type === SourceInputType.DECKLINK) {
+			return this.inputRef('decklink',input.device,input.format)
+		} else if (input.type === SourceInputType.HTML_PAGE) {
+			return this.htmlPageRef(input.url)
+		} else {
+			// @ts-ignore never
+			throw new Error(`Unknown input.type "${input.type}"`)
+		}
+	}
+	getSource (input: SourceInputAny, layer: string, mixer: Mixer): TSRTimelineObj {
+		if (input.type === SourceInputType.MEDIA) {
+			return this.media(
+				layer,
+				input.file,
+				mixer
+			)
+		} else if (input.type === SourceInputType.DECKLINK) {
+			return this.input(
+				layer,
+				'decklink',
+				input.device,
+				input.format,
+				mixer
+			)
+		} else if (input.type === SourceInputType.HTML_PAGE) {
+			return this.htmlPage(
+				layer,
+				input.url,
+				mixer
+			)
+		} else {
+			// @ts-ignore never
+			throw new Error(`Unknown input.type "${input.type}"`)
+		}
+	}
+
 	mediaRef (file: string): string {
 		return 'media_' + file
 	}
@@ -471,6 +498,27 @@ class CasparReferrer {
 				deviceFormat: deviceFormat,
 				inputType: inputType,
 
+				mixer: mixer
+			}
+		}
+		this.setRef(refId, layer)
+		return o
+	}
+	htmlPageRef (url: string): string {
+		return 'htmlpage_' + url
+	}
+	htmlPage (layer: string, url: string, mixer?: Mixer): TimelineObjCCGHTMLPage | TimelineObjCCGRoute {
+		const refId = this.htmlPageRef(url)
+		const ref = this.getRef(refId, layer, mixer)
+		if (ref) return ref
+		const o: TimelineObjCCGHTMLPage = {
+			id:  '',
+			layer: layer,
+			enable: { while: 1 },
+			content: {
+				deviceType: DeviceType.CASPARCG,
+				type: TimelineContentTypeCasparCg.HTMLPAGE,
+				url: url,
 				mixer: mixer
 			}
 		}

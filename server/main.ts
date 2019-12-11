@@ -75,18 +75,16 @@ export default class Main {
 
           // Find where the sources have been mapped up in CasparCG, so we know which layers to fetch the images from in the UI:
           _.each(fullConfig.sources, (source, sourceId) => {
-            if (source.input.type === SourceInputType.MEDIA) {
-              const refId = Main.tsrController.refer.mediaRef(source.input.file)
-              const ref = Main.tsrController.refer.getRef(refId, '')
-              if (ref) {
-                const mapping = Main.tsrController.mappings[ref.content.mappedLayer]
-                if (mapping) {
-                  fullConfigClient.sourceReferenceLayers[sourceId] = {
-                    channel: mapping.channel,
-                    layer: mapping.layer
-                  }
-                }
 
+            const refId = Main.tsrController.refer.getSourceRef(source.input)
+            const ref = Main.tsrController.refer.getRef(refId, '')
+            if (ref) {
+              const mapping = Main.tsrController.mappings[ref.content.mappedLayer]
+              if (mapping) {
+                fullConfigClient.sourceReferenceLayers[sourceId] = {
+                  channel: mapping.channel,
+                  layer: mapping.layer
+                }
               }
             }
           })

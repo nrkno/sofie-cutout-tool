@@ -1,3 +1,4 @@
+import { ChannelFormat } from "timeline-state-resolver"
 
 export interface FullConfig {
 	cutouts: Cutouts
@@ -35,21 +36,29 @@ export interface Source {
 	input: SourceInputAny
 }
 
-export type SourceInputAny = SourceInputDecklink | SourceInputMedia
+export type SourceInputAny = SourceInputDecklink |
+	SourceInputMedia |
+	SourceInputHtmlPage
 export interface SourceInputBase {
 	type: SourceInputType
 }
 export enum SourceInputType {
 	DECKLINK = 'decklink',
-	MEDIA = 'media'
+	MEDIA = 'media',
+	HTML_PAGE = 'html_page'
 }
 export interface SourceInputDecklink extends SourceInputBase {
 	type: SourceInputType.DECKLINK
-	format: string
+	format: ChannelFormat
+	device: number
 }
 export interface SourceInputMedia extends SourceInputBase {
 	type: SourceInputType.MEDIA
 	file: string
+}
+export interface SourceInputHtmlPage extends SourceInputBase {
+	type: SourceInputType.HTML_PAGE
+	url: string
 }
 
 export interface Cutouts {
