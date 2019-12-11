@@ -79,15 +79,6 @@ class VideoCropper extends HTMLElement {
       this.cropTool.style.top    = `${y - height / 2}px`;
       this.cropTool.style.width  = `${width}px`;
       this.cropTool.style.height = `${height}px`;
-      
-      // const flip = (this.source.rotation % 180) !== 0
-      // console.log('flip', flip)
-      // this.cropTool.style.marginLeft = `calc(50% - ${width/2}px)`;
-      // this.cropTool.style.marginTop = `calc(50%)`;
-      // if (!flip) {
-      // } else {
-      // }
-      // this.cropTool.style.marginTop = `calc(50% - ${height/2}px)`;
     }
 
   }
@@ -98,7 +89,9 @@ class VideoCropper extends HTMLElement {
       const pathToCasparCGImageProvider = 'http://127.0.0.1:3020'
       fetch(pathToCasparCGImageProvider + `/layer/${this.sourceReferenceLayer.channel}/${this.sourceReferenceLayer.layer}/image?hash=${Date.now()}`)
       .then((response) => {
-        // console.log(response)
+        if (response.status !== 200) {
+          throw new Error(`Response ${response.status}: ${statusText}`)
+        }
         response.arrayBuffer().then((buffer) => {
           if (this.hasBeenRemoved) return
 
@@ -112,7 +105,8 @@ class VideoCropper extends HTMLElement {
             this.updateImage()
           }, 50)
         });
-      }, (e) => {
+      })
+      .catch((e) => {
         console.error(e)
         setTimeout(() => {
           this.updateImage()

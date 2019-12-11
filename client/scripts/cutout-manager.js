@@ -20,6 +20,8 @@ ipcRenderer.on('new-config', (event, newFullConfig) => {
 	// A new config is received from the backend.
 	document.fullConfig = newFullConfig
 
+	console.log('newFullConfig received', newFullConfig)
+
 	// Note: How this is handled is very much a draft
 	// It should be replaced by something more intelligent later
 
