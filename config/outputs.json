@@ -6,29 +6,29 @@
             "width": 1280,
             "height": 720,
             "cutout": {
-                "cutoutId": "ambfull",
+                "cutoutId": "cutout_A",
                 "x": 0,
                 "y": 0,
-                "scale": 1
+                "scale": 0
             }
         },
         {
             "type": "multiview",
             "cutouts": [
                 {
-                    "cutoutId": "ambfull",
+                    "cutoutId": "cutout_A",
                     "x": -310,
                     "y": 0,
-                    "scale": 0.333
+                    "scale": 0.5
                 },
                 {
-                    "cutoutId": "go0",
+                    "cutoutId": "cutout_B",
                     "x": 320,
                     "y": 0,
-                    "scale": 0.333
+                    "scale": 0.5
                 }
             ],
-            "background": "",
+            "background": "gray",
             "casparChannel": 2,
             "width": 1280,
             "height": 720

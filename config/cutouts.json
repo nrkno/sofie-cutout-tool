@@ -1,20 +1,20 @@
 {
   "note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
   "cutouts": {
-    "ambfull": {
+    "cutout_A": {
       "height": 720,
-      "outputRotation": 90,
-      "source": "amb",
-      "width": 405,
-      "x": -202,
+      "outputRotation": 0,
+      "source": "source_A",
+      "width": 720,
+      "x": 0,
       "y": 0
     },
-    "go0": {
+    "cutout_B": {
       "height": 720,
-      "outputRotation": 90,
-      "source": "go1080p25",
-      "width": 405,
-      "x": 78.5,
+      "outputRotation": 0,
+      "source": "source_B",
+      "width": 720,
+      "x": 0,
       "y": 0
     }
   }

@@ -18,6 +18,7 @@ const fsWriteFile = util.promisify(fs.writeFile)
 export class DataHandler {
 
 	private _onConfigChangedTimeout?: NodeJS.Timeout
+	private _lastTimeStoredCutouts: number = 0
 
 	constructor (
 		private _basePath: string
@@ -31,7 +32,7 @@ export class DataHandler {
 			sources: await this._getConfigSources()
 		}
 	}
-	public onConfigChanged (callback: () => void, monitorCutouts?: boolean) {
+	public onConfigChanged (callback: () => void) {
 		const triggerCallback = () => {
 			if (this._onConfigChangedTimeout) {
 				clearTimeout(this._onConfigChangedTimeout)
@@ -46,16 +47,19 @@ export class DataHandler {
 		chokidar.watch(this._getConfigPath('sources.json')).on('all', (event, path) => {
 			triggerCallback()
 		});
-		if (monitorCutouts) {
-			chokidar.watch(this._getConfigPath('cutouts.json')).on('all', (event, path) => {
+		
+		chokidar.watch(this._getConfigPath('cutouts.json')).on('all', (event, path) => {
+			if (Date.now() - this._lastTimeStoredCutouts > 1000) {
 				triggerCallback()
-			});
-		}
+			}
+		});
+	
 	}
 
 	async setConfigCutout (cutoutId: string, cutout: Cutout) {
 		const cutouts = await this._getConfigCutouts()
 		cutouts[cutoutId] = cutout
+		this._lastTimeStoredCutouts = Date.now()
 		await this._storeConfig('cutouts.json', {
 			note: 'This file is not intended to be manually edited, it will update when the user makes changes in the UI',
 			cutouts: cutouts

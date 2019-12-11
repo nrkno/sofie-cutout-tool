@@ -6,7 +6,9 @@ const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper
 <section class="video-cropper">
   <div class="${containerClassname}">
     <img class="${imgClassname}" />
-    <div class="${cropToolClassname}"></div>
+    <div class="video-cropper--center">
+      <div class="${cropToolClassname}"></div>
+    </div>
   </div>
 </section>`
 
@@ -73,11 +75,19 @@ class VideoCropper extends HTMLElement {
       const width = this.cutout.width * this.scale
       const height = this.cutout.height * this.scale
 
-      this.cropTool.style.left   = `${x }px`;
-      this.cropTool.style.top    = `${y}px`;
+      this.cropTool.style.left   = `${x - width / 2}px`;
+      this.cropTool.style.top    = `${y - height / 2}px`;
       this.cropTool.style.width  = `${width}px`;
       this.cropTool.style.height = `${height}px`;
-      this.cropTool.style.marginLeft = `calc(50% - ${width/2}px)`;
+      
+      // const flip = (this.source.rotation % 180) !== 0
+      // console.log('flip', flip)
+      // this.cropTool.style.marginLeft = `calc(50% - ${width/2}px)`;
+      // this.cropTool.style.marginTop = `calc(50%)`;
+      // if (!flip) {
+      // } else {
+      // }
+      // this.cropTool.style.marginTop = `calc(50% - ${height/2}px)`;
     }
 
   }
@@ -100,7 +110,7 @@ class VideoCropper extends HTMLElement {
           this.img.src = base64Flag + imageStr
           setTimeout(() => {
             this.updateImage()
-          }, 1000)
+          }, 50)
         });
       }, (e) => {
         console.error(e)
@@ -130,9 +140,9 @@ class VideoCropper extends HTMLElement {
 
     // set bounds for movable to avoid placing it outside the container
     const minX = -(sourceDimensions.width - this.cutout.width) / 2
-    const minY = 0
-    const maxX = (sourceDimensions.width  - this.cutout.width) / 2;
-    const maxY = sourceDimensions.height - this.cutout.height;
+    const minY = -(sourceDimensions.height - this.cutout.height) / 2
+    const maxX = (sourceDimensions.width  - this.cutout.width) / 2
+    const maxY = (sourceDimensions.height - this.cutout.height) / 2
 
     this.cutout.x += deltaX / this.scale
     this.cutout.y += deltaY / this.scale

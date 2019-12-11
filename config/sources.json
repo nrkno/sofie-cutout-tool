@@ -1,6 +1,6 @@
 {
     "sources": {
-        "amb": {
+        "source_A": {
             "title": "Source A",
             "width": 1280,
             "height": 720,
@@ -11,14 +11,14 @@
                 "loop": true
             }
         },
-        "go1080p25": {
+        "source_B": {
             "title": "Source B",
             "width": 1280,
             "height": 720,
-            "rotation": 0,
+            "rotation": 90,
             "input": {
                 "type": "media",
-                "file": "go1080p25",
+                "file": "amb",
                 "loop": true
             }
         }

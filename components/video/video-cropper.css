@@ -22,6 +22,15 @@
 .video-cropper--img {
   z-index: 1;
 }
+.video-cropper--center {
+  z-index: 2;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: 50%;
+  bottom: 50%;
+}
 .video-cropper--cutout-window {
   z-index: 2;
 

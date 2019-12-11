@@ -65,6 +65,8 @@ export interface Cutout {
 	width: number
 	/** Cutout height, (relative to the Source coordinate-space) */
 	height: number
+	/** Scaling of cutout in output */
+	scale?: number
 
 	/** How the Cutout will be oriented in the output */
 	outputRotation: number
@@ -76,7 +78,7 @@ export interface CutoutInOutput {
 	x: number
 	/** Position of cutout in Output, in screen coordinates */
 	y: number
-	/** Scaling of cutout in output */
+	/** Scaling of cutout in output. Omit to automatically scale to fill */
 	scale: number
 }
 export type Outputs = OutputAny[]

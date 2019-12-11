@@ -31,9 +31,7 @@ import {
 	OutputType,
 	OutputAny,
 	Source,
-	Cutout,
-	OutputMultiview,
-	CutoutInOutput
+	Cutout
 } from './api'
 
 export class TSRController {
@@ -63,6 +61,9 @@ export class TSRController {
 		})
 		this.tsr.on('warning', (msg, ...args) => {
 			console.log('Warning: TSR', msg, ...args)
+		})
+		this.tsr.on('debug', (msg, ...args) => {
+			// console.log('Debug: TSR', msg, ...args)
 		})
 		// this.tsr.on('setTimelineTriggerTime', (_r: TimelineTriggerTimeResult) => {})
 		// this.tsr.on('timelineCallback', (_time, _objId, _callbackName, _data) => {})
@@ -96,9 +97,11 @@ export class TSRController {
 
 		this.mappings = {}
 		this.timeline = []
+		this.refer.reset()
 
+		// Sort the outputs, to make sure we're processing the multiview first, since we want that to host the inputs,
+		// which are then routed to other places
 		outputs.sort((a,b) => {
-
 			if (a.type === OutputType.MULTIVIEW && b.type !== OutputType.MULTIVIEW) return -1
 			if (a.type !== OutputType.MULTIVIEW && b.type === OutputType.MULTIVIEW) return 1
 		})
@@ -120,26 +123,53 @@ export class TSRController {
 				const source = sources[cutout.source]
 				if (!source) throw Error(`source "${cutout.source} not found!`)
 
+				const cutoutInOutput = output.cutout
+
 				let sourceTransform = this._sourceTransform(source)
 				let cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout)
-
-				let outputTransform = compose(
+				
+				let matrix0 = compose(
+					rotateDEG(cutout.outputRotation, 0, 0),
+				)
+				const rotatedCutout = applyToPoint(matrix0, { x: cutout.width, y: cutout.height })
+				let scaleToFill = (
+					cutoutInOutput.scale ||
+					Math.min(
+						output.width  / Math.abs(rotatedCutout.x),
+						output.height / Math.abs(rotatedCutout.y)
+					)
+				)
+				
+				let viewportTransform = compose(
 					translate(0.5, 0.5),
 					scale( 1 / output.width, 1 / output.height ),
-					cutoutTransform,
+					translate( cutoutInOutput.x, cutoutInOutput.y ),
 					rotateDEG(cutout.outputRotation, 0.5, 0.5),
+					scale( scaleToFill ),
+				)
+				let outputTransform = compose(
+					viewportTransform,
+					cutoutTransform
 				)
 
 				const mixerPosition = this._casparTransformPosition(
 					source,
 					outputTransform
 				)
+				const mixerClipping = this._casparTransformClip(
+					cutout,
+					viewportTransform
+				)
 
 				if (source.input.type === SourceInputType.MEDIA) {
 					this.timeline.push(this.refer.media(
 						layer,
 						source.input.file,
-						mixerPosition
+						{
+
+							...mixerPosition,
+							...mixerClipping
+						}
 					))
 
 				} else if (source.input.type === SourceInputType.DECKLINK) {
@@ -192,18 +222,15 @@ export class TSRController {
 						let sourceTransform = this._sourceTransform(source)
 						let cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout)
 
-						let outputTransform = compose(
-							translate(0.5, 0.5),
-							scale( 1 / output.width, 1 / output.height ),
-							translate( cutoutOutput.x, cutoutOutput.y ),
-							scale( cutoutOutput.scale ),
-							cutoutTransform
-						)
 						let viewportTransform = compose(
 							translate(0.5, 0.5),
 							scale( 1 / output.width, 1 / output.height ),
 							translate( cutoutOutput.x, cutoutOutput.y ),
 							scale( cutoutOutput.scale )
+						)
+						let outputTransform = compose(
+							viewportTransform,
+							cutoutTransform
 						)
 
 						const mixerPosition = this._casparTransformPosition(
@@ -211,7 +238,10 @@ export class TSRController {
 							outputTransform
 						)
 						const mixerClipping = this._casparTransformClip(
-							output,
+							cutout,
+							viewportTransform
+						)
+						const mixerClippingBg = this._casparTransformClip(
 							cutout,
 							viewportTransform
 						)
@@ -221,7 +251,7 @@ export class TSRController {
 							this.refer.media(
 								layerBg,
 								'black',
-								mixerClipping
+								mixerClippingBg
 							)
 						)
 
@@ -238,7 +268,6 @@ export class TSRController {
 								)
 							)
 
-
 						} else if (source.input.type === SourceInputType.DECKLINK) {
 							throw new Error('Not implemented yet')
 						} else {
@@ -248,10 +277,7 @@ export class TSRController {
 					})
 				}
 			}
-
 		})
-
-
 
 		_.each(this.timeline, (tlObj, i) => {
 			if (!tlObj.id) tlObj.id = 'Unnamed' + i
@@ -260,8 +286,6 @@ export class TSRController {
 		// Send mappings and timeline to TSR:
 		this.tsr.setMapping(this.mappings)
 		this.tsr.timeline = this.timeline
-
-		// console.log(JSON.stringify(this.timeline, null, 2))
 	}
 
 	private _addTSRDevice (deviceId: string, options: DeviceOptionsAny): void {
@@ -311,15 +335,12 @@ export class TSRController {
 		cutout: Cutout
 	): Matrix {
 		// Transform from view-space, via cutout to Output
-
 		const u1 = applyToPoint(sourceTransform, {x: source.width, y: source.height})
 		const sourceDimensions = { // In view-space
 			width: Math.abs(u1.x),
 			height: Math.abs(u1.y)
 		}
-
 		return compose(
-			scale(source.width / cutout.width, source.height / cutout.height),
 			translate(-cutout.x, -cutout.y),
 			sourceTransform,
 		)
@@ -330,7 +351,6 @@ export class TSRController {
 	): Mixer {
 
 		// Apply coordinates to CasparCG coordinate system:
-
 		const x0 = -source.width/2
 		const y0 = -source.height/2
 		const x1 = source.width/2
@@ -357,24 +377,18 @@ export class TSRController {
 		return mixer
 	}
 	private _casparTransformClip (
-		output: OutputMultiview,
-		cutout: Cutout,
-		outputTransform: Matrix,
+		clipDimensions: {width: number, height: number},
+		transform: Matrix,
 	): Mixer {
 		// Apply coordinates to CasparCG coordinate system:
 
-		const x0 = -output.width/2
-		const y0 = -output.height/2
-		const x1 = output.width/2
-		const y1 = output.height/2
+		const x0 = -clipDimensions.width/2
+		const y0 = -clipDimensions.height/2
+		const x1 = clipDimensions.width/2
+		const y1 = clipDimensions.height/2
 
-		const matrix = compose(
-			outputTransform,
-			rotateDEG(cutout.outputRotation),
-		)
-
-		const u0	= applyToPoint(matrix, {x: x0,	y: y0})
-		const u1	= applyToPoint(matrix, {x: x1,	y: y1})
+		const u0	= applyToPoint(transform, {x: x0,	y: y0})
+		const u1	= applyToPoint(transform, {x: x1,	y: y1})
 
 		const topLeft = {
 			x: Math.min(u0.x, u1.x),

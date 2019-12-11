@@ -2,6 +2,6 @@
   --bg-main: #111;
   --bg-light: #1b263b;
   --text-main: #fff;
-  --frame-dark: #415a77;
+  --frame-dark: rgba(255, 0, 0, 0.5);
   --frame-light: #778da9;
 }

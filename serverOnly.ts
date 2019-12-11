@@ -23,4 +23,4 @@ dataHandler.onConfigChanged(() => {
 			fullConfig.outputs
 		)
 	}).catch(console.error)
-}, true)
+})
