@@ -1,17 +1,19 @@
 const { ipcRenderer } = require('electron');
 
+import { attributeNames, createVideoDisplayElement } from './video-display.js';
+
 const containerClassname = 'video-cropper--src';
 const cropToolClassname = 'video-cropper--cutout-window';
-const imgClassname = 'video-cropper--img';
 const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper.css" />
 <section class="video-cropper">
   <div class="${containerClassname}">
-    <img class="${imgClassname}" />
     <div class="video-cropper--center">
       <div class="${cropToolClassname}"></div>
     </div>
   </div>
 </section>`;
+
+const pathToCasparCGImageProvider = 'http://127.0.0.1:3020';
 
 class VideoCropper extends HTMLElement {
 	constructor() {
@@ -19,26 +21,30 @@ class VideoCropper extends HTMLElement {
 
 		this.scale = 0.5; // This is a hack, make something better later
 
-		// console.log('new VideoCropper', this.getAttribute('id'))
-
 		const shadowRoot = this.attachShadow({ mode: 'open' });
 		shadowRoot.innerHTML = innerHTML;
 
 		this.srcContainer = shadowRoot.querySelector(`.${containerClassname}`);
 		this.cropTool = shadowRoot.querySelector(`.${cropToolClassname}`);
-		this.img = shadowRoot.querySelector(`.${imgClassname}`);
 
-		this.updateImage();
+		this.videoDisplay = createVideoDisplayElement(pathToCasparCGImageProvider);
+		this.srcContainer.insertAdjacentElement('afterbegin', this.videoDisplay);
 	}
+
 	static get observedAttributes() {
 		return ['id'];
 	}
+
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (name === 'id') {
 			this.cutoutId = newValue;
 			this.cutout = Object.assign({}, document.fullConfig.cutouts[newValue]); // shallow clone
 			this.source = document.fullConfig.sources[this.cutout.source];
 			this.sourceReferenceLayer = document.fullConfig.sourceReferenceLayers[this.cutout.source];
+			this.videoDisplay.setAttribute(
+				attributeNames.STREAM_CHANNEL,
+				this.sourceReferenceLayer.channel
+			);
 		}
 		this.updateStyle();
 	}
@@ -58,12 +64,12 @@ class VideoCropper extends HTMLElement {
 			this.srcContainer.style.width = `${sourceDimensions.width * this.scale}px`;
 			this.srcContainer.style.height = `${sourceDimensions.height * this.scale}px`;
 
-			this.img.style.backgroundColor = `#333`; // the png:s have opacity, make them black instead
-			this.img.style.width = `${this.source.width * this.scale}px`;
-			this.img.style.height = `${this.source.height * this.scale}px`;
-			const wImg = (this.source.width * this.scale) / 2;
-			this.img.style.transformOrigin = `${wImg}px ${wImg}px`;
-			this.img.style.transform = `rotate(${-this.source.rotation}deg)`;
+			// this.img.style.backgroundColor = `#333`; // the png:s have opacity, make them black instead
+			// this.img.style.width = `${this.source.width * this.scale}px`;
+			// this.img.style.height = `${this.source.height * this.scale}px`;
+			// const wImg = (this.source.width * this.scale) / 2;
+			// this.img.style.transformOrigin = `${wImg}px ${wImg}px`;
+			// this.img.style.transform = `rotate(${-this.source.rotation}deg)`;
 
 			const x = this.cutout.x * this.scale;
 			const y = this.cutout.y * this.scale;
@@ -76,46 +82,7 @@ class VideoCropper extends HTMLElement {
 			this.cropTool.style.height = `${height}px`;
 		}
 	}
-	updateImage() {
-		if (this.hasBeenRemoved) return;
 
-		if (this.sourceReferenceLayer) {
-			const pathToCasparCGImageProvider = 'http://127.0.0.1:3020';
-			fetch(
-				pathToCasparCGImageProvider +
-					`/layer/${this.sourceReferenceLayer.channel}/${
-						this.sourceReferenceLayer.layer
-					}/image?hash=${Date.now()}`
-			)
-				.then((response) => {
-					if (response.status !== 200) {
-						throw new Error(`Response ${response.status}: ${statusText}`);
-					}
-					response.arrayBuffer().then((buffer) => {
-						if (this.hasBeenRemoved) return;
-
-						var base64Flag = 'data:image/jpeg;base64,';
-						var imageStr = arrayBufferToBase64(buffer);
-
-						// this.img.setAttribute('src', base64Flag + imageStr)
-						this.img.src = base64Flag + imageStr;
-						setTimeout(() => {
-							this.updateImage();
-						}, 50);
-					});
-				})
-				.catch((e) => {
-					console.error(e);
-					setTimeout(() => {
-						this.updateImage();
-					}, 5000);
-				});
-		} else {
-			setTimeout(() => {
-				this.updateImage();
-			}, 1000);
-		}
-	}
 	getSourceDimensions() {
 		// TODO: This could be considered a hack, and only supports rotation of 0, 90, 180 etc..
 		const flip = this.source.rotation % 180 !== 0;
@@ -230,9 +197,7 @@ class VideoCropper extends HTMLElement {
 			}
 		});
 	}
-	disconnectedCallback() {
-		this.hasBeenRemoved = true;
-	}
+
 	triggerSendUpdate() {
 		if (!this.sendUpdateTimeout) {
 			this.sendUpdateTimeout = setTimeout(() => {
@@ -251,13 +216,4 @@ customElements.define('video-cropper', VideoCropper);
 
 function clamp(value, min, max) {
 	return Math.min(max, Math.max(value, min));
-}
-
-function arrayBufferToBase64(buffer) {
-	var binary = '';
-	var bytes = [].slice.call(new Uint8Array(buffer));
-
-	bytes.forEach((b) => (binary += String.fromCharCode(b)));
-
-	return window.btoa(binary);
 }

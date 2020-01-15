@@ -1,0 +1,15 @@
+/*
+  WARNING: These class names are also used in the element definition script,
+  and so they must be changed there if they are changed here.
+*/
+.stream-container {
+	width: 100%;
+	padding-top: 56.25%;
+	position: relative;
+	overflow: hidden;
+}
+
+.img {
+	position: absolute;
+	background: #000000;
+}

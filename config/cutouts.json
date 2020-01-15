@@ -6,7 +6,7 @@
 			"outputRotation": 0,
 			"source": "source_A",
 			"width": 720,
-			"x": 102,
+			"x": 124,
 			"y": 0
 		},
 		"cutout_B": {
@@ -15,7 +15,7 @@
 			"source": "source_B",
 			"width": 720,
 			"x": 0,
-			"y": -252
+			"y": -240
 		}
 	}
 }
