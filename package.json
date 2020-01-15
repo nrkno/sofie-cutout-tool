@@ -7,6 +7,8 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "npm run prestart && electron .",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "npm run lint -- --fix",
     "watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
     "watch-server": "nodemon serverOnly.ts --ignore \"config/**\"",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,21 +20,44 @@
     "chokidar": "^3.3.0",
     "esm": "^3.2.25",
     "timeline-state-resolver": "^3.15.0",
-    "transformation-matrix": "^2.1.1",
+    "transformation-matrix": "^2.2.0",
     "tslib": "^1.10.0",
     "underscore": "^1.9.1"
   },
   "devDependencies": {
     "@types/chokidar": "^2.1.3",
     "@types/underscore": "^1.9.4",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
     "electron": "^7.1.1",
     "electron-rebuild": "^1.8.8",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "husky": "^4.0.9",
+    "lint-staged": "^9.5.0",
     "nodemon": "^2.0.0",
+    "prettier": "^1.19.1",
     "trash-cli": "^3.0.0",
     "ts-node": "^8.5.3",
     "typescript": "^3.7.2"
   },
   "resolutions": {
     "osc": "git+https://github.com/nytamin/osc.js.git#654b98fe4129c4fff80607ac76810eaf5ed06175"
-  }
+  },
+  "husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{js,css,json,md}": [
+			"prettier --write",
+			"git add"
+		],
+		"*.{ts}": [
+			"npm run lint:fix --",
+			"git add"
+		]
+	}
 }

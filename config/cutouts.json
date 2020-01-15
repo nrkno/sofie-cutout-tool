@@ -1,21 +1,21 @@
 {
-  "note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
-  "cutouts": {
-    "cutout_A": {
-      "height": 720,
-      "outputRotation": 0,
-      "source": "source_A",
-      "width": 720,
-      "x": 0,
-      "y": 0
-    },
-    "cutout_B": {
-      "height": 720,
-      "outputRotation": 0,
-      "source": "source_B",
-      "width": 720,
-      "x": 0,
-      "y": 0
-    }
-  }
+	"note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
+	"cutouts": {
+		"cutout_A": {
+			"height": 720,
+			"outputRotation": 0,
+			"source": "source_A",
+			"width": 720,
+			"x": 102,
+			"y": 0
+		},
+		"cutout_B": {
+			"height": 720,
+			"outputRotation": 0,
+			"source": "source_B",
+			"width": 720,
+			"x": 0,
+			"y": -252
+		}
+	}
 }

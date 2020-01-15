@@ -1,2 +1,3 @@
 // ui components
-import './video/video-cropper.js'
+
+import './video/video-cropper.js';

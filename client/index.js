@@ -1,4 +1,4 @@
-import {init} from './scripts/cutout-manager.js'
+import { init } from './scripts/cutout-manager.js';
 
-console.log('Client scripts loaded.')
-init()
+console.log('Client scripts loaded.');
+init();
