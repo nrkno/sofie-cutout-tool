@@ -1,5 +1,5 @@
 {
-	"extends": ["plugin:prettier/recommended"],
+	"extends": ["eslint:recommended", "plugin:prettier/recommended"],
 	"plugins": ["prettier"],
 	"rules": {
 		"prettier/prettier": "error"
@@ -18,6 +18,10 @@
 				"plugin:@typescript-eslint/recommended",
 				"prettier/@typescript-eslint"
 			]
+		},
+		{
+			"files": ["*.js"],
+			"env": { "browser": true }
 		}
 	]
 }
