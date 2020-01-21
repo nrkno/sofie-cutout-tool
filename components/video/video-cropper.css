@@ -1,51 +1,9 @@
-@import "../../client/styles/colorscheme.css";
+@import '../../client/styles/colorscheme.css';
 
-.video-cropper {
-  border: 1px solid  var(--frame-light);
+.video-cropper--container {
+	border: 1px solid var(--frame-light);
 
-  margin: 15px;
+	margin: 15px;
 
-  /* --src-width: 480px;
-  --src-height: 270px; */
-}
-
-.video-cropper--src {
-  background: red;
-
-  /* height: var(--src-height);
-  width: var(--src-width); */
-
-  margin: 0 auto;
-  position: relative;
-}
-
-.video-cropper--img {
-  z-index: 1;
-}
-.video-cropper--center {
-  z-index: 2;
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  right: 50%;
-  bottom: 50%;
-}
-.video-cropper--cutout-window {
-  z-index: 2;
-
-  /* background: blue; */
-  border: 5px solid var(--frame-dark);
-  box-sizing: border-box;
-
-
-  position: absolute;
-
-  touch-action: none;
-  /*
-  height: 100%;
-  width: calc(var(--src-height) / 16 * 9);
-  top: 0;
-  left: calc(calc(100% / 2) - calc(var(--src-height) / 16 * 9 / 2));
-  */
+	position: relative;
 }

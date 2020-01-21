@@ -22,6 +22,8 @@ ipcRenderer.on('new-config', (event, newFullConfig) => {
 
 	console.log('newFullConfig received', newFullConfig);
 
+	document.dispatchEvent(new CustomEvent('new-config'));
+
 	// Note: How this is handled is very much a draft
 	// It should be replaced by something more intelligent later
 

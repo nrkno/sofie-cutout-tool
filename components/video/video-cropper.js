@@ -1,17 +1,21 @@
 const { ipcRenderer } = require('electron');
 
-import { attributeNames, createVideoDisplayElement } from './video-display.js';
+import {
+	createVideoDisplayElement,
+	attributeNames as videoDisplayAttributeNames
+} from './video-display.js';
 
-const containerClassname = 'video-cropper--src';
-const cropToolClassname = 'video-cropper--cutout-window';
+import { tagName as cropToolTagName } from './cutout-window.js';
+
+const tagName = 'video-cropper';
+
+const classNames = {
+	CONTAINER: `video-cropper--container`
+};
+
 const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper.css" />
-<section class="video-cropper">
-  <div class="${containerClassname}">
-    <div class="video-cropper--center">
-      <div class="${cropToolClassname}"></div>
-    </div>
-  </div>
-</section>`;
+<div class="${classNames.CONTAINER}"></div>
+`;
 
 const pathToCasparCGImageProvider = 'http://127.0.0.1:3020';
 
@@ -24,11 +28,11 @@ class VideoCropper extends HTMLElement {
 		const shadowRoot = this.attachShadow({ mode: 'open' });
 		shadowRoot.innerHTML = innerHTML;
 
-		this.srcContainer = shadowRoot.querySelector(`.${containerClassname}`);
-		this.cropTool = shadowRoot.querySelector(`.${cropToolClassname}`);
-
 		this.videoDisplay = createVideoDisplayElement(pathToCasparCGImageProvider);
-		this.srcContainer.insertAdjacentElement('afterbegin', this.videoDisplay);
+		shadowRoot.appendChild(this.videoDisplay);
+
+		this.cropTool = document.createElement(cropToolTagName);
+		shadowRoot.appendChild(this.cropTool);
 	}
 
 	static get observedAttributes() {
@@ -36,17 +40,28 @@ class VideoCropper extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		if (name === 'id') {
-			this.cutoutId = newValue;
-			this.cutout = Object.assign({}, document.fullConfig.cutouts[newValue]); // shallow clone
-			this.source = document.fullConfig.sources[this.cutout.source];
-			this.sourceReferenceLayer = document.fullConfig.sourceReferenceLayers[this.cutout.source];
-			this.videoDisplay.setAttribute(
-				attributeNames.STREAM_CHANNEL,
-				this.sourceReferenceLayer.channel
-			);
+		console.log(`<${tagName}>.attributeChangedCallback`, name, oldValue, newValue);
+		if (name === 'id' && newValue) {
+			this.updateId(newValue);
 		}
 		this.updateStyle();
+	}
+
+	connectedCallback() {
+		console.log(`<${tagName}> connected`, this);
+		if (this.hasAttribute('id')) {
+			this.updateId(this.getAttribute('id'));
+		}
+	}
+
+	updateId(id) {
+		this.cutoutId = id;
+		this.cutout = Object.assign({}, document.fullConfig.cutouts[id]); // shallow clone
+		this.source = document.fullConfig.sources[this.cutout.source];
+		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
+		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
+		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
+		console.log('<${tagName}>.updateId()');
 	}
 
 	emitMoveEvent({ width, height, x, y }) {
@@ -61,8 +76,8 @@ class VideoCropper extends HTMLElement {
 		if (this.cutout) {
 			const sourceDimensions = this.getSourceDimensions();
 
-			this.srcContainer.style.width = `${sourceDimensions.width * this.scale}px`;
-			this.srcContainer.style.height = `${sourceDimensions.height * this.scale}px`;
+			// this.srcContainer.style.width = `${sourceDimensions.width * this.scale}px`;
+			// this.srcContainer.style.height = `${sourceDimensions.height * this.scale}px`;
 
 			// this.img.style.backgroundColor = `#333`; // the png:s have opacity, make them black instead
 			// this.img.style.width = `${this.source.width * this.scale}px`;
@@ -91,112 +106,6 @@ class VideoCropper extends HTMLElement {
 			height: !flip ? this.source.height : this.source.width
 		};
 	}
-	moveCrop(deltaX, deltaY) {
-		// console.log('moveCrop', deltaX, deltaY)
-
-		const sourceDimensions = this.getSourceDimensions();
-
-		// set bounds for movable to avoid placing it outside the container
-		const minX = -(sourceDimensions.width - this.cutout.width) / 2;
-		const minY = -(sourceDimensions.height - this.cutout.height) / 2;
-		const maxX = (sourceDimensions.width - this.cutout.width) / 2;
-		const maxY = (sourceDimensions.height - this.cutout.height) / 2;
-
-		this.cutout.x += deltaX / this.scale;
-		this.cutout.y += deltaY / this.scale;
-
-		this.cutout.x = clamp(this.cutout.x, minX, maxX);
-		this.cutout.y = clamp(this.cutout.y, minY, maxY);
-
-		this.updateStyle();
-
-		this.triggerSendUpdate();
-	}
-
-	moveCropFromTouch(event) {
-		if (!event) {
-			return;
-		}
-
-		if (event.type === 'touchend') {
-			delete this.activeTouch;
-			return;
-		}
-
-		let touch;
-		if (this.activeTouch) {
-			// console.log('event.targetTouches', event.targetTouches)
-			for (let i = 0; i < event.targetTouches.length; i++) {
-				let t = event.targetTouches[i];
-				if (t.identifier === this.activeTouch.identifier) {
-					touch = t;
-					break;
-				}
-			}
-			if (!touch) {
-				delete this.activeTouch;
-				touch = event.targetTouches[0];
-			}
-		} else {
-			touch = event.targetTouches[0];
-		}
-		// console.log('touch', touch.clientX, touch.clientY)
-
-		if (touch && this.activeTouch && event.type === 'touchmove') {
-			this.moveCrop(touch.pageX - this.activeTouch.x, touch.pageY - this.activeTouch.y);
-		}
-
-		if (touch) {
-			this.activeTouch = {
-				identifier: touch.identifier,
-				x: touch.pageX,
-				y: touch.pageY
-			};
-		} else {
-			delete this.activeTouch;
-		}
-	}
-
-	connectedCallback() {
-		this.cropTool.addEventListener('drag', (event) => {
-			// console.log(event)
-		});
-		this.cropTool.addEventListener('mousedown', (event) => {
-			event.preventDefault();
-			// console.log('mousedown')
-			this.mouseDown = true;
-		});
-		document.addEventListener('mouseup', (event) => {
-			event.preventDefault();
-			this.mouseDown = false;
-		});
-		document.body.addEventListener('mousemove', (event) => {
-			if (this.mouseDown) {
-				this.moveCrop(event.movementX, event.movementY);
-			}
-		});
-
-		this.cropTool.addEventListener('touchmove', (event) => {
-			// console.log('touchmove')
-			if (event.target.isSameNode(this.cropTool)) {
-				this.moveCropFromTouch(event);
-			}
-		});
-
-		this.cropTool.addEventListener('touchstart', (event) => {
-			// console.log('touchstart')
-			if (event.target.isSameNode(this.cropTool)) {
-				this.moveCropFromTouch(event);
-			}
-		});
-
-		this.cropTool.addEventListener('touchend', (event) => {
-			// console.log('touchend')
-			if (event.target.isSameNode(this.cropTool)) {
-				this.moveCropFromTouch(event);
-			}
-		});
-	}
 
 	triggerSendUpdate() {
 		if (!this.sendUpdateTimeout) {
@@ -207,13 +116,11 @@ class VideoCropper extends HTMLElement {
 			}, 500);
 		}
 	}
+
 	sendUpdate() {
 		ipcRenderer.send('update-cutout', this.cutoutId, this.cutout);
 	}
 }
 
-customElements.define('video-cropper', VideoCropper);
-
-function clamp(value, min, max) {
-	return Math.min(max, Math.max(value, min));
-}
+customElements.define(tagName, VideoCropper);
+console.log(`<${tagName}> defined.`);
