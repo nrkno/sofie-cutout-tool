@@ -1,9 +1,11 @@
 @import '../../client/styles/colorscheme.css';
 
 .video-cropper--container {
-	border: 1px solid var(--frame-light);
+	display: grid;
+	grid-template-areas: 'video-cropper';
+}
 
-	margin: 15px;
-
-	position: relative;
+.video-cropper--content {
+	grid-area: video-cropper;
+	z-index: 1;
 }

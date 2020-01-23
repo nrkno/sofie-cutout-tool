@@ -4,9 +4,9 @@
 		"cutout_A": {
 			"height": 720,
 			"outputRotation": 0,
-			"source": "source_A",
-			"width": 720,
-			"x": -262,
+			"source": "source_C",
+			"width": 1280,
+			"x": 0,
 			"y": 0
 		},
 		"cutout_B": {
@@ -15,7 +15,7 @@
 			"source": "source_B",
 			"width": 720,
 			"x": 0,
-			"y": 206
+			"y": 0
 		}
 	}
 }

@@ -1,36 +1,16 @@
-cutout-window {
-	background: transparent url('../../assets/passepartouts/9_16-from-1_69src.png') center/100%;
-	border: 1px solid green;
-	width: 100%;
+.cutout-window--container {
+	background: transparent url('../../assets/passepartouts/9_16-from-1_69src.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	outline: 1px solid blue;
+	outline-offset: -1px;
+	z-index: 1;
 	height: 100%;
-	position: absolute;
-	top: 0;
-	left: 0;
 }
 
-.video-cropper--center {
-	z-index: 2;
-
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	right: 50%;
-	bottom: 50%;
-}
-.video-cropper--cutout-window {
-	z-index: 2;
-
-	/* background: blue; */
-	border: 5px solid var(--frame-dark);
-	box-sizing: border-box;
-
-	position: absolute;
-
-	touch-action: none;
-	/*
-  height: 100%;
-  width: calc(var(--src-height) / 16 * 9);
-  top: 0;
-  left: calc(calc(100% / 2) - calc(var(--src-height) / 16 * 9 / 2));
-  */
+.cutout-window--frame {
+	outline: 1px solid green;
+	outline-offset: -2px;
+	height: 100%;
 }

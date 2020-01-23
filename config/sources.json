@@ -1,26 +1,48 @@
 {
-    "sources": {
-        "source_A": {
-            "title": "Source A",
-            "width": 1280,
-            "height": 720,
-            "rotation": 0,
-            "input": {
-                "type": "media",
-                "file": "amb",
-                "loop": true
-            }
-        },
-        "source_B": {
-            "title": "Source B",
-            "width": 1280,
-            "height": 720,
-            "rotation": 90,
-            "input": {
-                "type": "media",
-                "file": "amb",
-                "loop": true
-            }
-        }
-    }
+	"sources": {
+		"source_A": {
+			"title": "Source A",
+			"width": 1280,
+			"height": 720,
+			"rotation": 0,
+			"input": {
+				"type": "media",
+				"file": "amb",
+				"loop": true
+			}
+		},
+		"source_B": {
+			"title": "Source B",
+			"width": 1280,
+			"height": 720,
+			"rotation": 90,
+			"input": {
+				"type": "media",
+				"file": "amb",
+				"loop": true
+			}
+		},
+		"source_C": {
+			"title": "LiveU Ulvedemo",
+			"width": 1920,
+			"height": 1080,
+			"rotation": 0,
+			"input": {
+				"type": "media",
+				"file": "LiveU-lot-ulv-220120_15_226442_5060-1",
+				"loop": true
+			}
+		},
+		"source_D": {
+			"title": "Brann Sola",
+			"width": 1920,
+			"height": 1080,
+			"rotation": 0,
+			"input": {
+				"type": "media",
+				"file": "9-16-test-brann-sola",
+				"loop": true
+			}
+		}
+	}
 }

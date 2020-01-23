@@ -4,14 +4,18 @@ export { tagName };
 
 const tagName = 'cutout-window';
 
+const classNames = {
+	CONTAINER: 'cutout-window--container',
+	CROP_FRAME: 'cutout-window--frame'
+};
+
 const innerHtml = `
 <link rel="stylesheet" href="./components/video/cutout-window.css" />
-<div class="cutout-window"></div>
+<div class="${classNames.CONTAINER}">
+	<div class="${classNames.CROP_FRAME}"></div>
+</div>
 `;
 
-// generate oversized background image with a hole based on aspect ratio of
-// cutout. stretch to fill container and scroll background with window
-// background could be semi transparent
 class CutoutWindow extends HTMLElement {
 	constructor() {
 		super();
@@ -19,8 +23,10 @@ class CutoutWindow extends HTMLElement {
 		const shadowRoot = this.attachShadow({ mode: 'open' });
 		shadowRoot.innerHTML = innerHtml;
 
+		this.container = shadowRoot.querySelector(`.${classNames.CONTAINER}`);
+		this.frame = shadowRoot.querySelector(`.${classNames.CROP_FRAME}`);
+
 		this.cutout = { x: 0, y: 0 };
-		this.scale = 0.5;
 	}
 
 	connectedCallback() {
@@ -125,8 +131,6 @@ class CutoutWindow extends HTMLElement {
 
 		this.cutout.x = clamp(this.cutout.x, minX, maxX);
 		this.cutout.y = clamp(this.cutout.y, minY, maxY);
-
-		this.updateStyle();
 
 		this.triggerSendUpdate();
 	}

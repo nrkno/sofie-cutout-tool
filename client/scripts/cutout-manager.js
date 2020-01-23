@@ -1,6 +1,12 @@
 const { ipcRenderer } = require('electron');
 
+import {
+	attributeNames as videoCropperAttributeNames,
+	tagName as videoCropperTagName
+} from '../../components/video/video-cropper.js';
+
 export { init };
+
 document.fullConfig = {
 	cutouts: {},
 	outputs: {},
@@ -32,8 +38,8 @@ ipcRenderer.on('new-config', (event, newFullConfig) => {
 	container.innerHTML = '';
 
 	for (let cutoutId in newFullConfig.cutouts) {
-		var cropper = document.createElement('video-cropper');
+		var cropper = document.createElement(videoCropperTagName);
 		container.appendChild(cropper);
-		cropper.setAttribute('id', cutoutId); // this is kind of a hack to trigger an update in VideoCropper.attributeChangedCallback
+		cropper.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutId); // this is kind of a hack to trigger an update in VideoCropper.attributeChangedCallback
 	}
 });

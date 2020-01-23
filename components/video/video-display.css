@@ -3,15 +3,22 @@
   and so they must be changed there if they are changed here.
 */
 .video-display--container {
-	border: 1px solid red;
-	width: 100%;
-	padding-top: 56.25%;
-	position: relative;
+	background: orange;
+	outline: 1px solid red;
+	display: grid;
+	grid-template-areas: 'video';
 	overflow: hidden;
+	position: relative;
+	margin: 0 auto;
 }
 
-.img {
-	width: 512px;
-	height: 288px;
-	background: #000000;
+.video-display--container .ar-placeholder {
+	width: 100%;
+	padding-bottom: 56.25%; /* 16:9, needs to be calculated based on src AR */
+	grid-area: video;
+}
+
+.video-display--container .img {
+	grid-area: video;
+	position: absolute;
 }

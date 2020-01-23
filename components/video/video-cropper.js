@@ -7,10 +7,18 @@ import {
 
 import { tagName as cropToolTagName } from './cutout-window.js';
 
+export { tagName, attributeNames };
+
 const tagName = 'video-cropper';
 
+/* These must be kept in sync with this element's stylesheet */
 const classNames = {
-	CONTAINER: `video-cropper--container`
+	CONTAINER: 'video-cropper--container',
+	CONTENT: 'video-cropper--content'
+};
+
+const attributeNames = {
+	SOURCE_ID: 'data-source-id'
 };
 
 const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper.css" />
@@ -23,34 +31,38 @@ class VideoCropper extends HTMLElement {
 	constructor() {
 		super();
 
-		this.scale = 0.5; // This is a hack, make something better later
-
 		const shadowRoot = this.attachShadow({ mode: 'open' });
 		shadowRoot.innerHTML = innerHTML;
 
+		this.container = shadowRoot.querySelector(`.${classNames.CONTAINER}`);
+
 		this.videoDisplay = createVideoDisplayElement(pathToCasparCGImageProvider);
-		shadowRoot.appendChild(this.videoDisplay);
+		this.videoDisplay.classList.add(classNames.CONTENT);
+		this.container.appendChild(this.videoDisplay);
 
 		this.cropTool = document.createElement(cropToolTagName);
-		shadowRoot.appendChild(this.cropTool);
+		this.cropTool.classList.add(classNames.CONTENT);
+		this.container.appendChild(this.cropTool);
 	}
 
 	static get observedAttributes() {
-		return ['id'];
+		return Object.values(attributeNames);
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		console.log(`<${tagName}>.attributeChangedCallback`, name, oldValue, newValue);
-		if (name === 'id' && newValue) {
-			this.updateId(newValue);
+		switch (name) {
+			case attributeNames.SOURCE_ID:
+				if (newValue) {
+					this.updateId(newValue);
+				}
+				break;
 		}
-		this.updateStyle();
 	}
 
 	connectedCallback() {
 		console.log(`<${tagName}> connected`, this);
-		if (this.hasAttribute('id')) {
-			this.updateId(this.getAttribute('id'));
+		if (this.hasAttribute(attributeNames.SOURCE_ID)) {
+			this.updateId(this.getAttribute(attributeNames.SOURCE_ID));
 		}
 	}
 
@@ -70,41 +82,6 @@ class VideoCropper extends HTMLElement {
 				detail: { source: null, width, height, x, y }
 			})
 		);
-	}
-
-	updateStyle() {
-		if (this.cutout) {
-			const sourceDimensions = this.getSourceDimensions();
-
-			// this.srcContainer.style.width = `${sourceDimensions.width * this.scale}px`;
-			// this.srcContainer.style.height = `${sourceDimensions.height * this.scale}px`;
-
-			// this.img.style.backgroundColor = `#333`; // the png:s have opacity, make them black instead
-			// this.img.style.width = `${this.source.width * this.scale}px`;
-			// this.img.style.height = `${this.source.height * this.scale}px`;
-			// const wImg = (this.source.width * this.scale) / 2;
-			// this.img.style.transformOrigin = `${wImg}px ${wImg}px`;
-			// this.img.style.transform = `rotate(${-this.source.rotation}deg)`;
-
-			const x = this.cutout.x * this.scale;
-			const y = this.cutout.y * this.scale;
-			const width = this.cutout.width * this.scale;
-			const height = this.cutout.height * this.scale;
-
-			this.cropTool.style.left = `${x - width / 2}px`;
-			this.cropTool.style.top = `${y - height / 2}px`;
-			this.cropTool.style.width = `${width}px`;
-			this.cropTool.style.height = `${height}px`;
-		}
-	}
-
-	getSourceDimensions() {
-		// TODO: This could be considered a hack, and only supports rotation of 0, 90, 180 etc..
-		const flip = this.source.rotation % 180 !== 0;
-		return {
-			width: !flip ? this.source.width : this.source.height,
-			height: !flip ? this.source.height : this.source.width
-		};
 	}
 
 	triggerSendUpdate() {
