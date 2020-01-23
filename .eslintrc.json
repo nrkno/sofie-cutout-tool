@@ -21,7 +21,10 @@
 		},
 		{
 			"files": ["*.js"],
-			"env": { "browser": true }
+			"env": {
+				"browser": true,
+				"amd": true
+			}
 		}
 	]
 }
