@@ -25,6 +25,12 @@
 				"browser": true,
 				"amd": true
 			}
+		},
+		{
+			"files": ["*-test.js"],
+			"env": {
+				"mocha": true
+			}
 		}
 	]
 }

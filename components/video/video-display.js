@@ -106,6 +106,7 @@ class VideoDisplay extends HTMLElement {
 
 		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
 		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
+		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);
 		const streamUrl = `${this.streamUrlBase}/channel/${this.streamChannel}/${this.streamLayer}/stream`;
 
 		fetch(streamUrl)
@@ -127,6 +128,9 @@ class VideoDisplay extends HTMLElement {
 				const scale = calcTransformScale(this.shadowRoot.host, region);
 				container.style.width = region.width * scale;
 				console.log('Container width', container.style.width);
+
+				const arPlaceholderBottomPadding = Number((region.height / region.width) * 100).toFixed(2);
+				arPlaceholder.style.paddingBottom = `${arPlaceholderBottomPadding}%`;
 
 				img.addEventListener('load', function(e) {
 					console.log('load', e);

@@ -5,7 +5,13 @@ import {
 	attributeNames as videoDisplayAttributeNames
 } from './video-display.js';
 
-import { tagName as cropToolTagName } from './cutout-window.js';
+import {
+	tagName as cropToolTagName,
+	attributeNames as cropToolAttributeNames,
+	eventNames as cropToolEventNames
+} from './cutout-window.js';
+
+import { calcAspectRatio } from '../../lib/aspect-ratios.js';
 
 export { tagName, attributeNames };
 
@@ -64,24 +70,27 @@ class VideoCropper extends HTMLElement {
 		if (this.hasAttribute(attributeNames.SOURCE_ID)) {
 			this.updateId(this.getAttribute(attributeNames.SOURCE_ID));
 		}
+
+		this.addEventListener(cropToolEventNames.MOVE, (event) => {
+			const { width, height, x, y } = event.details;
+			this.cutout = Object.assign({}, this.cutout, { width, height, x, y });
+			this.triggerSendUpdate();
+		});
 	}
 
 	updateId(id) {
 		this.cutoutId = id;
 		this.cutout = Object.assign({}, document.fullConfig.cutouts[id]); // shallow clone
 		this.source = document.fullConfig.sources[this.cutout.source];
+
+		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT_AR, calcAspectRatio(this.cutout));
+		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
+
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
-		console.log('<${tagName}>.updateId()');
-	}
 
-	emitMoveEvent({ width, height, x, y }) {
-		document.dispatchEvent(
-			new CustomEvent('cutout-move', {
-				detail: { source: null, width, height, x, y }
-			})
-		);
+		console.log('<${tagName}>.updateId()');
 	}
 
 	triggerSendUpdate() {
