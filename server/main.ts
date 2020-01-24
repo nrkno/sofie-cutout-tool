@@ -64,7 +64,8 @@ export default class Main {
 						Main.tsrController.updateTimeline(
 							fullConfig.sources,
 							fullConfig.cutouts, // TODO: tmp! this should come from the user instead
-							fullConfig.outputs
+							fullConfig.outputs,
+							fullConfig.settings
 						);
 
 						const fullConfigClient: FullConfigClient = _.extend(
@@ -102,7 +103,8 @@ export default class Main {
 						Main.tsrController.updateTimeline(
 							fullConfig.sources,
 							fullConfig.cutouts,
-							fullConfig.outputs
+							fullConfig.outputs,
+							fullConfig.settings
 						);
 					});
 				})

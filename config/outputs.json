@@ -2,7 +2,7 @@
     "outputs": [
         {
             "type": "cutout",
-            "casparChannel": 0,
+            "casparChannel": 1,
             "width": 1280,
             "height": 720,
             "cutout": {
@@ -11,27 +11,6 @@
                 "y": 0,
                 "scale": 0
             }
-        },
-        {
-            "type": "multiview",
-            "cutouts": [
-                {
-                    "cutoutId": "cutout_A",
-                    "x": -310,
-                    "y": 0,
-                    "scale": 0.5
-                },
-                {
-                    "cutoutId": "cutout_B",
-                    "x": 320,
-                    "y": 0,
-                    "scale": 0.5
-                }
-            ],
-            "background": "gray",
-            "casparChannel": 2,
-            "width": 1280,
-            "height": 720
         }
     ]
 }
