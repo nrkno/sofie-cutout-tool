@@ -6,7 +6,17 @@ import {
 	Mixer,
 	TSRTimeline
 } from 'timeline-state-resolver';
-import { Cutout, Cutouts, OutputAny, OutputType, Outputs, Source, Sources } from './api';
+import {
+	Cutout,
+	Cutouts,
+	OutputAny,
+	OutputType,
+	Outputs,
+	Source,
+	Sources,
+	Settings,
+	SourceInputAny
+} from './api';
 import { Matrix, applyToPoint, compose, rotateDEG, scale, translate } from 'transformation-matrix';
 
 import { CasparReferrer } from './CasparReferrer';
@@ -20,6 +30,7 @@ export class TSRController {
 	public mappings: any = {};
 
 	public refer: CasparReferrer;
+	private _memorySources: { [channelLayer: string]: SourceInputAny } = {};
 
 	constructor() {
 		this.refer = new CasparReferrer();
@@ -64,16 +75,49 @@ export class TSRController {
 		await this.tsr.destroy();
 	}
 	/** Calculate new timeline and send it into TSR */
-	updateTimeline(sources: Sources, cutouts: Cutouts, outputs: Outputs): void {
+	updateTimeline(sources: Sources, cutouts: Cutouts, outputs: Outputs, settings: Settings): void {
 		this.mappings = {};
 		this.timeline = [];
 		this.refer.reset();
 
-		// Sort the outputs, to make sure we're processing the multiview first, since we want that to host the inputs,
-		// which are then routed to other places
-		outputs.sort((a, b) => {
-			if (a.type === OutputType.MULTIVIEW && b.type !== OutputType.MULTIVIEW) return -1;
-			if (a.type !== OutputType.MULTIVIEW && b.type === OutputType.MULTIVIEW) return 1;
+		let routeLayer = settings.channelForRoutesStartLayer;
+		const prepareContentRoute = (input: SourceInputAny) => {
+			routeLayer++;
+
+			const layer = 'output' + routeLayer + '_content';
+
+			const mixer: Mixer = {
+				opacity: 0,
+				volume: 0
+			};
+
+			const refId = this.refer.getSourceRef(input);
+			if (
+				!this.refer.getRef(refId, layer) // If there already is a reference, do nothing
+			) {
+				this.mappings[layer] = {
+					device: DeviceType.CASPARCG,
+					deviceId: 'casparcg0',
+					channel: settings.channelForRoutes,
+					layer: routeLayer
+				};
+				this.timeline.push(this.refer.getSource(input, layer, mixer));
+			}
+		};
+		const shouldUseTransition = (layer: string, source: Source): boolean => {
+			const mapping = this.mappings[layer];
+			const channelLayerId = 'oldSource_' + mapping.channel * 1000 + mapping.layer;
+
+			if (_.isEqual(this._memorySources[channelLayerId], source.input)) {
+				return true;
+			} else {
+				this._memorySources[channelLayerId] = source.input;
+				return false;
+			}
+		};
+
+		_.each(sources, (source) => {
+			prepareContentRoute(source.input);
 		});
 
 		_.each(outputs, (output: OutputAny, outputi: number) => {
@@ -90,6 +134,8 @@ export class TSRController {
 				if (!cutout) throw Error(`cutout "${output.cutout.cutoutId} not found!`);
 				const source = sources[cutout.source];
 				if (!source) throw Error(`source "${cutout.source} not found!`);
+
+				const useTransition = shouldUseTransition(layer, source);
 
 				const cutoutInOutput = output.cutout;
 
@@ -114,8 +160,8 @@ export class TSRController {
 				);
 				const outputTransform = compose(viewportTransform, cutoutTransform);
 
-				const mixerPosition = this._casparTransformPosition(source, outputTransform);
-				const mixerClipping = this._casparTransformClip(cutout, viewportTransform);
+				const mixerPosition = this._casparTransformPosition(source, outputTransform, useTransition);
+				const mixerClipping = this._casparTransformClip(cutout, viewportTransform, useTransition);
 
 				this.timeline.push(
 					this.refer.getSource(source.input, layer, {
@@ -158,6 +204,8 @@ export class TSRController {
 						const source = sources[cutout.source];
 						if (!source) throw Error(`source "${cutout.source} not found!`);
 
+						const useTransition = shouldUseTransition(layer, source);
+
 						const sourceTransform = this._sourceTransform(source);
 						const cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout);
 
@@ -169,9 +217,21 @@ export class TSRController {
 						);
 						const outputTransform = compose(viewportTransform, cutoutTransform);
 
-						const mixerPosition = this._casparTransformPosition(source, outputTransform);
-						const mixerClipping = this._casparTransformClip(cutout, viewportTransform);
-						const mixerClippingBg = this._casparTransformClip(cutout, viewportTransform);
+						const mixerPosition = this._casparTransformPosition(
+							source,
+							outputTransform,
+							useTransition
+						);
+						const mixerClipping = this._casparTransformClip(
+							cutout,
+							viewportTransform,
+							useTransition
+						);
+						const mixerClippingBg = this._casparTransformClip(
+							cutout,
+							viewportTransform,
+							useTransition
+						);
 
 						// Black background behind clip:
 						this.timeline.push(this.refer.media(layerBg, 'black', mixerClippingBg));
@@ -239,7 +299,8 @@ export class TSRController {
 	}
 	private _casparTransformPosition(
 		source: { width: number; height: number },
-		outputTransform: Matrix
+		outputTransform: Matrix,
+		useTransition: boolean
 	): Mixer {
 		// Apply coordinates to CasparCG coordinate system:
 		const x0 = -source.width / 2;
@@ -253,7 +314,7 @@ export class TSRController {
 		const bottomRight = applyToPoint(outputTransform, { x: x1, y: y1 });
 
 		const mixer: Mixer = {
-			...this._casparTransformTransition(),
+			...this._casparTransformTransition(useTransition),
 			perspective: {
 				topLeftX: topLeft['x'],
 				topLeftY: topLeft['y'],
@@ -269,7 +330,8 @@ export class TSRController {
 	}
 	private _casparTransformClip(
 		clipDimensions: { width: number; height: number },
-		transform: Matrix
+		transform: Matrix,
+		useTransition: boolean
 	): Mixer {
 		// Apply coordinates to CasparCG coordinate system:
 
@@ -291,7 +353,7 @@ export class TSRController {
 		};
 
 		const mixer: Mixer = {
-			...this._casparTransformTransition(),
+			...this._casparTransformTransition(useTransition),
 			clip: {
 				x: topLeft.x,
 				y: topLeft.y,
@@ -301,7 +363,8 @@ export class TSRController {
 		};
 		return mixer;
 	}
-	private _casparTransformTransition(): Mixer {
+	private _casparTransformTransition(useTransition: boolean): Mixer {
+		if (!useTransition) return {};
 		return {
 			inTransition: {
 				easing: 'EASEINOUTQUAD',

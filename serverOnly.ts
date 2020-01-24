@@ -16,7 +16,8 @@ dataHandler.onConfigChanged(() => {
 			tsrController.updateTimeline(
 				fullConfig.sources,
 				fullConfig.cutouts, // TODO: tmp! this should come from the user instead
-				fullConfig.outputs
+				fullConfig.outputs,
+				fullConfig.settings
 			);
 		})
 		.catch(console.error);

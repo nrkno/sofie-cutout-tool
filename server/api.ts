@@ -4,6 +4,7 @@ export interface FullConfig {
 	cutouts: Cutouts;
 	outputs: Outputs;
 	sources: Sources;
+	settings: Settings;
 }
 export interface FullConfigClient extends FullConfig {
 	sourceReferenceLayers: {
@@ -113,4 +114,11 @@ export interface OutputMultiview extends OutputBase {
 
 	/** Background to put behind the multiview */
 	background?: string;
+}
+
+export interface Settings {
+	/** The channel to use for putting inputs on (and route the content from there) */
+	channelForRoutes: number;
+	/** What layer to start on */
+	channelForRoutesStartLayer: number;
 }

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
 
-import { Cutout, Cutouts, FullConfig, Outputs, Sources } from './api';
+import { Cutout, Cutouts, FullConfig, Outputs, Sources, Settings } from './api';
 
 const fsReadFile = util.promisify(fs.readFile);
 const fsWriteFile = util.promisify(fs.writeFile);
@@ -19,7 +19,8 @@ export class DataHandler {
 		return {
 			cutouts: await this._getConfigCutouts(),
 			outputs: await this._getConfigOutputs(),
-			sources: await this._getConfigSources()
+			sources: await this._getConfigSources(),
+			settings: await this._getConfigSettings()
 		};
 	}
 	public onConfigChanged(callback: () => void): void {
@@ -35,6 +36,9 @@ export class DataHandler {
 			triggerCallback();
 		});
 		chokidar.watch(this._getConfigPath('sources.json')).on('all', () => {
+			triggerCallback();
+		});
+		chokidar.watch(this._getConfigPath('settings.json')).on('all', () => {
 			triggerCallback();
 		});
 
@@ -66,6 +70,10 @@ export class DataHandler {
 	private async _getConfigSources(): Promise<Sources> {
 		// TODO: add data verifications here..
 		return (await this._getConfig('sources.json')).sources as Sources;
+	}
+	private async _getConfigSettings(): Promise<Settings> {
+		// TODO: add data verifications here..
+		return (await this._getConfig('settings.json')).settings as Settings;
 	}
 
 	private async _getConfig(fileName: string): Promise<any> {

@@ -118,7 +118,7 @@ export class CasparReferrer {
 		this.setRef(refId, layer);
 		return o;
 	}
-	getRef(refId: string, layer: string, mixer?: Mixer): TimelineObjCCGRoute | null {
+	getRef(refId: string, layer: string, mixer?: Mixer): TimelineObjCCGRoute | undefined {
 		const ref = this.decklingInputRefs[refId];
 		if (ref) {
 			return {

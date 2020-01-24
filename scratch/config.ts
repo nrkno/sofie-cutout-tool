@@ -3,7 +3,8 @@ import {
     SourceInputType,
     Cutouts,
     Outputs,
-    OutputType
+    OutputType,
+    Settings
 } from '../server/api'
 
 const sources: Sources = {
@@ -110,3 +111,7 @@ const outputs: Outputs = [
         height: 720
     }
 ]
+const settings: Settings = {
+    channelForRoutes: 1,
+    channelForRoutesStartLayer: 900
+}
