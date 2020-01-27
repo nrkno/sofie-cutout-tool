@@ -45,9 +45,6 @@
   "ts-node": "^8.5.3",
   "typescript": "^3.7.2"
  },
- "resolutions": {
-  "osc": "git+https://github.com/nytamin/osc.js.git#654b98fe4129c4fff80607ac76810eaf5ed06175"
- },
  "husky": {
   "hooks": {
    "pre-commit": "lint-staged"
