@@ -46,9 +46,9 @@ class VideoCropper extends HTMLElement {
 		this.videoDisplay.classList.add(classNames.CONTENT);
 		this.container.appendChild(this.videoDisplay);
 
-		this.cropTool = document.createElement(cropToolTagName);
-		this.cropTool.classList.add(classNames.CONTENT);
-		this.container.appendChild(this.cropTool);
+		// this.cropTool = document.createElement(cropToolTagName);
+		// this.cropTool.classList.add(classNames.CONTENT);
+		// this.container.appendChild(this.cropTool);
 	}
 
 	static get observedAttributes() {
@@ -79,18 +79,20 @@ class VideoCropper extends HTMLElement {
 	}
 
 	updateId(id) {
+		console.log(`<${tagName}>.updateId(${id})...`);
 		this.cutoutId = id;
 		this.cutout = Object.assign({}, document.fullConfig.cutouts[id]); // shallow clone
+		console.log('Using cutout', this.cutout);
 		this.source = document.fullConfig.sources[this.cutout.source];
 
-		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT_AR, calcAspectRatio(this.cutout));
-		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
+		// this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT_AR, calcAspectRatio(this.cutout));
+		// this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
 
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
 
-		console.log('<${tagName}>.updateId()');
+		console.log(`<${tagName}>.updateId() completed`);
 	}
 
 	triggerSendUpdate() {

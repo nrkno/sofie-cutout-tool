@@ -36,13 +36,35 @@ class CutoutWindow extends HTMLElement {
 		this.container = shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 		this.frame = shadowRoot.querySelector(`.${classNames.CROP_FRAME}`);
 
-		this.scale = 1;
-
 		this.cutout = { x: 0, y: 0 };
+	}
+
+	static get observedAttributes() {
+		return Object.values(attributeNames);
 	}
 
 	connectedCallback() {
 		console.log(`<${tagName}> connected`, this);
+
+		this.setFrameSize();
+
+		this.setupEventListeners();
+	}
+
+	setFrameSize() {
+		const ar = this.hasAttribute(attributeNames.CUTOUT_AR)
+			? this.getAttribute(attributeNames.CUTOUT_AR)
+			: 'not foudn';
+		console.log(this.attributes);
+		console.log(ar, this.frame);
+		const height = getElementHeight(this.frame);
+		const width = (1 / ar) * height;
+		console.log(`Cutout frame: ${width}x${height}`);
+
+		this.frame.style.width = width;
+	}
+
+	setupEventListeners() {
 		this.addEventListener('drag', (event) => {
 			// console.log(event)
 		});
@@ -154,6 +176,7 @@ class CutoutWindow extends HTMLElement {
 
 		document.dispatchEvent(
 			new CustomEvent(eventNames.MOVE, {
+				bubbles: true,
 				detail: { source: null, width, height, x, y }
 			})
 		);

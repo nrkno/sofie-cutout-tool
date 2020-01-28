@@ -1,7 +1,17 @@
+export { tagName, classNames, eventNames };
+
 const tagName = 'source-selector';
 
 const classNames = {
 	SOURCES_LIST: 'input-source-list'
+};
+
+const attributeNames = {
+	SOURCE_ID: 'data-source-id'
+};
+
+const eventNames = {
+	SOURCE_SELECTED: 'source-selected'
 };
 
 const innerHtml = `
@@ -27,44 +37,35 @@ class SourceSelector extends HTMLElement {
 	}
 
 	updateSources() {
-		this.sources = document.fullConfig.sources;
-		this.renderSourceSelectors();
+		const { fullConfig } = document;
+		if (fullConfig) {
+			this.sources = document.fullConfig.sources;
+			this.renderSourceSelectors();
+		}
 	}
 
-	/*
-    "sources": {
-        "source_A": {
-            "title": "Source A",
-            "width": 1280,
-            "height": 720,
-            "rotation": 0,
-            "input": {
-                "type": "media",
-                "file": "amb",
-                "loop": true
-            }
-        },
-        "source_B": {
-            "title": "Source B",
-            "width": 1280,
-            "height": 720,
-            "rotation": 90,
-            "input": {
-                "type": "media",
-                "file": "amb",
-                "loop": true
-            }
-        }
-    }
-*/
 	renderSourceSelectors() {
 		this.sourceListElement.innerHTML = '';
 		const ids = Object.keys(this.sources);
 		ids.forEach((id) => {
 			const source = this.sources[id];
+
 			const listElement = document.createElement('li');
-			listElement.textContent = source.title;
 			this.sourceListElement.appendChild(listElement);
+
+			const link = document.createElement('a');
+			link.setAttribute(attributeNames.SOURCE_ID, id);
+			link.href = '#';
+			link.textContent = source.title;
+			link.addEventListener('click', () => {
+				const event = new CustomEvent(eventNames.SOURCE_SELECTED, {
+					bubbles: true,
+					detail: { id }
+				});
+				console.log('dispatching', this, event);
+				this.dispatchEvent(event);
+			});
+			listElement.appendChild(link);
 		});
 	}
 }

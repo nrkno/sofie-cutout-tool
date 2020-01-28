@@ -96,6 +96,7 @@ export default class Main {
 			});
 		});
 		ipcMain.on('update-cutout', (event, cutoutId: string, cutout: Cutout) => {
+			console.log('update-cutout handler', cutoutId, cutout);
 			Main.dataHandler
 				.setConfigCutout(cutoutId, cutout)
 				.then(() => {

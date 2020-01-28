@@ -10,7 +10,6 @@
 }
 
 .cutout-window--frame {
-	background: rgba(255, 0, 0, 0.8);
 	outline: 1px solid green;
 	outline-offset: -2px;
 	height: 100%;
