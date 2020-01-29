@@ -126,22 +126,23 @@ class VideoDisplay extends HTMLElement {
 				console.log('region', region);
 
 				const scale = calcTransformScale(this.shadowRoot.host, region);
-				container.style.width = region.width * scale;
-				console.log('Container width', container.style.width);
 
-				const arPlaceholderBottomPadding = Number((region.height / region.width) * 100).toFixed(2);
-				arPlaceholder.style.paddingBottom = `${arPlaceholderBottomPadding}%`;
+				const containerDimensions = {
+					width: Math.round(region.width * scale),
+					height: Math.round(region.height * scale)
+				};
 
-				img.addEventListener('load', function(e) {
-					console.log('load', e);
-				});
+				container.style.width = containerDimensions.width;
+				arPlaceholder.style.paddingBottom = `${containerDimensions.height}px`;
+
+				img.addEventListener('load', () => console.log('Stream loaded'));
 				img.addEventListener('error', function(e) {
 					console.log('error', e);
 				});
 
 				img.src = this.streamUrlBase + stream.url;
-				img.style.transform = `translate3d(-${region.x}, -${region.y}, 0) scale3d(${scale},${scale}, 1)`;
-				console.log('Using transform', img.style.transform);
+				img.style.transform = getCSSTransformString(scale, containerDimensions, region);
+				console.log('Using transform', getCSSTransformString(scale, containerDimensions, region));
 			})
 			.catch(console.error);
 	}
@@ -153,4 +154,16 @@ function calcTransformScale(container, region) {
 	const width = getElementWidth(container);
 	console.log(`Container width: ${width}`);
 	return width / region.width;
+}
+
+function getCSSTransformString(scale, container, region) {
+	const transforms = [];
+
+	transforms.push(`scale3d(${scale},${scale}, 1)`);
+
+	const translateX = Math.round((container.width - region.width) / 2);
+	const translateY = Math.round((container.height - region.height) / 2);
+	transforms.push(`translate3d(${translateX}px, ${translateY}px, 0)`);
+
+	return transforms.join(' ');
 }

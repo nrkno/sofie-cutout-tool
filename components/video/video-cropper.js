@@ -66,7 +66,6 @@ class VideoCropper extends HTMLElement {
 	}
 
 	connectedCallback() {
-		console.log(`<${tagName}> connected`, this);
 		if (this.hasAttribute(attributeNames.SOURCE_ID)) {
 			this.updateId(this.getAttribute(attributeNames.SOURCE_ID));
 		}
@@ -75,6 +74,13 @@ class VideoCropper extends HTMLElement {
 			const { width, height, x, y } = event.details;
 			this.cutout = Object.assign({}, this.cutout, { width, height, x, y });
 			this.triggerSendUpdate();
+		});
+
+		document.addEventListener('new-config', () => {
+			console.log(`<${tagName}>: new config!`);
+			if (this.cutoutId) {
+				this.updateId(this.cutoutId);
+			}
 		});
 	}
 
@@ -111,4 +117,4 @@ class VideoCropper extends HTMLElement {
 }
 
 customElements.define(tagName, VideoCropper);
-console.log(`<${tagName}> defined.`);
+console.log(`<${tagName}> defined`);

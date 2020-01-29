@@ -59,7 +59,6 @@ function init(logger, document) {
 			}
 		}
 	});
-	logger.log(`Added eventListener for ${sourceSelectorEventNames.SOURCE_SELECTED}`);
 
 	ipcRenderer.send('initialize');
 	return 'cutout-manager init complete';
@@ -69,10 +68,12 @@ function createCutoutFromSource(sourceId, logger) {
 	if (!document || !document.fullConfig || !document.fullConfig.sources) {
 		logger.error('No sources in document.fullConfig', document);
 	}
-	console.log('We have a document', document);
 	const { sources } = document.fullConfig;
+	if (!sources) {
+		return undefined;
+	}
 
-	const source = sources.find((source) => source.id === sourceId);
+	const source = sources[sourceId];
 	if (!source) {
 		logger.error('Cant create cutout for unknown source', sourceId);
 		return undefined;

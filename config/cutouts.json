@@ -16,6 +16,22 @@
 			"width": 720,
 			"x": 0,
 			"y": 0
+		},
+		"cutout_source_D": {
+			"height": 1280,
+			"outputRotation": 0,
+			"source": "source_D",
+			"width": 720,
+			"x": 0,
+			"y": 0
+		},
+		"cutout_source_A": {
+			"height": 1280,
+			"outputRotation": 0,
+			"source": "source_A",
+			"width": 720,
+			"x": 0,
+			"y": 0
 		}
 	}
 }
