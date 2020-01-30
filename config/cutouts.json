@@ -32,6 +32,14 @@
 			"width": 720,
 			"x": 0,
 			"y": 0
+		},
+		"cutout_source_E": {
+			"height": 1280,
+			"outputRotation": 0,
+			"source": "source_E",
+			"width": 720,
+			"x": 0,
+			"y": 0
 		}
 	}
 }

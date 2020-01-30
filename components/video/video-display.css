@@ -20,4 +20,5 @@
 .video-display--container .img {
 	grid-area: video;
 	position: absolute;
+	transform-origin: top left;
 }

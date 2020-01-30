@@ -78,18 +78,21 @@ class VideoDisplay extends HTMLElement {
 			case attributeNames.STREAM_BASE_URL:
 				if (this.streamUrlBase !== currentValue) {
 					this.streamUrlBase = currentValue;
+					console.log('Updated streamUrlBase', this.streamUrlBase);
 					this.loadStream();
 				}
 				break;
 			case attributeNames.STREAM_CHANNEL:
 				if (this.streamChannel !== currentValue) {
 					this.streamChannel = currentValue;
+					console.log('Updated streamChannel', this.streamChannel);
 					this.loadStream();
 				}
 				break;
 			case attributeNames.STREAM_LAYER:
 				if (this.streamLayer !== currentValue) {
 					this.streamLayer = currentValue;
+					console.log('Updated streamLayer', this.streamLayer);
 					this.loadStream();
 				}
 				break;
@@ -108,11 +111,14 @@ class VideoDisplay extends HTMLElement {
 		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);
 		const streamUrl = `${this.streamUrlBase}/channel/${this.streamChannel}/${this.streamLayer}/stream`;
+		console.log('Using stream URL', streamUrl);
 
 		fetch(streamUrl)
 			.then((response) => response.json())
 			.then((streamInfo) => {
-				const region = streamInfo.regions.find((r) => r.channel == this.streamChannel);
+				const region = streamInfo.regions.find(
+					(r) => r.layer === this.streamLayer && r.channel === this.streamChannel
+				);
 				if (!region) {
 					throw new Error(`Region for channel ${this.streamChannel} not found using ${streamUrl}`);
 				}
@@ -141,8 +147,8 @@ class VideoDisplay extends HTMLElement {
 				});
 
 				img.src = this.streamUrlBase + stream.url;
-				img.style.transform = getCSSTransformString(scale, containerDimensions, region);
-				console.log('Using transform', getCSSTransformString(scale, containerDimensions, region));
+				img.style.transform = getCSSTransformString(scale, region);
+				console.log('Using transform', getCSSTransformString(scale, region));
 			})
 			.catch(console.error);
 	}
@@ -156,14 +162,13 @@ function calcTransformScale(container, region) {
 	return width / region.width;
 }
 
-function getCSSTransformString(scale, container, region) {
+function getCSSTransformString(scale, region) {
+	/* Note that the transforums depend on transform-origin: top left, which is
+	set in the component stylesheet */
 	const transforms = [];
 
 	transforms.push(`scale3d(${scale},${scale}, 1)`);
-
-	const translateX = Math.round((container.width - region.width) / 2);
-	const translateY = Math.round((container.height - region.height) / 2);
-	transforms.push(`translate3d(${translateX}px, ${translateY}px, 0)`);
+	transforms.push(`translate3d(${-region.x}px, ${-region.y}px, 0)`);
 
 	return transforms.join(' ');
 }
