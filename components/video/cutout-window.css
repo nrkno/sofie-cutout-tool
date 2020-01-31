@@ -1,4 +1,5 @@
 .cutout-window--container {
+	background-color: transparent;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: cover;
@@ -9,11 +10,11 @@
 }
 
 .cutout-window--container.crop916src169 {
-	background: transparent url('../../assets/passepartouts/9_16-from-16_9.png');
+	background-image: url('../../assets/passepartouts/9_16-from-16_9.svg');
 }
 
 .cutout-window--container.crop11src169 {
-	background: transparent url('../../assets/passepartouts/1_1-from-16_9.png');
+	background-image: url('../../assets/passepartouts/1_1-from-16_9.svg');
 }
 
 .cutout-window--frame {
