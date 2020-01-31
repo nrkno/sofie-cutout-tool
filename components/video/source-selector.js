@@ -33,6 +33,21 @@ class SourceSelector extends HTMLElement {
 		document.addEventListener('new-config', () => {
 			this.updateSources();
 		});
+
+		this.shadowRoot.addEventListener('click', ({ target }) => {
+			const id = target.getAttribute(attributeNames.SOURCE_ID);
+			if (!id) {
+				return;
+			}
+
+			const event = new CustomEvent(eventNames.SOURCE_SELECTED, {
+				bubbles: true,
+				composed: true,
+				detail: { id }
+			});
+			this.dispatchEvent(event);
+		});
+
 		this.updateSources();
 	}
 
@@ -57,14 +72,6 @@ class SourceSelector extends HTMLElement {
 			link.setAttribute(attributeNames.SOURCE_ID, id);
 			link.href = '#';
 			link.textContent = source.title;
-			link.addEventListener('click', () => {
-				const event = new CustomEvent(eventNames.SOURCE_SELECTED, {
-					bubbles: true,
-					detail: { id }
-				});
-				console.log('dispatching', this, event);
-				this.dispatchEvent(event);
-			});
 			listElement.appendChild(link);
 		});
 	}

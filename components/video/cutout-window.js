@@ -1,5 +1,6 @@
 import { clamp } from '../../lib/math.js';
 import { getElementHeight, getElementWidth } from '../../lib/dimensions.js';
+import { aspectRatios } from '../../lib/aspect-ratios.js';
 
 export { tagName, attributeNames, eventNames };
 
@@ -7,7 +8,9 @@ const tagName = 'cutout-window';
 
 const classNames = {
 	CONTAINER: 'cutout-window--container',
-	CROP_FRAME: 'cutout-window--frame'
+	CROP_FRAME: 'cutout-window--frame',
+	AR1_1_FROM_16_9: 'crop11src169',
+	AR9_16_FROM_16_9: 'crop916src169'
 };
 
 const attributeNames = {
@@ -16,7 +19,8 @@ const attributeNames = {
 };
 
 const eventNames = {
-	MOVE: 'cutout-move'
+	MOVE: 'cutout-move',
+	UPDATE_FRAME_SIZE: 'update-frame-size'
 };
 
 const innerHtml = `
@@ -43,6 +47,15 @@ class CutoutWindow extends HTMLElement {
 		return Object.values(attributeNames);
 	}
 
+	attributeChangedCallback(name, oldValue, newValue) {
+		console.log(`<${tagName}>.attributeChangedCallback()`, name, newValue);
+		switch (name) {
+			case attributeNames.CUTOUT_AR:
+				this.setFrameSize();
+				break;
+		}
+	}
+
 	connectedCallback() {
 		console.log(`<${tagName}> connected`, this);
 
@@ -52,16 +65,36 @@ class CutoutWindow extends HTMLElement {
 	}
 
 	setFrameSize() {
-		const ar = this.hasAttribute(attributeNames.CUTOUT_AR)
-			? this.getAttribute(attributeNames.CUTOUT_AR)
-			: 'not foudn';
-		console.log(this.attributes);
-		console.log(ar, this.frame);
-		const height = getElementHeight(this.frame);
+		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
+		const cutoutFrame = this.shadowRoot.querySelector(`.${classNames.CROP_FRAME}`);
+		const ar = Number(this.getAttribute(attributeNames.CUTOUT_AR));
+
+		if (!ar) {
+			console.log('No aspect ratio set for cutout, unable to set frame size');
+			return;
+		}
+
+		switch (ar) {
+			case aspectRatios['1_1']:
+				container.classList.add(classNames.AR1_1_FROM_16_9);
+				break;
+			case aspectRatios['9_16']:
+				container.classList.add(classNames.AR9_16_FROM_16_9);
+				break;
+			default:
+				console.log(
+					`Unknown aspect ratio ${ar}, wanted one of ${Object.values(aspectRatios).join(',')}`
+				);
+		}
+
+		// calc x position for cutout frame
+		// calc offset for background frame edge => background-position-x
+
+		const height = getElementHeight(cutoutFrame);
 		const width = (1 / ar) * height;
 		console.log(`Cutout frame: ${width}x${height}`);
 
-		this.frame.style.width = width;
+		cutoutFrame.style.width = width;
 	}
 
 	setupEventListeners() {
@@ -102,6 +135,11 @@ class CutoutWindow extends HTMLElement {
 			if (event.target.isSameNode(this.frame)) {
 				this.moveCropFromTouch(event);
 			}
+		});
+
+		this.addEventListener(eventNames.UPDATE_FRAME_SIZE, () => {
+			console.log(`<${tagName}>`, eventNames.UPDATE_FRAME_SIZE);
+			this.setFrameSize();
 		});
 	}
 
@@ -162,6 +200,7 @@ class CutoutWindow extends HTMLElement {
 		const maxX = (sourceDimensions.width - this.cutout.width) / 2;
 		const maxY = (sourceDimensions.height - this.cutout.height) / 2;
 
+		// cutout values must be normalized according to src size
 		this.cutout.x += deltaX / this.scale;
 		this.cutout.y += deltaY / this.scale;
 
@@ -177,6 +216,7 @@ class CutoutWindow extends HTMLElement {
 		document.dispatchEvent(
 			new CustomEvent(eventNames.MOVE, {
 				bubbles: true,
+				composed: true,
 				detail: { source: null, width, height, x, y }
 			})
 		);
@@ -184,4 +224,3 @@ class CutoutWindow extends HTMLElement {
 }
 
 customElements.define(tagName, CutoutWindow);
-console.log(`<${tagName}> defined.`);

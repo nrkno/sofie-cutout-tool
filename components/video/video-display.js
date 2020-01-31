@@ -1,6 +1,6 @@
 import { getElementWidth } from '../../lib/dimensions.js';
 
-export { createVideoDisplayElement, attributeNames };
+export { createVideoDisplayElement, attributeNames, eventNames };
 
 const tagName = 'video-display';
 const attributeNames = {
@@ -17,6 +17,10 @@ const classNames = {
 	CONTAINER: 'video-display--container',
 	AR_PLACEHOLDER: 'ar-placeholder',
 	IMG: 'img'
+};
+
+const eventNames = {
+	STREAM_PLAYING: 'stream-playing'
 };
 
 /**
@@ -69,8 +73,15 @@ class VideoDisplay extends HTMLElement {
 	}
 
 	connectedCallback() {
-		console.log(`<${tagName}> connected`, this);
 		this.loadStream();
+
+		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
+		img.addEventListener('load', () => {
+			this.dispatchStreamPlaying();
+		});
+		img.addEventListener('error', function(e) {
+			console.log('Error loading video stream', e);
+		});
 	}
 
 	attributeChangedCallback(name, oldValue, currentValue) {
@@ -78,25 +89,27 @@ class VideoDisplay extends HTMLElement {
 			case attributeNames.STREAM_BASE_URL:
 				if (this.streamUrlBase !== currentValue) {
 					this.streamUrlBase = currentValue;
-					console.log('Updated streamUrlBase', this.streamUrlBase);
 					this.loadStream();
 				}
 				break;
 			case attributeNames.STREAM_CHANNEL:
 				if (this.streamChannel !== currentValue) {
 					this.streamChannel = currentValue;
-					console.log('Updated streamChannel', this.streamChannel);
 					this.loadStream();
 				}
 				break;
 			case attributeNames.STREAM_LAYER:
 				if (this.streamLayer !== currentValue) {
 					this.streamLayer = currentValue;
-					console.log('Updated streamLayer', this.streamLayer);
 					this.loadStream();
 				}
 				break;
 		}
+	}
+
+	dispatchStreamPlaying() {
+		const event = new CustomEvent(eventNames.STREAM_PLAYING, { bubbles: true, composed: true });
+		this.dispatchEvent(event);
 	}
 
 	loadStream() {
@@ -111,7 +124,6 @@ class VideoDisplay extends HTMLElement {
 		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);
 		const streamUrl = `${this.streamUrlBase}/channel/${this.streamChannel}/${this.streamLayer}/stream`;
-		console.log('Using stream URL', streamUrl);
 
 		fetch(streamUrl)
 			.then((response) => response.json())
@@ -128,9 +140,7 @@ class VideoDisplay extends HTMLElement {
 					throw new Error(`Stream ${region.streamId} not found`);
 				}
 
-				console.log('stream', stream);
-				console.log('region', region);
-
+				const srcUrl = this.streamUrlBase + stream.url;
 				const scale = calcTransformScale(this.shadowRoot.host, region);
 
 				const containerDimensions = {
@@ -141,14 +151,13 @@ class VideoDisplay extends HTMLElement {
 				container.style.width = containerDimensions.width;
 				arPlaceholder.style.paddingBottom = `${containerDimensions.height}px`;
 
-				img.addEventListener('load', () => console.log('Stream loaded'));
-				img.addEventListener('error', function(e) {
-					console.log('error', e);
-				});
+				if (img.src !== srcUrl) {
+					img.src = srcUrl;
+				} else {
+					this.dispatchStreamPlaying();
+				}
 
-				img.src = this.streamUrlBase + stream.url;
 				img.style.transform = getCSSTransformString(scale, region);
-				console.log('Using transform', getCSSTransformString(scale, region));
 			})
 			.catch(console.error);
 	}
@@ -158,12 +167,11 @@ customElements.define(tagName, VideoDisplay);
 
 function calcTransformScale(container, region) {
 	const width = getElementWidth(container);
-	console.log(`Container width: ${width}`);
 	return width / region.width;
 }
 
 function getCSSTransformString(scale, region) {
-	/* Note that the transforums depend on transform-origin: top left, which is
+	/* Note that the transforms depend on transform-origin: top left, which is
 	set in the component stylesheet */
 	const transforms = [];
 

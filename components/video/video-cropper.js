@@ -2,7 +2,8 @@ const { ipcRenderer } = require('electron');
 
 import {
 	createVideoDisplayElement,
-	attributeNames as videoDisplayAttributeNames
+	attributeNames as videoDisplayAttributeNames,
+	eventNames as videoDisplayEventNames
 } from './video-display.js';
 
 import {
@@ -46,9 +47,9 @@ class VideoCropper extends HTMLElement {
 		this.videoDisplay.classList.add(classNames.CONTENT);
 		this.container.appendChild(this.videoDisplay);
 
-		// this.cropTool = document.createElement(cropToolTagName);
-		// this.cropTool.classList.add(classNames.CONTENT);
-		// this.container.appendChild(this.cropTool);
+		this.cropTool = document.createElement(cropToolTagName);
+		this.cropTool.classList.add(classNames.CONTENT);
+		this.container.appendChild(this.cropTool);
 	}
 
 	static get observedAttributes() {
@@ -76,6 +77,10 @@ class VideoCropper extends HTMLElement {
 			this.triggerSendUpdate();
 		});
 
+		this.addEventListener(videoDisplayEventNames.STREAM_PLAYING, () => {
+			this.cropTool.dispatchEvent(new CustomEvent(cropToolEventNames.UPDATE_FRAME_SIZE));
+		});
+
 		document.addEventListener('new-config', () => {
 			console.log(`<${tagName}>: new config!`);
 			if (this.cutoutId) {
@@ -91,14 +96,12 @@ class VideoCropper extends HTMLElement {
 		console.log('Using cutout', this.cutout);
 		this.source = document.fullConfig.sources[this.cutout.source];
 
-		// this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT_AR, calcAspectRatio(this.cutout));
-		// this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
+		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT_AR, calcAspectRatio(this.cutout));
+		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
 
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
-
-		console.log(`<${tagName}>.updateId() completed`);
 	}
 
 	triggerSendUpdate() {
@@ -117,4 +120,3 @@ class VideoCropper extends HTMLElement {
 }
 
 customElements.define(tagName, VideoCropper);
-console.log(`<${tagName}> defined`);
