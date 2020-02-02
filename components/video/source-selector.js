@@ -1,3 +1,8 @@
+import {
+	tagName as thumbnailTagName,
+	attributeNames as thumbnailAttributeNames
+} from './source-thumbnail.js';
+
 export { tagName, classNames, eventNames };
 
 const tagName = 'source-selector';
@@ -71,7 +76,12 @@ class SourceSelector extends HTMLElement {
 			const link = document.createElement('a');
 			link.setAttribute(attributeNames.SOURCE_ID, id);
 			link.href = '#';
-			link.textContent = source.title;
+			link.title = source.title;
+
+			const thumbnail = document.createElement(thumbnailTagName);
+			thumbnail.setAttribute(thumbnailAttributeNames.SOURCE_ID, id);
+			link.appendChild(thumbnail);
+
 			listElement.appendChild(link);
 		});
 	}
