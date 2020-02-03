@@ -1,39 +1,29 @@
 import { arrayBufferToBase64 } from '../../lib/conversion.js';
 
-export { tagName, attributeNames };
+export { tagNames, attributeNames };
 
-const tagName = 'source-thumbnail';
+const tagNames = {
+	CUSTOM: 'source-thumbnail',
+	BASE: 'img'
+};
 
 const attributeNames = {
 	SOURCE_ID: 'data-source-id'
 };
 
-const classNames = {
-	IMAGE: 'source-thumbnail--img'
-};
-
 //TODO: should come from config
 const pathToCasparCGImageProvider = 'http://127.0.0.1:3020';
 
-const innerHtml = `
-	<link rel="stylesheet" href="./components/video/source-thumbnail.css" />
-	<img class="${classNames.IMAGE}"/>
-`;
-
-class SourceThumbnail extends HTMLElement {
+class SourceThumbnail extends HTMLImageElement {
 	constructor() {
 		super();
-
-		const shadowRoot = this.attachShadow({ mode: 'open' });
-		shadowRoot.innerHTML = innerHtml;
-
-		this.img = shadowRoot.querySelector(`.${classNames.IMAGE}`);
 	}
 
 	connectedCallback() {
 		const sourceId = this.getAttribute(attributeNames.SOURCE_ID);
 		if (!isDefined(sourceId)) {
 			console.warn(`No source id set, unable to display thumbnail.`);
+			return;
 		}
 
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[sourceId];
@@ -58,19 +48,24 @@ class SourceThumbnail extends HTMLElement {
 						break; // no retries for not found
 					case 200:
 						response.arrayBuffer().then((buffer) => {
-							if (this.hasBeenRemoved) return;
+							if (this.hasBeenRemoved) {
+								console.log('Element removed, not setting image src');
+								return;
+							}
 
-							var base64Flag = 'data:image/jpeg;base64,';
-							var imageStr = arrayBufferToBase64(buffer);
-
-							this.img.src = base64Flag + imageStr;
+							const dataPrefix = 'data:image/png;base64,';
+							const imageData = arrayBufferToBase64(buffer);
+							this.src = `${dataPrefix}${imageData}`;
 							setTimeout(() => {
 								this.updateImage();
-							}, 100);
+							}, 1000);
 						});
 						break;
 					default:
 						console.error(`HTTP ${status} for ${url}: ${response.statusText}`);
+						setTimeout(() => {
+							this.updateImage();
+						}, 5000);
 						break;
 				}
 			})
@@ -82,7 +77,7 @@ class SourceThumbnail extends HTMLElement {
 			});
 	}
 }
-customElements.define(tagName, SourceThumbnail);
+customElements.define(tagNames.CUSTOM, SourceThumbnail, { extends: tagNames.BASE });
 
 function isDefined(value) {
 	return value !== null && value !== undefined;

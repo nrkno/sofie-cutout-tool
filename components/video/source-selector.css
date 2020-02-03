@@ -1,0 +1,14 @@
+.input-source-list {
+	display: flex;
+	flex-wrap: wrap;
+	list-style: none;
+	padding-inline-start: 0;
+}
+
+.input-source-list--item {
+	padding: 0 16px 16px;
+}
+
+.source-thumbnail {
+	width: 256px;
+}

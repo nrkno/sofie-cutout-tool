@@ -1,5 +1,5 @@
 import {
-	tagName as thumbnailTagName,
+	tagNames as thumbnailTagNames,
 	attributeNames as thumbnailAttributeNames
 } from './source-thumbnail.js';
 
@@ -8,7 +8,9 @@ export { tagName, classNames, eventNames };
 const tagName = 'source-selector';
 
 const classNames = {
-	SOURCES_LIST: 'input-source-list'
+	SOURCES_LIST: 'input-source-list',
+	SOURCES_LIST_ITEM: 'input-source-list--item',
+	SRC_THUMB: 'source-thumbnail'
 };
 
 const attributeNames = {
@@ -20,6 +22,7 @@ const eventNames = {
 };
 
 const innerHtml = `
+<link rel="stylesheet" href="./components/video/source-selector.css">
 <ul class="${classNames.SOURCES_LIST}"></ul>
 `;
 
@@ -70,21 +73,30 @@ class SourceSelector extends HTMLElement {
 		ids.forEach((id) => {
 			const source = this.sources[id];
 
-			const listElement = document.createElement('li');
+			const listElement = createListItem(source, id);
 			this.sourceListElement.appendChild(listElement);
-
-			const link = document.createElement('a');
-			link.setAttribute(attributeNames.SOURCE_ID, id);
-			link.href = '#';
-			link.title = source.title;
-
-			const thumbnail = document.createElement(thumbnailTagName);
-			thumbnail.setAttribute(thumbnailAttributeNames.SOURCE_ID, id);
-			link.appendChild(thumbnail);
-
-			listElement.appendChild(link);
 		});
 	}
 }
 
 customElements.define(tagName, SourceSelector);
+
+function createListItem(source, sourceId) {
+	const listItem = document.createElement('li');
+	listItem.classList.add(classNames.SOURCES_LIST_ITEM);
+
+	const link = document.createElement('a');
+	link.setAttribute(attributeNames.SOURCE_ID, sourceId);
+	link.href = '#';
+	link.title = source.title;
+	listItem.appendChild(link);
+
+	const thumbnail = document.createElement(thumbnailTagNames.BASE, {
+		is: thumbnailTagNames.CUSTOM
+	});
+	thumbnail.setAttribute(thumbnailAttributeNames.SOURCE_ID, sourceId);
+	thumbnail.classList.add(classNames.SRC_THUMB);
+	link.appendChild(thumbnail);
+
+	return listItem;
+}
