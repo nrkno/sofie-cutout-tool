@@ -12,8 +12,6 @@ import {
 	eventNames as cropToolEventNames
 } from './cutout-window.js';
 
-import { calcAspectRatio } from '../../lib/aspect-ratios.js';
-
 export { tagName, attributeNames };
 
 const tagName = 'video-cropper';
@@ -96,8 +94,8 @@ class VideoCropper extends HTMLElement {
 		console.log('Using cutout', this.cutout);
 		this.source = document.fullConfig.sources[this.cutout.source];
 
-		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT_AR, calcAspectRatio(this.cutout));
 		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
+		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, JSON.stringify(this.cutout));
 
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);

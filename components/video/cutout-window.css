@@ -3,11 +3,9 @@
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: cover;
-	outline: 1px solid blue;
-	outline-offset: -1px;
-	z-index: 1;
 	height: 100%;
-	opacity: 90%;
+	opacity: 60%;
+	position: relative;
 }
 
 .cutout-window--container.crop916src169 {
@@ -19,8 +17,7 @@
 }
 
 .cutout-window--frame {
-	outline: 1px solid green;
-	outline-offset: -2px;
+	outline: 1px solid red;
 	height: 100%;
-	z-index: 10;
+	position: absolute;
 }

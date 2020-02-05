@@ -14,7 +14,7 @@
 			"outputRotation": 0,
 			"source": "source_B",
 			"width": 720,
-			"x": 0,
+			"x": 128,
 			"y": 0
 		},
 		"cutout_source_D": {
@@ -22,7 +22,7 @@
 			"outputRotation": 0,
 			"source": "source_D",
 			"width": 720,
-			"x": 0,
+			"x": 448,
 			"y": 0
 		},
 		"cutout_source_A": {
@@ -30,7 +30,7 @@
 			"outputRotation": 0,
 			"source": "source_A",
 			"width": 720,
-			"x": 0,
+			"x": 384,
 			"y": 0
 		},
 		"cutout_source_E": {
@@ -38,7 +38,7 @@
 			"outputRotation": 0,
 			"source": "source_E",
 			"width": 720,
-			"x": 0,
+			"x": 256,
 			"y": 0
 		}
 	}

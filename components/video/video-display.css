@@ -3,13 +3,16 @@
   and so they must be changed there if they are changed here.
 */
 .video-display--container {
-	background: orange;
-	outline: 1px solid red;
+	background: yellow;
 	display: grid;
 	grid-template-areas: 'video';
 	overflow: hidden;
 	position: relative;
 	margin: 0 auto;
+
+	/* placeholder size, will be overridden when actual video is loaded */
+	width: 952px;
+	height: 536px;
 }
 
 .video-display--container .ar-placeholder {
