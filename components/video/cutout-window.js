@@ -56,7 +56,8 @@ class CutoutWindow extends HTMLElement {
 		console.log(`<${tagName}> connected`, this);
 
 		this.setupEventListeners();
-		this.source = this.updateCutoutFromAttribute();
+		this.updateCutoutFromAttribute();
+		this.setSourceFromAttribute();
 		this.setFrameSize();
 		// this.moveCrop(this.cutout.x, this.cutout.y);
 	}
@@ -66,12 +67,10 @@ class CutoutWindow extends HTMLElement {
 		switch (name) {
 			case attributeNames.CUTOUT:
 				this.updateCutoutFromAttribute();
-				this.calcScale();
 				this.setFrameSize();
 				break;
 			case attributeNames.SRC:
 				this.setSourceFromAttribute();
-				this.calcScale();
 				this.setFrameSize();
 				break;
 		}
@@ -104,6 +103,7 @@ class CutoutWindow extends HTMLElement {
 			cutout.source = source; // source isn't a Number
 			this.cutout = cutout;
 			console.log('Using cutout', this.cutout);
+			this.calcScale();
 		} catch (error) {
 			console.warn(`Unable to set cutout from attribute value ${attributeValue}`, error);
 		}
@@ -113,6 +113,7 @@ class CutoutWindow extends HTMLElement {
 		const sourceString = this.getAttribute(attributeNames.SRC);
 		try {
 			this.source = JSON.parse(sourceString);
+			this.calcScale();
 		} catch (error) {
 			console.warn('Unable to update source from attribute', error, sourceString);
 		}
@@ -127,10 +128,6 @@ class CutoutWindow extends HTMLElement {
 	}
 
 	setPassepartoutPosition() {
-		/**
-		 * For now, this assumes that the src ar is equal to or wider than the cutout ar.
-		 * In other words, this assumption is wrong if going from 9:16 to 1:1.
-		 */
 		/* The passepartout backgrounds are constructed after the following rules:
 			- the cutout is placed in the middle of the background and is fully transparent
 			- on both sides of the cutout there is exactly the amount of non-transparent 
@@ -138,7 +135,7 @@ class CutoutWindow extends HTMLElement {
 				on either edge.
 			
 			This means that for a 1:1 cutout for a 16:9 source the background is built up
-			like this:
+			like this from left to right, all areas in full height:
 				1: 7 units of non-transparent space
 				2: 9 units of transparent space
 				3: 7 units of non-transparent space
@@ -158,10 +155,10 @@ class CutoutWindow extends HTMLElement {
 				y = scaled cutout frame y - distance from background top edge to top edge of transparent area
 
 			Since the background is scaled to the container, it will have the same scale as this component's
-			calculated scale. Considering the construction rules for the passepartouts we can therefore defer
+			cutout frame. Considering the construction rules for the passepartouts we can therefore defer
 			the following:
-			- distance from left edge of background to left edge of transparent area equals container width - cutout width * scale
-			- distance from the top edge of background to top edge of transparent area equals container height - cutout height * scale
+			- distance from left edge of background to left edge of transparent area equals container width - cutout frame width
+			- distance from the top edge of background to top edge of transparent area equals container height - cutout frame height
 		*/
 		const backgroundOffsetX = getElementWidth(this.container) - getElementWidth(this.frame);
 		const backgroundOffsetY = getElementHeight(this.container) - getElementHeight(this.frame);
@@ -187,6 +184,7 @@ class CutoutWindow extends HTMLElement {
 			console.log('No aspect ratio set for cutout, unable to set frame size');
 			return;
 		}
+
 		console.log('Using AR', ar);
 		switch (ar) {
 			case aspectRatios['1_1']:
