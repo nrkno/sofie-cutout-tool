@@ -70,7 +70,7 @@ class VideoCropper extends HTMLElement {
 		}
 
 		this.addEventListener(cropToolEventNames.MOVE, (event) => {
-			const { width, height, x, y } = event.details;
+			const { width, height, x, y } = event.detail;
 			this.cutout = Object.assign({}, this.cutout, { width, height, x, y });
 			this.triggerSendUpdate();
 		});

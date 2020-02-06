@@ -7,5 +7,4 @@
 
 .video-cropper--content {
 	grid-area: video-cropper;
-	z-index: 1;
 }

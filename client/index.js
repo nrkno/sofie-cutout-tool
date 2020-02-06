@@ -11,6 +11,4 @@ const logger = {
 	info: (args) => console.info(args)
 };
 
-console.log('Client scripts loaded.');
-console.log(cutoutManagerInit(logger, document));
-console.log('Client scripts init executed');
+cutoutManagerInit(logger, document);

@@ -33,7 +33,6 @@ function init(logger, document) {
 	});
 
 	document.addEventListener(sourceSelectorEventNames.SOURCE_SELECTED, ({ detail }) => {
-		logger.log('SOURCE_SELECTED', detail);
 		if (detail) {
 			const { id } = detail;
 			let cutoutId = findCutoutIdFromSourceId(id);
@@ -51,7 +50,6 @@ function init(logger, document) {
 			}
 
 			if (cutoutId) {
-				logger.log('Changing preview to cutout', cutoutId);
 				const preview = document.querySelector(`${videoCropperTagName}.preview`);
 				preview.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutId);
 			} else {
@@ -61,7 +59,7 @@ function init(logger, document) {
 	});
 
 	ipcRenderer.send('initialize');
-	return 'cutout-manager init complete';
+	return;
 }
 
 function createCutoutFromSource(sourceId, logger) {
@@ -99,5 +97,3 @@ function findCutoutIdFromSourceId(sourceId, logger) {
 
 	return undefined;
 }
-
-console.log('Cutout manager', document, window, console);
