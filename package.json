@@ -16,7 +16,7 @@
   "postinstall": "trash node_modules/@serialport node_modules/serialport && electron-rebuild"
  },
  "author": "",
- "license": "ISC",
+ "license": "MIT",
  "dependencies": {
   "@sinonjs/referee": "^4.0.0",
   "chokidar": "^3.3.0",
