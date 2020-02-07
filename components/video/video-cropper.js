@@ -1,5 +1,3 @@
-const { ipcRenderer } = require('electron');
-
 import {
 	createVideoDisplayElement,
 	attributeNames as videoDisplayAttributeNames,
@@ -12,7 +10,7 @@ import {
 	eventNames as cropToolEventNames
 } from './cutout-window.js';
 
-export { tagName, attributeNames };
+export { tagName, attributeNames, eventNames };
 
 const tagName = 'video-cropper';
 
@@ -24,6 +22,10 @@ const classNames = {
 
 const attributeNames = {
 	SOURCE_ID: 'data-source-id'
+};
+
+const eventNames = {
+	CROP_MOVE: 'crop-move'
 };
 
 const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper.css" />
@@ -69,14 +71,15 @@ class VideoCropper extends HTMLElement {
 			this.updateId(this.getAttribute(attributeNames.SOURCE_ID));
 		}
 
-		this.addEventListener(cropToolEventNames.MOVE, (event) => {
+		this.addEventListener(videoDisplayEventNames.STREAM_PLAYING, () => {
+			this.cropTool.dispatchEvent(new CustomEvent(cropToolEventNames.UPDATE_FRAME_SIZE));
+		});
+
+		document.addEventListener(cropToolEventNames.MOVE, (event) => {
+			event.stopPropagation();
 			const { width, height, x, y } = event.detail;
 			this.cutout = Object.assign({}, this.cutout, { width, height, x, y });
 			this.triggerSendUpdate();
-		});
-
-		this.addEventListener(videoDisplayEventNames.STREAM_PLAYING, () => {
-			this.cropTool.dispatchEvent(new CustomEvent(cropToolEventNames.UPDATE_FRAME_SIZE));
 		});
 
 		document.addEventListener('new-config', () => {
@@ -107,13 +110,17 @@ class VideoCropper extends HTMLElement {
 			this.sendUpdateTimeout = setTimeout(() => {
 				this.sendUpdateTimeout = null;
 
-				this.sendUpdate();
+				const event = new CustomEvent(eventNames.CROP_MOVE, {
+					bubbles: true,
+					composed: true,
+					detail: {
+						cutoutId: this.cutoutId,
+						cutout: this.cutout
+					}
+				});
+				this.dispatchEvent();
 			}, 500);
 		}
-	}
-
-	sendUpdate() {
-		ipcRenderer.send('update-cutout', this.cutoutId, this.cutout);
 	}
 }
 

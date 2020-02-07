@@ -9,10 +9,6 @@
 	overflow: hidden;
 	position: relative;
 	margin: 0 auto;
-
-	/* placeholder size, will be overridden when actual video is loaded */
-	width: 952px;
-	height: 536px;
 }
 
 .video-display--container .ar-placeholder {

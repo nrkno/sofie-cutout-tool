@@ -2,7 +2,8 @@ const { ipcRenderer } = require('electron');
 
 import {
 	attributeNames as videoCropperAttributeNames,
-	tagName as videoCropperTagName
+	tagName as videoCropperTagName,
+	eventNames as videoCropperEventNames
 } from '../../components/video/video-cropper.js';
 
 import { eventNames as sourceSelectorEventNames } from '../../components/video/source-selector.js';
@@ -58,8 +59,30 @@ function init(logger, document) {
 		}
 	});
 
+	document.addEventListener(videoCropperEventNames.CROP_MOVE, ({ detail }) => {
+		if (detail) {
+			const { cutoutId, cutout } = detail;
+			if (cutoutId && cutout) {
+				triggerSendUpdate(cutoutId, cutout);
+				document.cutouts[cutoutId] = cutout;
+			}
+		}
+	});
+
 	ipcRenderer.send('initialize');
 	return;
+}
+
+let sendUpdateTimeout = null;
+
+function triggerSendUpdate(cutoutId, cutout) {
+	if (sendUpdateTimeout) {
+		sendUpdateTimeout = setTimeout(() => {
+			sendUpdateTimeout = null;
+
+			ipcRenderer.send('update-cutout', cutoutId, cutout);
+		}, 500);
+	}
 }
 
 function createCutoutFromSource(sourceId, logger) {

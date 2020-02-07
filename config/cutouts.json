@@ -6,39 +6,39 @@
 			"outputRotation": 0,
 			"source": "source_C",
 			"width": 1280,
-			"x": 0,
-			"y": 0
+			"x": 430.9333333333333,
+			"y": 125.3333333333333
 		},
 		"cutout_B": {
 			"height": 720,
 			"outputRotation": 0,
 			"source": "source_B",
 			"width": 720,
-			"x": 128,
-			"y": 0
+			"x": 568.5333333333335,
+			"y": 150.9333333333334
 		},
 		"cutout_source_D": {
-			"height": 1280,
+			"height": 1080,
 			"outputRotation": 0,
 			"source": "source_D",
-			"width": 720,
-			"x": 912.3074732614414,
+			"width": 607.5,
+			"x": 54.70747326144152,
 			"y": 0
 		},
 		"cutout_source_A": {
-			"height": 1280,
+			"height": 1080,
 			"outputRotation": 0,
 			"source": "source_A",
-			"width": 720,
-			"x": 384,
+			"width": 607.5,
+			"x": 1214.366666666667,
 			"y": 0
 		},
 		"cutout_source_E": {
-			"height": 1280,
+			"height": 1080,
 			"outputRotation": 0,
 			"source": "source_E",
-			"width": 720,
-			"x": 256,
+			"width": 607.5,
+			"x": 46.153846153846146,
 			"y": 0
 		}
 	}

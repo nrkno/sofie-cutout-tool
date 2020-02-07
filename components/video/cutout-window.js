@@ -59,7 +59,7 @@ class CutoutWindow extends HTMLElement {
 		this.setupEventListeners();
 		this.updateCutoutFromAttribute();
 		this.setSourceFromAttribute();
-		this.setFrameSize();
+		this.setFrameSizeAndPosition();
 		// this.moveCrop(this.cutout.x, this.cutout.y);
 	}
 
@@ -68,11 +68,11 @@ class CutoutWindow extends HTMLElement {
 		switch (name) {
 			case attributeNames.CUTOUT:
 				this.updateCutoutFromAttribute();
-				this.setFrameSize();
+				this.setFrameSizeAndPosition();
 				break;
 			case attributeNames.SRC:
 				this.setSourceFromAttribute();
-				this.setFrameSize();
+				this.setFrameSizeAndPosition();
 				break;
 		}
 	}
@@ -169,6 +169,11 @@ class CutoutWindow extends HTMLElement {
 			console.warn('Unable to update source from attribute', error, sourceString);
 		}
 	}
+	setFrameSizeAndPosition() {
+		if (!this.cutout) return;
+		this.setFrameSize();
+		this.setFramePosition();
+	}
 
 	setFramePosition() {
 		const { x, y } = this.cutout;
@@ -260,12 +265,16 @@ class CutoutWindow extends HTMLElement {
 				);
 		}
 
-		const height = getElementHeight(cutoutFrame);
-		const width = ar * height;
-		console.log(`Cutout frame: ${width}x${height}`);
+		// const height = getElementHeight(cutoutFrame);
+		// const width = ar * height;
+		// console.log(`Cutout frame: ${width}x${height}`);
 
-		cutoutFrame.style.width = `${width}px`;
-		this.setFramePosition();
+		// cutoutFrame.style.width = `${width}px`;
+
+		// johan wants:
+		const { width, height } = this.cutout;
+		cutoutFrame.style.width = `${width * this.screenSpaceScale}px`;
+		cutoutFrame.style.height = `${height * this.screenSpaceScale}px`;
 	}
 
 	setupEventListeners() {
@@ -283,6 +292,7 @@ class CutoutWindow extends HTMLElement {
 		});
 		document.body.addEventListener('mousemove', (event) => {
 			if (this.mouseDown) {
+				// console.log('event.movementX', event.movementX)
 				this.moveCrop(event.movementX, event.movementY);
 			}
 		});
@@ -310,7 +320,7 @@ class CutoutWindow extends HTMLElement {
 
 		this.addEventListener(eventNames.UPDATE_FRAME_SIZE, () => {
 			console.log(`<${tagName}>`, eventNames.UPDATE_FRAME_SIZE);
-			this.setFrameSize();
+			this.setFrameSizeAndPosition();
 		});
 	}
 
@@ -368,22 +378,35 @@ class CutoutWindow extends HTMLElement {
 		const scaledDeltaX = deltaX / this.screenSpaceScale;
 		const scaledDeltaY = deltaY / this.screenSpaceScale;
 
+		// Scale to fit (if we want to)
+		if (this.cutout.height > this.source.height) {
+			const scaleDownFactor = this.source.height / this.cutout.height;
+
+			this.cutout.height *= scaleDownFactor;
+			this.cutout.width *= scaleDownFactor;
+		} else if (this.cutout.width > this.source.width) {
+			const scaleDownFactor = this.source.width / this.cutout.width;
+
+			this.cutout.height *= scaleDownFactor;
+			this.cutout.width *= scaleDownFactor;
+		}
+
 		// normalize cutout to source size
-		const scaledCutoutX = this.cutout.x * this.cutoutScale;
-		const scaledCutoutY = this.cutout.y * this.cutoutScale;
+		// const scaledCutoutX = this.cutout.x * this.cutoutScale;
+		// const scaledCutoutY = this.cutout.y * this.cutoutScale;
 
-		// normalized position
-		const x = scaledCutoutX + scaledDeltaX;
-		const y = scaledCutoutY + scaledDeltaY;
+		// // normalized position
+		const x = this.cutout.x + scaledDeltaX;
+		const y = this.cutout.y + scaledDeltaY;
 
-		console.log('Normalized position from screenspace', scaledCutoutX, scaledCutoutY);
+		// console.log('Normalized position from screenspace', scaledCutoutX, scaledCutoutY);
 
-		this.cutout.x = clamp(x, 0, this.source.width - this.cutout.width * this.cutoutScale);
-		this.cutout.y = clamp(y, 0, this.source.height - this.cutout.height * this.cutoutScale);
+		this.cutout.x = clamp(x, 0, this.source.width - this.cutout.width);
+		this.cutout.y = clamp(y, 0, this.source.height - this.cutout.height);
 
-		console.log('Clamped within source boundaries', this.cutout.x, this.cutout.y);
+		// console.log('Clamped within source boundaries', this.cutout.x, this.cutout.y);
 
-		this.setFramePosition();
+		this.setFrameSizeAndPosition();
 		this.emitMoveEvent();
 	}
 
