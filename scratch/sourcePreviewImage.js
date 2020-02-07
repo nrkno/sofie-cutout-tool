@@ -1,4 +1,4 @@
-const pathToCasparCGImageProvider = 'http://127.0.0.1:3020';
+const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
 
 updateImage(sourceReferenceLayer, img) {
   if (sourceReferenceLayer) {
