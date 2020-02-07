@@ -30,7 +30,7 @@ const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper
 <div class="${classNames.CONTAINER}"></div>
 `;
 
-const pathToCasparCGImageProvider = 'http://127.0.0.1:3020';
+const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
 
 class VideoCropper extends HTMLElement {
 	constructor() {
