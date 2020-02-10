@@ -79,7 +79,13 @@ class VideoCropper extends HTMLElement {
 		document.addEventListener(cropToolEventNames.MOVE, (event) => {
 			event.stopPropagation();
 			const { width, height, x, y } = event.detail;
-			this.cutout = Object.assign({}, this.cutout, { width, height, x, y });
+			const centeredPosition = transformTopLeftToCenterOrigo({ x, y, width, height }, this.source);
+			this.cutout = Object.assign({}, this.cutout, {
+				width,
+				height,
+				x: centeredPosition.x,
+				y: centeredPosition.y
+			});
 			this.triggerSendUpdate();
 		});
 
@@ -99,7 +105,13 @@ class VideoCropper extends HTMLElement {
 		this.source = document.fullConfig.sources[this.cutout.source];
 
 		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
-		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, JSON.stringify(this.cutout));
+
+		const topLeftPosition = transformCenterToTopLeft(this.cutout, this.source);
+		const topLeftCutout = Object.assign({}, this.cutout, {
+			x: topLeftPosition.x,
+			y: topLeftPosition.y
+		});
+		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, JSON.stringify(topLeftCutout));
 
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
@@ -126,3 +138,23 @@ class VideoCropper extends HTMLElement {
 }
 
 customElements.define(tagName, VideoCropper);
+
+function transformTopLeftToCenterOrigo(cutout, source) {
+	const cutoutOrigoX = cutout.x + cutout.width / 2;
+	const cutoutOrigoY = cutout.y + cutout.height / 2;
+
+	return {
+		x: cutoutOrigoX - source.width / 2,
+		y: cutoutOrigoY - source.height / 2
+	};
+}
+
+function transformCenterToTopLeft(cutout, source) {
+	const cutoutOrigoX = cutout.x - cutout.width / 2;
+	const cutoutOrigoY = cutout.y - cutout.height / 2;
+
+	return {
+		x: cutoutOrigoX + source.width / 2,
+		y: cutoutOrigoY + source.height / 2
+	};
+}
