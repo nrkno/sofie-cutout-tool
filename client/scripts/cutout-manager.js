@@ -53,6 +53,7 @@ function init(logger, document) {
 			if (cutoutId) {
 				const preview = document.querySelector(`${videoCropperTagName}.preview`);
 				preview.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutId);
+				ipcRenderer.send('preview', cutoutId);
 			} else {
 				logger.warn('Unable to find or create a cutout for source', id);
 			}
@@ -65,6 +66,16 @@ function init(logger, document) {
 			if (cutoutId && cutout) {
 				triggerSendUpdate(cutoutId, cutout);
 				document.cutouts[cutoutId] = cutout;
+			}
+		}
+	});
+
+	document.addEventListener('click', (target) => {
+		if (target.classList.contains('take')) {
+			const preview = document.querySelector(`${videoCropperTagName}.preview`);
+			const cutoutId = preview.getAttribute(videoCropperAttributeNames.SOURCE_ID);
+			if (cutoutId) {
+				ipcRenderer.send('take', cutoutId);
 			}
 		}
 	});
