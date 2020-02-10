@@ -1,45 +1,53 @@
 {
-	"note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
-	"cutouts": {
-		"cutout_A": {
-			"height": 720,
-			"outputRotation": 0,
-			"source": "source_C",
-			"width": 1280,
-			"x": 430.9333333333333,
-			"y": 125.3333333333333
-		},
-		"cutout_B": {
-			"height": 720,
-			"outputRotation": 0,
-			"source": "source_B",
-			"width": 720,
-			"x": 568.5333333333335,
-			"y": 150.9333333333334
-		},
-		"cutout_source_D": {
-			"height": 1080,
-			"outputRotation": 0,
-			"source": "source_D",
-			"width": 607.5,
-			"x": 54.70747326144152,
-			"y": 0
-		},
-		"cutout_source_A": {
-			"height": 1080,
-			"outputRotation": 0,
-			"source": "source_A",
-			"width": 607.5,
-			"x": 1214.366666666667,
-			"y": 0
-		},
-		"cutout_source_E": {
-			"height": 1080,
-			"outputRotation": 0,
-			"source": "source_E",
-			"width": 607.5,
-			"x": 46.153846153846146,
-			"y": 0
-		}
-	}
+  "note": "This file is not intended to be manually edited, it will update when the user makes changes in the UI",
+  "cutouts": {
+    "cutout_A": {
+      "height": 720,
+      "outputRotation": 0,
+      "source": "source_C",
+      "width": 1280,
+      "x": 430.9333333333333,
+      "y": 125.3333333333333
+    },
+    "cutout_B": {
+      "height": 720,
+      "outputRotation": 0,
+      "source": "source_B",
+      "width": 720,
+      "x": 568.5333333333335,
+      "y": 150.9333333333334
+    },
+    "cutout_source_D": {
+      "height": 1080,
+      "outputRotation": 0,
+      "source": "source_D",
+      "width": 607.5,
+      "x": 54.70747326144152,
+      "y": 0
+    },
+    "cutout_source_A": {
+      "height": 1080,
+      "outputRotation": 0,
+      "source": "source_A",
+      "width": 607.5,
+      "x": 660.5504587155967,
+      "y": 0
+    },
+    "cutout_source_E": {
+      "height": 1080,
+      "outputRotation": 0,
+      "source": "source_E",
+      "width": 607.5,
+      "x": 46.153846153846146,
+      "y": 0
+    },
+    "cutout_source_AMB": {
+      "height": 1280,
+      "outputRotation": 0,
+      "source": "source_AMB",
+      "width": 720,
+      "x": 0,
+      "y": 0
+    }
+  }
 }

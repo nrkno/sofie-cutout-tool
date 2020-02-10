@@ -30,6 +30,7 @@ export class TSRController {
 	public mappings: any = {};
 
 	public refer: CasparReferrer;
+
 	private _memorySources: { [channelLayer: string]: SourceInputAny } = {};
 
 	constructor() {
@@ -63,7 +64,7 @@ export class TSRController {
 		this._addTSRDevice('casparcg0', {
 			type: DeviceType.CASPARCG,
 			options: {
-				host: '127.0.0.1',
+				host: '160.67.48.165',
 				port: 5250
 			},
 			isMultiThreaded: false
@@ -75,7 +76,13 @@ export class TSRController {
 		await this.tsr.destroy();
 	}
 	/** Calculate new timeline and send it into TSR */
-	updateTimeline(sources: Sources, cutouts: Cutouts, outputs: Outputs, settings: Settings): void {
+	updateTimeline(
+		sources: Sources,
+		cutouts: Cutouts,
+		outputs: Outputs,
+		settings: Settings,
+		runtimeData: RunTimeData
+	): void {
 		this.mappings = {};
 		this.timeline = [];
 		this.refer.reset();
@@ -130,8 +137,10 @@ export class TSRController {
 					layer: 10
 				};
 
-				const cutout = cutouts[output.cutout.cutoutId];
-				if (!cutout) throw Error(`cutout "${output.cutout.cutoutId} not found!`);
+				const cutoutId = runtimeData.pgmCutout || output.cutout.cutoutId;
+				// const cutoutId = output.cutout.cutoutId
+				const cutout = cutouts[cutoutId];
+				if (!cutout) throw Error(`cutout "${cutoutId} not found!`);
 				const source = sources[cutout.source];
 				if (!source) throw Error(`source "${cutout.source} not found!`);
 
@@ -249,6 +258,7 @@ export class TSRController {
 		_.each(this.timeline, (tlObj, i) => {
 			if (!tlObj.id) tlObj.id = 'Unnamed' + i;
 		});
+		console.log('update timeline');
 
 		// Send mappings and timeline to TSR:
 		this.tsr.setMapping(this.mappings);
@@ -380,4 +390,8 @@ export class TSRController {
 
 export interface DecklinkInputRefs {
 	[refId: string]: string;
+}
+export interface RunTimeData {
+	pvwCutout?: string;
+	pgmCutout?: string;
 }

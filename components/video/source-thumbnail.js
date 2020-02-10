@@ -12,7 +12,8 @@ const attributeNames = {
 };
 
 //TODO: should come from config
-const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
+// const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
+const pathToCasparCGImageProvider = 'http://160.67.48.165:5255';
 
 class SourceThumbnail extends HTMLImageElement {
 	constructor() {
@@ -58,7 +59,7 @@ class SourceThumbnail extends HTMLImageElement {
 							this.src = `${dataPrefix}${imageData}`;
 							setTimeout(() => {
 								this.updateImage();
-							}, 1000);
+							}, 20000);
 						});
 						break;
 					default:

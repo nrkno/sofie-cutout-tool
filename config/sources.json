@@ -1,5 +1,16 @@
 {
 	"sources": {
+		"source_AMB": {
+			"title": "Caspar Test Loop",
+			"width": 1920,
+			"height": 1080,
+			"rotation": 0,
+			"input": {
+				"type": "media",
+				"file": "AMB",
+				"loop": true
+			}
+		},
 		"source_A": {
 			"title": "Overturisme",
 			"width": 1920,

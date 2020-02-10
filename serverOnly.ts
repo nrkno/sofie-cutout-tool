@@ -17,7 +17,8 @@ dataHandler.onConfigChanged(() => {
 				fullConfig.sources,
 				fullConfig.cutouts, // TODO: tmp! this should come from the user instead
 				fullConfig.outputs,
-				fullConfig.settings
+				fullConfig.settings,
+				{}
 			);
 		})
 		.catch(console.error);

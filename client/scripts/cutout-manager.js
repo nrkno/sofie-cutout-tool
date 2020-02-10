@@ -70,11 +70,13 @@ function init(logger, document) {
 		}
 	});
 
-	document.addEventListener('click', (target) => {
+	document.addEventListener('click', ({ target }) => {
 		if (target.classList.contains('take')) {
 			const preview = document.querySelector(`${videoCropperTagName}.preview`);
 			const cutoutId = preview.getAttribute(videoCropperAttributeNames.SOURCE_ID);
 			if (cutoutId) {
+				const program = document.querySelector(`${videoCropperTagName}.program`);
+				program.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutId);
 				ipcRenderer.send('take', cutoutId);
 			}
 		}
@@ -87,12 +89,12 @@ function init(logger, document) {
 let sendUpdateTimeout = null;
 
 function triggerSendUpdate(cutoutId, cutout) {
-	if (sendUpdateTimeout) {
+	if (!sendUpdateTimeout) {
 		sendUpdateTimeout = setTimeout(() => {
 			sendUpdateTimeout = null;
 
 			ipcRenderer.send('update-cutout', cutoutId, cutout);
-		}, 500);
+		}, 50);
 	}
 }
 

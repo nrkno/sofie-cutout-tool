@@ -4,7 +4,7 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { Cutout, FullConfig, FullConfigClient } from './api';
 
 import { DataHandler } from './dataHandler';
-import { TSRController } from './TSRController';
+import { TSRController, RunTimeData } from './TSRController';
 import _ from 'underscore';
 
 export default class Main {
@@ -14,6 +14,8 @@ export default class Main {
 
 	static tsrController: TSRController;
 	static dataHandler: DataHandler;
+
+	static runtimeData: RunTimeData = {};
 
 	private static onWindowAllClosed(): void {
 		// On macOS it is common for applications and their menu bar
@@ -50,7 +52,7 @@ export default class Main {
 		Main.tsrController.init().catch(console.error);
 
 		ipcMain.on('cutout-move', (event, move) => {
-			console.log(move);
+			// console.log(move);
 		});
 		ipcMain.on('initialize', (event) => {
 			console.log('Initializing...');
@@ -65,7 +67,8 @@ export default class Main {
 							fullConfig.sources,
 							fullConfig.cutouts, // TODO: tmp! this should come from the user instead
 							fullConfig.outputs,
-							fullConfig.settings
+							fullConfig.settings,
+							Main.runtimeData
 						);
 
 						const fullConfigClient: FullConfigClient = _.extend(
@@ -101,15 +104,30 @@ export default class Main {
 				.setConfigCutout(cutoutId, cutout)
 				.then(() => {
 					return Main.dataHandler.requestConfig().then((fullConfig: FullConfig) => {
+						console.log('fullConfig.cutouts', fullConfig.cutouts);
 						Main.tsrController.updateTimeline(
 							fullConfig.sources,
 							fullConfig.cutouts,
 							fullConfig.outputs,
-							fullConfig.settings
+							fullConfig.settings,
+							Main.runtimeData
 						);
 					});
 				})
 				.catch(console.error);
+		});
+		ipcMain.on('take', (event, cutoutId: string) => {
+			console.log('TAKE', cutoutId);
+			Main.runtimeData.pgmCutout = cutoutId;
+			return Main.dataHandler.requestConfig().then((fullConfig: FullConfig) => {
+				Main.tsrController.updateTimeline(
+					fullConfig.sources,
+					fullConfig.cutouts,
+					fullConfig.outputs,
+					fullConfig.settings,
+					Main.runtimeData
+				);
+			});
 		});
 	}
 

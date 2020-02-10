@@ -32,7 +32,8 @@ const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper
 <div class="${classNames.CONTAINER}"></div>
 `;
 
-const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
+// const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
+const pathToCasparCGImageProvider = 'http://160.67.48.165:5255';
 
 class VideoCropper extends HTMLElement {
 	constructor() {
@@ -118,7 +119,7 @@ class VideoCropper extends HTMLElement {
 						cutout: this.cutout
 					}
 				});
-				this.dispatchEvent();
+				this.dispatchEvent(event);
 			}, 500);
 		}
 	}
