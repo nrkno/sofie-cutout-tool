@@ -59,13 +59,12 @@ export class DataHandler {
 	}
 
 	async setConfigCutout(cutoutId: string, cutout: Cutout): Promise<void> {
-		const cutouts = await this._getConfigCutouts();
-		cutouts[cutoutId] = cutout;
+		this._localConfig.cutouts[cutoutId] = cutout;
 		this._lastTimeStoredCutouts = Date.now();
 		await this._storeConfig('cutouts.json', {
 			note:
 				'This file is not intended to be manually edited, it will update when the user makes changes in the UI',
-			cutouts: cutouts
+			cutouts: this._localConfig.cutouts
 		});
 	}
 	private async _getConfigCutouts(): Promise<Cutouts> {
