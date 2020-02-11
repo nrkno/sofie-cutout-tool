@@ -5,21 +5,15 @@ import { TSRController } from './server/TSRController';
 const dataHandler = new DataHandler('./');
 const tsrController = new TSRController();
 
-tsrController.init().catch(console.error);
+dataHandler
+	.updateConfig()
+	.then(() => {
+		return tsrController.init(dataHandler.getConfig());
+	})
+	.catch(console.error);
 
 dataHandler.onConfigChanged(() => {
 	console.log('config changed, reloading..');
 
-	dataHandler
-		.requestConfig()
-		.then((fullConfig) => {
-			tsrController.updateTimeline(
-				fullConfig.sources,
-				fullConfig.cutouts, // TODO: tmp! this should come from the user instead
-				fullConfig.outputs,
-				fullConfig.settings,
-				{}
-			);
-		})
-		.catch(console.error);
+	tsrController.updateTimeline(dataHandler.getConfig(), {});
 });

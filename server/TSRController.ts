@@ -15,7 +15,8 @@ import {
 	Source,
 	Sources,
 	Settings,
-	SourceInputAny
+	SourceInputAny,
+	FullConfig
 } from './api';
 import { Matrix, applyToPoint, compose, rotateDEG, scale, translate } from 'transformation-matrix';
 
@@ -56,7 +57,7 @@ export class TSRController {
 		// this.tsr.on('setTimelineTriggerTime', (_r: TimelineTriggerTimeResult) => {})
 		// this.tsr.on('timelineCallback', (_time, _objId, _callbackName, _data) => {})
 	}
-	async init(): Promise<void> {
+	async init(fullConfig: FullConfig): Promise<void> {
 		console.log('TSR init');
 		await this.tsr.init();
 
@@ -64,8 +65,8 @@ export class TSRController {
 		this._addTSRDevice('casparcg0', {
 			type: DeviceType.CASPARCG,
 			options: {
-				host: '160.67.48.165',
-				port: 5250
+				host: fullConfig.settings.casparCGHost,
+				port: fullConfig.settings.casparCGPort || 5250
 			},
 			isMultiThreaded: false
 		});
@@ -76,13 +77,12 @@ export class TSRController {
 		await this.tsr.destroy();
 	}
 	/** Calculate new timeline and send it into TSR */
-	updateTimeline(
-		sources: Sources,
-		cutouts: Cutouts,
-		outputs: Outputs,
-		settings: Settings,
-		runtimeData: RunTimeData
-	): void {
+	updateTimeline(fullConfig: FullConfig, runtimeData: RunTimeData): void {
+		const sources: Sources = fullConfig.sources;
+		const cutouts: Cutouts = fullConfig.cutouts;
+		const outputs: Outputs = fullConfig.outputs;
+		const settings: Settings = fullConfig.settings;
+
 		this.mappings = {};
 		this.timeline = [];
 		this.refer.reset();
