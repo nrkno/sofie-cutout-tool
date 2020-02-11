@@ -81,7 +81,7 @@ export interface Cutout {
 }
 
 export interface CutoutInOutput {
-	cutoutId: string;
+	cutoutId?: string;
 	/** Position of cutout in Output, in screen coordinates */
 	x: number;
 	/** Position of cutout in Output, in screen coordinates */

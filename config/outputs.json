@@ -1,16 +1,16 @@
 {
-    "outputs": [
-        {
-            "type": "cutout",
-            "casparChannel": 1,
-            "width": 1280,
-            "height": 720,
-            "cutout": {
-                "cutoutId": "cutout_A",
-                "x": 0,
-                "y": 0,
-                "scale": 0
-            }
-        }
-    ]
+	"outputs": [
+		{
+			"type": "cutout",
+			"casparChannel": 1,
+			"width": 1280,
+			"height": 720,
+			"cutout": {
+				"cutoutId": null,
+				"x": 0,
+				"y": 0,
+				"scale": 0
+			}
+		}
+	]
 }
