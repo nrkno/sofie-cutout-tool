@@ -1,23 +1,27 @@
-import { arrayBufferToBase64 } from '../../lib/conversion.js';
+import { createVideoDisplayElement } from './video-display.js';
 
-export { tagNames, attributeNames };
+export { tagName, attributeNames };
 
-const tagNames = {
-	CUSTOM: 'source-thumbnail',
-	BASE: 'img'
-};
+const tagName = 'source-thumbnail';
 
 const attributeNames = {
 	SOURCE_ID: 'data-source-id'
 };
 
+const classNames = {
+	VIDEO_DISPLAY: 'source-thumbnail--video'
+};
+
 //TODO: should come from config
 // const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
-const pathToCasparCGImageProvider = 'http://160.67.48.165:5255';
+const pathToCasparCGImageProvider = 'http://160.67.52.144:5255';
 
-class SourceThumbnail extends HTMLImageElement {
+class SourceThumbnail extends HTMLElement {
 	constructor() {
 		super();
+
+		this.attachShadow({ mode: 'open' });
+		this.shadowRoot.innerHTML = `<link rel="stylesheet" href="./components/video/source-thumbnail.css">`;
 	}
 
 	connectedCallback() {
@@ -30,55 +34,15 @@ class SourceThumbnail extends HTMLImageElement {
 		const { channel, layer } = document.fullConfig.sourceReferenceLayers[sourceId];
 
 		if (isDefined(channel) && isDefined(layer)) {
-			this.imageUrl = `${pathToCasparCGImageProvider}/channel/${channel}/${layer}/image`;
-			this.updateImage();
+			const video = createVideoDisplayElement(pathToCasparCGImageProvider, channel, layer);
+			video.classList.add(classNames.VIDEO_DISPLAY);
+			this.shadowRoot.appendChild(video);
 		} else {
 			console.warn(`Channel and/or layer not found for source ${sourceId}`);
 		}
 	}
-
-	updateImage() {
-		const url = `${this.imageUrl}?hash=${Date.now()}`;
-
-		fetch(url)
-			.then((response) => {
-				const { status } = response;
-				switch (status) {
-					case 404:
-						console.error(`HTTP 404: ${url}`);
-						break; // no retries for not found
-					case 200:
-						response.arrayBuffer().then((buffer) => {
-							if (this.hasBeenRemoved) {
-								console.log('Element removed, not setting image src');
-								return;
-							}
-
-							const dataPrefix = 'data:image/png;base64,';
-							const imageData = arrayBufferToBase64(buffer);
-							this.src = `${dataPrefix}${imageData}`;
-							setTimeout(() => {
-								this.updateImage();
-							}, 20000);
-						});
-						break;
-					default:
-						console.error(`HTTP ${status} for ${url}: ${response.statusText}`);
-						setTimeout(() => {
-							this.updateImage();
-						}, 5000);
-						break;
-				}
-			})
-			.catch((e) => {
-				console.error(e);
-				setTimeout(() => {
-					this.updateImage();
-				}, 5000);
-			});
-	}
 }
-customElements.define(tagNames.CUSTOM, SourceThumbnail, { extends: tagNames.BASE });
+customElements.define(tagName, SourceThumbnail);
 
 function isDefined(value) {
 	return value !== null && value !== undefined;

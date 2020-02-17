@@ -6,9 +6,21 @@
 }
 
 .input-source-list--item {
+	display: flex;
+	flex-direction: column;
 	padding: 0 16px 16px;
+	width: 256px;
+	cursor: pointer;
 }
 
-.source-thumbnail {
-	width: 256px;
+.input-source-list--item--thumbnail {
+	width: 100%;
+}
+
+.input-source-list--item--title {
+	width: 100%;
+	background-color: var(--bg-light);
+	color: var(--text-main);
+	text-decoration: none;
+	line-height: 1.5em;
 }
