@@ -73,11 +73,15 @@ function init(logger, document) {
 	document.addEventListener('click', ({ target }) => {
 		if (target.classList.contains('take')) {
 			const preview = document.querySelector(`${videoCropperTagName}.preview`);
-			const cutoutId = preview.getAttribute(videoCropperAttributeNames.SOURCE_ID);
-			if (cutoutId) {
-				const program = document.querySelector(`${videoCropperTagName}.program`);
-				program.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutId);
-				ipcRenderer.send('take', cutoutId);
+			const program = document.querySelector(`${videoCropperTagName}.program`);
+			const cutoutOnPreviewId = preview.getAttribute(videoCropperAttributeNames.SOURCE_ID);
+			const cutoutOnProgramId = program.getAttribute(videoCropperAttributeNames.SOURCE_ID);
+
+			if (cutoutOnPreviewId) {
+				program.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutOnPreviewId);
+				preview.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutOnProgramId);
+
+				ipcRenderer.send('take', cutoutOnPreviewId);
 			}
 		}
 	});

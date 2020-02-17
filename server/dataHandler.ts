@@ -12,11 +12,16 @@ export class DataHandler {
 	private _onConfigChangedTimeout?: NodeJS.Timeout;
 	private _lastTimeStoredCutouts = 0;
 
+	private _localConfig: FullConfig;
+
 	constructor(private _basePath: string) {
 		this._getConfigCutouts().catch(console.error);
 	}
-	public async requestConfig(): Promise<FullConfig> {
-		return {
+	public getConfig(): FullConfig {
+		return this._localConfig;
+	}
+	public async updateConfig(): Promise<void> {
+		this._localConfig = {
 			cutouts: await this._getConfigCutouts(),
 			outputs: await this._getConfigOutputs(),
 			sources: await this._getConfigSources(),
@@ -29,7 +34,11 @@ export class DataHandler {
 				clearTimeout(this._onConfigChangedTimeout);
 			}
 			this._onConfigChangedTimeout = setTimeout(() => {
-				callback();
+				this.updateConfig()
+					.then(() => {
+						callback();
+					})
+					.catch(console.error);
 			}, 500);
 		};
 		chokidar.watch(this._getConfigPath('outputs.json')).on('all', () => {
@@ -50,13 +59,12 @@ export class DataHandler {
 	}
 
 	async setConfigCutout(cutoutId: string, cutout: Cutout): Promise<void> {
-		const cutouts = await this._getConfigCutouts();
-		cutouts[cutoutId] = cutout;
+		this._localConfig.cutouts[cutoutId] = cutout;
 		this._lastTimeStoredCutouts = Date.now();
 		await this._storeConfig('cutouts.json', {
 			note:
 				'This file is not intended to be manually edited, it will update when the user makes changes in the UI',
-			cutouts: cutouts
+			cutouts: this._localConfig.cutouts
 		});
 	}
 	private async _getConfigCutouts(): Promise<Cutouts> {

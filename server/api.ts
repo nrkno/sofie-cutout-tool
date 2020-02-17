@@ -81,7 +81,7 @@ export interface Cutout {
 }
 
 export interface CutoutInOutput {
-	cutoutId: string;
+	cutoutId?: string;
 	/** Position of cutout in Output, in screen coordinates */
 	x: number;
 	/** Position of cutout in Output, in screen coordinates */
@@ -121,4 +121,9 @@ export interface Settings {
 	channelForRoutes: number;
 	/** What layer to start on */
 	channelForRoutesStartLayer: number;
+
+	/** Host name / IP-adress of the CasparCG server to connect to */
+	casparCGHost: string;
+	/** Port number of the CasparCG server to connect to, deafaults to 5250 */
+	casparCGPort?: number;
 }

@@ -49,7 +49,12 @@ export default class Main {
 			console.log(event, path);
 		});
 
-		Main.tsrController.init().catch(console.error);
+		Main.dataHandler
+			.updateConfig()
+			.then(() => {
+				return Main.tsrController.init(Main.dataHandler.getConfig());
+			})
+			.catch(console.error);
 
 		ipcMain.on('cutout-move', (event, move) => {
 			// console.log(move);
@@ -60,42 +65,33 @@ export default class Main {
 			Main.dataHandler.onConfigChanged(() => {
 				console.log('config changed, reloading..');
 
-				Main.dataHandler
-					.requestConfig()
-					.then((fullConfig: FullConfig) => {
-						Main.tsrController.updateTimeline(
-							fullConfig.sources,
-							fullConfig.cutouts, // TODO: tmp! this should come from the user instead
-							fullConfig.outputs,
-							fullConfig.settings,
-							Main.runtimeData
-						);
+				Main.updateTimeline();
 
-						const fullConfigClient: FullConfigClient = _.extend(
-							{
-								sourceReferenceLayers: {}
-							},
-							fullConfig
-						);
+				const fullConfig = Main.dataHandler.getConfig();
 
-						// Find where the sources have been mapped up in CasparCG, so we know which layers to fetch the images from in the UI:
-						_.each(fullConfig.sources, (source, sourceId) => {
-							const refId = Main.tsrController.refer.getSourceRef(source.input);
-							const ref = Main.tsrController.refer.getRef(refId, '');
-							if (ref) {
-								const mapping = Main.tsrController.mappings[ref.content.mappedLayer];
-								if (mapping) {
-									fullConfigClient.sourceReferenceLayers[sourceId] = {
-										channel: mapping.channel,
-										layer: mapping.layer
-									};
-								}
-							}
-						});
+				const fullConfigClient: FullConfigClient = _.extend(
+					{
+						sourceReferenceLayers: {}
+					},
+					fullConfig
+				);
 
-						event.reply('new-config', fullConfigClient);
-					})
-					.catch(console.error);
+				// Find where the sources have been mapped up in CasparCG, so we know which layers to fetch the images from in the UI:
+				_.each(fullConfig.sources, (source, sourceId) => {
+					const refId = Main.tsrController.refer.getSourceRef(source.input);
+					const ref = Main.tsrController.refer.getRef(refId, '');
+					if (ref) {
+						const mapping = Main.tsrController.mappings[ref.content.mappedLayer];
+						if (mapping) {
+							fullConfigClient.sourceReferenceLayers[sourceId] = {
+								channel: mapping.channel,
+								layer: mapping.layer
+							};
+						}
+					}
+				});
+
+				event.reply('new-config', fullConfigClient);
 			});
 		});
 		ipcMain.on('update-cutout', (event, cutoutId: string, cutout: Cutout) => {
@@ -103,32 +99,22 @@ export default class Main {
 			Main.dataHandler
 				.setConfigCutout(cutoutId, cutout)
 				.then(() => {
-					return Main.dataHandler.requestConfig().then((fullConfig: FullConfig) => {
-						console.log('fullConfig.cutouts', fullConfig.cutouts);
-						Main.tsrController.updateTimeline(
-							fullConfig.sources,
-							fullConfig.cutouts,
-							fullConfig.outputs,
-							fullConfig.settings,
-							Main.runtimeData
-						);
-					});
+					const fullConfig = Main.dataHandler.getConfig();
+					console.log('fullConfig.cutouts', fullConfig.cutouts);
+					Main.updateTimeline();
 				})
 				.catch(console.error);
 		});
 		ipcMain.on('take', (event, cutoutId: string) => {
 			console.log('TAKE', cutoutId);
 			Main.runtimeData.pgmCutout = cutoutId;
-			return Main.dataHandler.requestConfig().then((fullConfig: FullConfig) => {
-				Main.tsrController.updateTimeline(
-					fullConfig.sources,
-					fullConfig.cutouts,
-					fullConfig.outputs,
-					fullConfig.settings,
-					Main.runtimeData
-				);
-			});
+
+			Main.updateTimeline();
 		});
+	}
+
+	private static updateTimeline() {
+		Main.tsrController.updateTimeline(Main.dataHandler.getConfig(), Main.runtimeData);
 	}
 
 	// On macOS it's common to re-create a window in the app when the

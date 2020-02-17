@@ -15,7 +15,8 @@ import {
 	Source,
 	Sources,
 	Settings,
-	SourceInputAny
+	SourceInputAny,
+	FullConfig
 } from './api';
 import { Matrix, applyToPoint, compose, rotateDEG, scale, translate } from 'transformation-matrix';
 
@@ -56,7 +57,7 @@ export class TSRController {
 		// this.tsr.on('setTimelineTriggerTime', (_r: TimelineTriggerTimeResult) => {})
 		// this.tsr.on('timelineCallback', (_time, _objId, _callbackName, _data) => {})
 	}
-	async init(): Promise<void> {
+	async init(fullConfig: FullConfig): Promise<void> {
 		console.log('TSR init');
 		await this.tsr.init();
 
@@ -64,8 +65,8 @@ export class TSRController {
 		this._addTSRDevice('casparcg0', {
 			type: DeviceType.CASPARCG,
 			options: {
-				host: '160.67.48.165',
-				port: 5250
+				host: fullConfig.settings.casparCGHost,
+				port: fullConfig.settings.casparCGPort || 5250
 			},
 			isMultiThreaded: false
 		});
@@ -76,13 +77,12 @@ export class TSRController {
 		await this.tsr.destroy();
 	}
 	/** Calculate new timeline and send it into TSR */
-	updateTimeline(
-		sources: Sources,
-		cutouts: Cutouts,
-		outputs: Outputs,
-		settings: Settings,
-		runtimeData: RunTimeData
-	): void {
+	updateTimeline(fullConfig: FullConfig, runtimeData: RunTimeData): void {
+		const sources: Sources = fullConfig.sources;
+		const cutouts: Cutouts = fullConfig.cutouts;
+		const outputs: Outputs = fullConfig.outputs;
+		const settings: Settings = fullConfig.settings;
+
 		this.mappings = {};
 		this.timeline = [];
 		this.refer.reset();
@@ -137,47 +137,55 @@ export class TSRController {
 					layer: 10
 				};
 
-				const cutoutId = runtimeData.pgmCutout || output.cutout.cutoutId;
-				// const cutoutId = output.cutout.cutoutId
-				const cutout = cutouts[cutoutId];
-				if (!cutout) throw Error(`cutout "${cutoutId} not found!`);
-				const source = sources[cutout.source];
-				if (!source) throw Error(`source "${cutout.source} not found!`);
+				const cutoutId: string | undefined = runtimeData.pgmCutout || output.cutout.cutoutId;
+				if (cutoutId) {
+					// const cutoutId = output.cutout.cutoutId
+					const cutout = cutouts[cutoutId];
+					if (!cutout) throw Error(`cutout "${cutoutId} not found!`);
+					const source = sources[cutout.source];
+					if (!source) throw Error(`source "${cutout.source} not found!`);
 
-				const useTransition = shouldUseTransition(layer, source);
+					const useTransition = shouldUseTransition(layer, source);
 
-				const cutoutInOutput = output.cutout;
+					const cutoutInOutput = output.cutout;
 
-				const sourceTransform = this._sourceTransform(source);
-				const cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout);
+					const sourceTransform = this._sourceTransform(source);
+					const cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout);
 
-				const matrix0 = compose(rotateDEG(cutout.outputRotation, 0, 0));
-				const rotatedCutout = applyToPoint(matrix0, { x: cutout.width, y: cutout.height });
-				const scaleToFill =
-					cutoutInOutput.scale ||
-					Math.min(
-						output.width / Math.abs(rotatedCutout['x']),
-						output.height / Math.abs(rotatedCutout['y'])
+					const matrix0 = compose(rotateDEG(cutout.outputRotation, 0, 0));
+					const rotatedCutout = applyToPoint(matrix0, { x: cutout.width, y: cutout.height });
+					const scaleToFill =
+						cutoutInOutput.scale ||
+						Math.min(
+							output.width / Math.abs(rotatedCutout['x']),
+							output.height / Math.abs(rotatedCutout['y'])
+						);
+
+					const viewportTransform = compose(
+						translate(0.5, 0.5),
+						scale(1 / output.width, 1 / output.height),
+						translate(cutoutInOutput.x, cutoutInOutput.y),
+						rotateDEG(cutout.outputRotation, 0.5, 0.5),
+						scale(scaleToFill)
 					);
+					const outputTransform = compose(viewportTransform, cutoutTransform);
 
-				const viewportTransform = compose(
-					translate(0.5, 0.5),
-					scale(1 / output.width, 1 / output.height),
-					translate(cutoutInOutput.x, cutoutInOutput.y),
-					rotateDEG(cutout.outputRotation, 0.5, 0.5),
-					scale(scaleToFill)
-				);
-				const outputTransform = compose(viewportTransform, cutoutTransform);
+					const mixerPosition = this._casparTransformPosition(
+						source,
+						outputTransform,
+						useTransition
+					);
+					const mixerClipping = this._casparTransformClip(cutout, viewportTransform, useTransition);
 
-				const mixerPosition = this._casparTransformPosition(source, outputTransform, useTransition);
-				const mixerClipping = this._casparTransformClip(cutout, viewportTransform, useTransition);
-
-				this.timeline.push(
-					this.refer.getSource(source.input, layer, {
-						...mixerPosition,
-						...mixerClipping
-					})
-				);
+					this.timeline.push(
+						this.refer.getSource(source.input, layer, {
+							...mixerPosition,
+							...mixerClipping
+						})
+					);
+				} else {
+					// No cutout on program
+				}
 			} else if (output.type === OutputType.MULTIVIEW) {
 				if (output.background) {
 					const layerMultiviewBg = 'output' + outputi + '_mvbg';

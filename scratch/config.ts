@@ -113,5 +113,6 @@ const outputs: Outputs = [
 ]
 const settings: Settings = {
     channelForRoutes: 1,
-    channelForRoutesStartLayer: 900
+    channelForRoutesStartLayer: 900,
+    casparCGHost: '127.0.0.1'
 }
