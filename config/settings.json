@@ -3,6 +3,13 @@
 		"channelForRoutes": 1,
 		"channelForRoutesStartLayer": 900,
 
-		"casparCGHost": "127.0.0.1"
+		"resources": {
+			"casparCG": {
+				"url": "http://160.67.52.144:5250"
+			},
+			"imageProvider": {
+				"url": "http://160.67.52.144:5255"
+			}
+		}
 	}
 }

@@ -122,8 +122,11 @@ export interface Settings {
 	/** What layer to start on */
 	channelForRoutesStartLayer: number;
 
-	/** Host name / IP-adress of the CasparCG server to connect to */
-	casparCGHost: string;
-	/** Port number of the CasparCG server to connect to, deafaults to 5250 */
-	casparCGPort?: number;
+	resources?: {
+		[name: string]: ResourceDescription;
+	};
+}
+
+export interface ResourceDescription {
+	url?: string;
 }

@@ -60,13 +60,34 @@ export class TSRController {
 	async init(fullConfig: FullConfig): Promise<void> {
 		console.log('TSR init');
 		await this.tsr.init();
+		let host = '127.0.0.1';
+		let port = 5250;
+
+		if (fullConfig.settings.resources && fullConfig.settings.resources.casparCG) {
+			const { url } = fullConfig.settings.resources.casparCG;
+			if (url) {
+				try {
+					const resolved = new URL(fullConfig.settings.resources.casparCG.url);
+					host = resolved.hostname;
+					const portNumber = Number(resolved.port);
+					if (!Number.isNaN(portNumber)) {
+						port = portNumber;
+					}
+				} catch (error) {
+					console.warn(
+						'Illegal values for CasparCG resource in config:',
+						fullConfig.settings.resources.casparCG
+					);
+				}
+			}
+		}
 
 		// TODO: Move info config file:
 		this._addTSRDevice('casparcg0', {
 			type: DeviceType.CASPARCG,
 			options: {
-				host: fullConfig.settings.casparCGHost,
-				port: fullConfig.settings.casparCGPort || 5250
+				host,
+				port
 			},
 			isMultiThreaded: false
 		});

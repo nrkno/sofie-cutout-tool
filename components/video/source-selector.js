@@ -2,6 +2,7 @@ import {
 	tagName as thumbnailTagName,
 	attributeNames as thumbnailAttributeNames
 } from './source-thumbnail.js';
+import { get as getConfigValue } from '../../lib/config.js';
 
 export { tagName, classNames, eventNames };
 
@@ -61,9 +62,9 @@ class SourceSelector extends HTMLElement {
 	}
 
 	updateSources() {
-		const { fullConfig } = document;
-		if (fullConfig) {
-			this.sources = document.fullConfig.sources;
+		const sources = getConfigValue('sources');
+		if (sources) {
+			this.sources = sources;
 			this.renderSourceSelectors();
 		}
 	}

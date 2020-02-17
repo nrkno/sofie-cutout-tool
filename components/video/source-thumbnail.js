@@ -1,4 +1,8 @@
-import { createVideoDisplayElement } from './video-display.js';
+import {
+	tagName as videoDisplayTagName,
+	attributeNames as videoDisplayAttributeNames
+} from './video-display.js';
+import { get as getConfigValue } from '../../lib/config.js';
 
 export { tagName, attributeNames };
 
@@ -11,10 +15,6 @@ const attributeNames = {
 const classNames = {
 	VIDEO_DISPLAY: 'source-thumbnail--video'
 };
-
-//TODO: should come from config
-// const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
-const pathToCasparCGImageProvider = 'http://160.67.52.144:5255';
 
 class SourceThumbnail extends HTMLElement {
 	constructor() {
@@ -31,10 +31,13 @@ class SourceThumbnail extends HTMLElement {
 			return;
 		}
 
-		const { channel, layer } = document.fullConfig.sourceReferenceLayers[sourceId];
+		const sourceReferenceLayers = getConfigValue('sourceReferenceLayers');
+		const { channel, layer } = sourceReferenceLayers[sourceId];
 
 		if (isDefined(channel) && isDefined(layer)) {
-			const video = createVideoDisplayElement(pathToCasparCGImageProvider, channel, layer);
+			const video = document.createElement(videoDisplayTagName);
+			video.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
+			video.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
 			video.classList.add(classNames.VIDEO_DISPLAY);
 			this.shadowRoot.appendChild(video);
 		} else {

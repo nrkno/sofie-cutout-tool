@@ -1,5 +1,5 @@
 import {
-	createVideoDisplayElement,
+	tagName as videoDisplayTagName,
 	attributeNames as videoDisplayAttributeNames,
 	eventNames as videoDisplayEventNames
 } from './video-display.js';
@@ -9,6 +9,7 @@ import {
 	attributeNames as cropToolAttributeNames,
 	eventNames as cropToolEventNames
 } from './cutout-window.js';
+import { get as getConfigValue } from '../../lib/config.js';
 
 export { tagName, attributeNames, eventNames };
 
@@ -32,9 +33,6 @@ const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper
 <div class="${classNames.CONTAINER}"></div>
 `;
 
-// const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
-const pathToCasparCGImageProvider = 'http://160.67.48.165:5255';
-
 class VideoCropper extends HTMLElement {
 	constructor() {
 		super();
@@ -44,7 +42,7 @@ class VideoCropper extends HTMLElement {
 
 		this.container = shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 
-		this.videoDisplay = createVideoDisplayElement(pathToCasparCGImageProvider);
+		this.videoDisplay = document.createElement(videoDisplayTagName);
 		this.videoDisplay.classList.add(classNames.CONTENT);
 		this.container.appendChild(this.videoDisplay);
 
@@ -98,11 +96,15 @@ class VideoCropper extends HTMLElement {
 	}
 
 	updateId(id) {
+		const cutouts = getConfigValue('cutouts');
+		const sources = getConfigValue('sources');
+		const sourceReferenceLayers = getConfigValue('sourceReferenceLayers');
+
 		console.log(`<${tagName}>.updateId(${id})...`);
 		this.cutoutId = id;
-		this.cutout = Object.assign({}, document.fullConfig.cutouts[id]); // shallow clone
+		this.cutout = Object.assign({}, cutouts[id]); // shallow clone
 		console.log('Using cutout', this.cutout);
-		this.source = document.fullConfig.sources[this.cutout.source];
+		this.source = sources[this.cutout.source];
 
 		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
 
@@ -113,7 +115,7 @@ class VideoCropper extends HTMLElement {
 		});
 		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, JSON.stringify(topLeftCutout));
 
-		const { channel, layer } = document.fullConfig.sourceReferenceLayers[this.cutout.source];
+		const { channel, layer } = sourceReferenceLayers[this.cutout.source];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
 	}

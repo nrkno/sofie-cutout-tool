@@ -7,14 +7,9 @@ import {
 } from '../../components/video/video-cropper.js';
 
 import { eventNames as sourceSelectorEventNames } from '../../components/video/source-selector.js';
+import { get as getConfigValue } from '../../lib/config.js';
 
 export { init };
-
-document.fullConfig = {
-	cutouts: {},
-	outputs: {},
-	sources: {}
-}; // TMP, we should change how to access this data
 
 function init(logger, document) {
 	logger.log('cutout-manager init starting...', document);
@@ -103,10 +98,7 @@ function triggerSendUpdate(cutoutId, cutout) {
 }
 
 function createCutoutFromSource(sourceId, logger) {
-	if (!document || !document.fullConfig || !document.fullConfig.sources) {
-		logger.error('No sources in document.fullConfig', document);
-	}
-	const { sources } = document.fullConfig;
+	const sources = getConfigValue('sources');
 	if (!sources) {
 		return undefined;
 	}
@@ -128,8 +120,8 @@ function createCutoutFromSource(sourceId, logger) {
 }
 
 function findCutoutIdFromSourceId(sourceId, logger) {
-	if (document.fullConfig) {
-		const { cutouts } = document.fullConfig;
+	const cutouts = getConfigValue('cutouts');
+	if (cutouts) {
 		return Object.keys(cutouts).find((cutoutId) => cutouts[cutoutId].source === sourceId);
 	} else {
 		logger.log('No cutout found for ', sourceId);
