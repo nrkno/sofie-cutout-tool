@@ -1,6 +1,10 @@
 @import './colorscheme.css';
 
-button.take {
+.take-control--container {
+	padding: 0 20px;
+}
+
+.take-control--button {
 	border: transparent;
 	border-radius: 5%;
 	width: 100%;
@@ -9,5 +13,4 @@ button.take {
 	font-size: 3em;
 	background: var(--frame-dark);
 	color: var(--text-main);
-	margin: 0 20px;
 }

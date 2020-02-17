@@ -71,7 +71,7 @@ function init(logger, document) {
 	});
 
 	document.addEventListener('click', ({ target }) => {
-		if (target.classList.contains('take')) {
+		if (target.classList.contains('take-control--button')) {
 			const preview = document.querySelector(`${videoCropperTagName}.preview`);
 			const program = document.querySelector(`${videoCropperTagName}.program`);
 			const cutoutOnPreviewId = preview.getAttribute(videoCropperAttributeNames.SOURCE_ID);
