@@ -8,15 +8,20 @@ const attributeNames = {
 	SOURCE_ID: 'data-source-id'
 };
 
+const classNames = {
+	VIDEO_DISPLAY: 'source-thumbnail--video'
+};
+
 //TODO: should come from config
 // const pathToCasparCGImageProvider = 'http://127.0.0.1:5255';
-const pathToCasparCGImageProvider = 'http://160.67.48.165:5255';
+const pathToCasparCGImageProvider = 'http://160.67.52.144:5255';
 
 class SourceThumbnail extends HTMLElement {
 	constructor() {
 		super();
 
 		this.attachShadow({ mode: 'open' });
+		this.shadowRoot.innerHTML = `<link rel="stylesheet" href="./components/video/source-thumbnail.css">`;
 	}
 
 	connectedCallback() {
@@ -30,6 +35,7 @@ class SourceThumbnail extends HTMLElement {
 
 		if (isDefined(channel) && isDefined(layer)) {
 			const video = createVideoDisplayElement(pathToCasparCGImageProvider, channel, layer);
+			video.classList.add(classNames.VIDEO_DISPLAY);
 			this.shadowRoot.appendChild(video);
 		} else {
 			console.warn(`Channel and/or layer not found for source ${sourceId}`);

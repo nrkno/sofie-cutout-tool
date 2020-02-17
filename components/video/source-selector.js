@@ -10,7 +10,8 @@ const tagName = 'source-selector';
 const classNames = {
 	SOURCES_LIST: 'input-source-list',
 	SOURCES_LIST_ITEM: 'input-source-list--item',
-	SRC_THUMB: 'source-thumbnail'
+	SRC_THUMB: 'input-source-list--item--thumbnail',
+	SRC_TITLE: 'input-source-list--item--title'
 };
 
 const attributeNames = {
@@ -97,6 +98,7 @@ function createListItem(source, sourceId) {
 	listItem.appendChild(thumbnail);
 
 	const link = document.createElement('a');
+	link.classList.add(classNames.SRC_TITLE);
 	link.setAttribute(attributeNames.SOURCE_ID, sourceId);
 	link.href = '#';
 	link.title = source.title;
