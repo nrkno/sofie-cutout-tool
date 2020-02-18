@@ -93,7 +93,7 @@ function triggerSendUpdate(cutoutId, cutout) {
 			sendUpdateTimeout = null;
 
 			ipcRenderer.send('update-cutout', cutoutId, cutout);
-		}, 50);
+		}, 40);
 	}
 }
 
