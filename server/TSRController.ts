@@ -390,6 +390,9 @@ export class TSRController {
 	}
 	private _casparTransformTransition(useTransition: boolean): Mixer {
 		if (!useTransition) return {};
+		// tmp: disable transition
+		return {}
+		/*
 		return {
 			inTransition: {
 				easing: 'EASEINOUTQUAD',
@@ -400,6 +403,7 @@ export class TSRController {
 				duration: 500
 			}
 		};
+		*/
 	}
 }
 

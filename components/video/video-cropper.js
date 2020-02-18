@@ -134,7 +134,7 @@ class VideoCropper extends HTMLElement {
 					}
 				});
 				this.dispatchEvent(event);
-			}, 500);
+			}, 40);
 		}
 	}
 }
