@@ -1,5 +1,5 @@
 import { getElementWidth } from '../../lib/dimensions.js';
-import { get as getConfigValue } from '../../lib/config.js';
+import { getImageProviderLocation } from '../../lib/config.js';
 
 export { tagName, attributeNames, eventNames };
 
@@ -94,7 +94,7 @@ class VideoDisplay extends HTMLElement {
 			return;
 		}
 
-		const imageProviderLocation = getConfigValue('settings.resources.imageProvider.url');
+		const imageProviderLocation = getImageProviderLocation();
 		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
 		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);

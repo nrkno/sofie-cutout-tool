@@ -122,11 +122,12 @@ export interface Settings {
 	/** What layer to start on */
 	channelForRoutesStartLayer: number;
 
-	resources?: {
-		[name: string]: ResourceDescription;
-	};
+	casparCG: NetworkResource;
+	imageProvider: NetworkResource;
 }
 
-export interface ResourceDescription {
-	url?: string;
+export interface NetworkResource {
+	hostname: string;
+	port: number;
+	protocol?: string;
 }

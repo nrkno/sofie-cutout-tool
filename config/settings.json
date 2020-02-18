@@ -3,13 +3,14 @@
 		"channelForRoutes": 1,
 		"channelForRoutesStartLayer": 900,
 
-		"resources": {
-			"casparCG": {
-				"url": "http://160.67.52.144:5250"
-			},
-			"imageProvider": {
-				"url": "http://160.67.52.144:5255"
-			}
+		"casparCG": {
+			"hostname": "160.67.52.144",
+			"port": 5250
+		},
+		"imageProvider": {
+			"hostname": "160.67.52.144",
+			"port": 5255,
+			"protocol": "http"
 		}
 	}
 }
