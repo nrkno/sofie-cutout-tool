@@ -75,13 +75,11 @@ class SourceSelector extends HTMLElement {
 		ids.forEach((id) => {
 			const source = this.sources[id];
 
-			console.log('Creating source preview', source);
 			try {
 				const listElement = createListItem(source, id);
 				this.sourceListElement.appendChild(listElement);
-				console.log('Success!', listElement);
 			} catch (error) {
-				console.log('FAIL!', error);
+				console.warn(`Unable to create source preview for ${id}`, error);
 			}
 		});
 	}

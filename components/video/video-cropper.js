@@ -88,7 +88,6 @@ class VideoCropper extends HTMLElement {
 		});
 
 		document.addEventListener('new-config', () => {
-			console.log(`<${tagName}>: new config!`);
 			if (this.cutoutId) {
 				this.updateId(this.cutoutId);
 			}
@@ -100,10 +99,8 @@ class VideoCropper extends HTMLElement {
 		const sources = getConfigValue('sources');
 		const sourceReferenceLayers = getConfigValue('sourceReferenceLayers');
 
-		console.log(`<${tagName}>.updateId(${id})...`);
 		this.cutoutId = id;
 		this.cutout = Object.assign({}, cutouts[id]); // shallow clone
-		console.log('Using cutout', this.cutout);
 		this.source = sources[this.cutout.source];
 
 		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));

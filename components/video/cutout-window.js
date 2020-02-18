@@ -54,8 +54,6 @@ class CutoutWindow extends HTMLElement {
 	}
 
 	connectedCallback() {
-		console.log(`<${tagName}> connected`, this);
-
 		this.setupEventListeners();
 		this.updateCutoutFromAttribute();
 		this.setSourceFromAttribute();
@@ -63,8 +61,7 @@ class CutoutWindow extends HTMLElement {
 		// this.moveCrop(this.cutout.x, this.cutout.y);
 	}
 
-	attributeChangedCallback(name, oldValue, newValue) {
-		console.log(`<${tagName}>.attributeChangedCallback()`, name, newValue);
+	attributeChangedCallback(name) {
 		switch (name) {
 			case attributeNames.CUTOUT:
 				this.updateCutoutFromAttribute();
@@ -150,7 +147,6 @@ class CutoutWindow extends HTMLElement {
 			}
 			cutout.source = source; // source isn't a Number
 			this.cutout = cutout;
-			console.log('Using cutout', this.cutout);
 			this.calcCutoutToSourceScale();
 		} catch (error) {
 			console.warn(`Unable to set cutout from attribute value ${attributeValue}`, error);
@@ -237,11 +233,10 @@ class CutoutWindow extends HTMLElement {
 		const ar = calcAspectRatio(this.cutout);
 
 		if (!ar) {
-			console.log('No aspect ratio set for cutout, unable to set frame size');
+			console.warn('No aspect ratio set for cutout, unable to set frame size');
 			return;
 		}
 
-		console.log('Using AR', ar);
 		switch (ar) {
 			case aspectRatios['1_1']:
 				container.classList.add(containerArClassnames.AR1_1_FROM_16_9);
@@ -260,7 +255,7 @@ class CutoutWindow extends HTMLElement {
 				);
 				break;
 			default:
-				console.log(
+				console.warn(
 					`Unknown aspect ratio ${ar}, wanted one of ${Object.values(aspectRatios).join(',')}`
 				);
 		}

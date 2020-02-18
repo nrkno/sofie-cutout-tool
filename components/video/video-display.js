@@ -53,15 +53,15 @@ class VideoDisplay extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.loadStream();
-
 		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
 		img.addEventListener('load', () => {
 			this.dispatchStreamPlaying();
 		});
 		img.addEventListener('error', function(e) {
-			console.log('Error loading video stream', e);
+			console.warn('Error loading video stream', e);
 		});
+
+		this.loadStream();
 	}
 
 	attributeChangedCallback(name, oldValue, currentValue) {
@@ -116,7 +116,6 @@ class VideoDisplay extends HTMLElement {
 				}
 
 				const srcUrl = imageProviderLocation + stream.url;
-				console.log('shadowroot host', this.shadowRoot.host);
 				const scale = calcTransformScale(this.shadowRoot.host, region);
 
 				const containerDimensions = {
@@ -143,7 +142,6 @@ customElements.define(tagName, VideoDisplay);
 
 function calcTransformScale(container, region) {
 	const width = getElementWidth(container);
-	console.log('container width', width, container);
 	return width / region.width;
 }
 
