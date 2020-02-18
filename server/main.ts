@@ -1,7 +1,7 @@
 import * as chokidar from 'chokidar';
 
 import { BrowserWindow, ipcMain } from 'electron';
-import { Cutout, FullConfig, FullConfigClient } from './api';
+import { Cutout, FullConfigClient } from './api';
 
 import { DataHandler } from './dataHandler';
 import { TSRController, RunTimeData } from './TSRController';
@@ -56,9 +56,6 @@ export default class Main {
 			})
 			.catch(console.error);
 
-		ipcMain.on('cutout-move', (event, move) => {
-			// console.log(move);
-		});
 		ipcMain.on('initialize', (event) => {
 			console.log('Initializing...');
 
@@ -95,12 +92,12 @@ export default class Main {
 			});
 		});
 		ipcMain.on('update-cutout', (event, cutoutId: string, cutout: Cutout) => {
-			console.log('update-cutout handler', cutoutId, cutout);
+			// console.log('update-cutout handler', cutoutId, cutout);
 			Main.dataHandler
 				.setConfigCutout(cutoutId, cutout)
 				.then(() => {
-					const fullConfig = Main.dataHandler.getConfig();
-					console.log('fullConfig.cutouts', fullConfig.cutouts);
+					// const fullConfig = Main.dataHandler.getConfig();
+					// console.log('fullConfig.cutouts', fullConfig.cutouts);
 					Main.updateTimeline();
 				})
 				.catch(console.error);
@@ -113,7 +110,7 @@ export default class Main {
 		});
 	}
 
-	private static updateTimeline() {
+	private static updateTimeline(): void {
 		Main.tsrController.updateTimeline(Main.dataHandler.getConfig(), Main.runtimeData);
 	}
 
