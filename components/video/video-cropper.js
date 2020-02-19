@@ -100,19 +100,15 @@ class VideoCropper extends HTMLElement {
 		const sourceReferenceLayers = getConfigValue('sourceReferenceLayers');
 
 		this.cutoutId = id;
-		this.cutout = Object.assign({}, cutouts[id]); // shallow clone
-		this.source = sources[this.cutout.source];
-
-		this.cropTool.setAttribute(cropToolAttributeNames.SRC, JSON.stringify(this.source));
+		this.cutout = Object.assign({}, cutouts[id]);
+		const sourceId = this.cutout.source;
+		this.source = sources[sourceId];
 
 		const topLeftPosition = transformCenterToTopLeft(this.cutout, this.source);
-		const topLeftCutout = Object.assign({}, this.cutout, {
-			x: topLeftPosition.x,
-			y: topLeftPosition.y
-		});
+		const topLeftCutout = Object.assign({}, this.cutout, topLeftPosition);
 		this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, JSON.stringify(topLeftCutout));
 
-		const { channel, layer } = sourceReferenceLayers[this.cutout.source];
+		const { channel, layer } = sourceReferenceLayers[sourceId];
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
 	}

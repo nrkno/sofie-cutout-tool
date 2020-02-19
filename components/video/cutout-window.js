@@ -1,6 +1,7 @@
 import { clamp } from '../../lib/math.js';
 import { getElementHeight, getElementWidth } from '../../lib/dimensions.js';
 import { aspectRatios, calcAspectRatio } from '../../lib/aspect-ratios.js';
+import { get } from '../../lib/config.js';
 
 export { tagName, attributeNames, eventNames };
 
@@ -56,19 +57,12 @@ class CutoutWindow extends HTMLElement {
 	connectedCallback() {
 		this.setupEventListeners();
 		this.updateCutoutFromAttribute();
-		this.setSourceFromAttribute();
-		this.setFrameSizeAndPosition();
-		// this.moveCrop(this.cutout.x, this.cutout.y);
 	}
 
 	attributeChangedCallback(name) {
 		switch (name) {
 			case attributeNames.CUTOUT:
 				this.updateCutoutFromAttribute();
-				this.setFrameSizeAndPosition();
-				break;
-			case attributeNames.SRC:
-				this.setSourceFromAttribute();
 				this.setFrameSizeAndPosition();
 				break;
 		}
@@ -83,53 +77,6 @@ class CutoutWindow extends HTMLElement {
 			console.warn('Unable to calculate screenspace scale, source width not defined', this.source);
 		}
 		this.screenSpaceScale = getElementWidth(this) / this.source.width;
-	}
-
-	calcCutoutToSourceScale() {
-		if (!this.source) {
-			console.warn('Unable to calculate cutout to source scale, source data missing');
-		}
-		if (!this.cutout) {
-			console.warn('Unable to calculate cutout to source scale, cutout data missing');
-		}
-
-		const { source, cutout } = this;
-
-		const yDiff = source.height - cutout.height;
-		const xDiff = source.width - cutout.width;
-
-		// We're doing greedy cutouts, meaning that we want as much image data as
-		// possible. Therefore one of the cutout dimensions (either width or
-		// height) should stretch to the corresponding boundary of the source.
-		// We must however still ensure that the cutout doesn't exceed any
-		// source boundary.
-		// If the cutout is bigger than the source it must be scaled down
-		// In that case we must use the highest negative diff to ensure
-		// the cutout doesn't exceed source dimensions. This means using
-		// the lowest value diff.
-		// If the cutout is smaller than the source it must be scaled up.
-		// In that case we use the closest distance to ensure that
-		// the upscaled cutout ends up being bigger than the source
-
-		// no matter the situation yDiff < xDiff means using height/height
-		// so this can be simplified. Leaving it like this for now for QA
-		if (yDiff < 0 || xDiff < 0) {
-			// cutout must be scaled down to fit
-			// must use highest negative diff to make sure it really fits
-			if (yDiff < xDiff) {
-				this.cutoutScale = source.height / cutout.height;
-			} else {
-				this.cutoutScale = source.width / cutout.width;
-			}
-		} else {
-			// cutout must be scaled up to fit (or not at all)
-			// use closest distance to avoid cutout crossing source boundaries
-			if (yDiff < xDiff) {
-				this.cutoutScale = source.height / cutout.height;
-			} else {
-				this.cutoutScale = source.width / cutout.width;
-			}
-		}
 	}
 
 	updateCutoutFromAttribute() {
@@ -147,26 +94,34 @@ class CutoutWindow extends HTMLElement {
 			}
 			cutout.source = source; // source isn't a Number
 			this.cutout = cutout;
-			this.calcCutoutToSourceScale();
+			this.setSource();
+			this.setFrameSizeAndPosition();
 		} catch (error) {
 			console.warn(`Unable to set cutout from attribute value ${attributeValue}`, error);
 		}
 	}
 
-	setSourceFromAttribute() {
-		const sourceString = this.getAttribute(attributeNames.SRC);
-		try {
-			this.source = JSON.parse(sourceString);
+	setSource() {
+		const source = get(`sources.${this.cutout.source}`);
+		if (source) {
+			this.source = source;
 			this.calcScreenspaceScale();
-			if (this.cutout) {
-				this.calcCutoutToSourceScale();
-			}
-		} catch (error) {
-			console.warn('Unable to update source from attribute', error, sourceString);
+			const cutoutScaleFactor = calcCutoutToSourceScale(this.cutout, source);
+			this.scaleCutout(cutoutScaleFactor);
+		} else {
+			console.warn(`Can't get source ${this.cutout.source} from config`);
 		}
 	}
+
+	scaleCutout(factor) {
+		this.cutout.width *= factor;
+		this.cutout.height *= factor;
+	}
+
 	setFrameSizeAndPosition() {
-		if (!this.cutout) return;
+		if (!this.cutout) {
+			return;
+		}
 		this.setFrameSize();
 		this.setFramePosition();
 	}
@@ -260,25 +215,14 @@ class CutoutWindow extends HTMLElement {
 				);
 		}
 
-		// const height = getElementHeight(cutoutFrame);
-		// const width = ar * height;
-		// console.log(`Cutout frame: ${width}x${height}`);
-
-		// cutoutFrame.style.width = `${width}px`;
-
-		// johan wants:
 		const { width, height } = this.cutout;
 		cutoutFrame.style.width = `${width * this.screenSpaceScale}px`;
 		cutoutFrame.style.height = `${height * this.screenSpaceScale}px`;
 	}
 
 	setupEventListeners() {
-		this.frame.addEventListener('drag', (event) => {
-			// console.log(event)
-		});
 		this.frame.addEventListener('mousedown', (event) => {
 			event.preventDefault();
-			// console.log('mousedown')
 			this.mouseDown = true;
 		});
 		document.addEventListener('mouseup', (event) => {
@@ -287,7 +231,6 @@ class CutoutWindow extends HTMLElement {
 		});
 		document.body.addEventListener('mousemove', (event) => {
 			if (this.mouseDown) {
-				// console.log('event.movementX', event.movementX)
 				this.moveCrop(event.movementX, event.movementY);
 			}
 		});
@@ -331,7 +274,6 @@ class CutoutWindow extends HTMLElement {
 
 		let touch;
 		if (this.activeTouch) {
-			console.log('event.targetTouches', event.targetTouches);
 			for (let i = 0; i < event.targetTouches.length; i++) {
 				let t = event.targetTouches[i];
 				if (t.identifier === this.activeTouch.identifier) {
@@ -346,7 +288,6 @@ class CutoutWindow extends HTMLElement {
 		} else {
 			touch = event.targetTouches[0];
 		}
-		console.log('touch', touch.clientX, touch.clientY);
 
 		if (touch && this.activeTouch && event.type === 'touchmove') {
 			this.moveCrop(touch.pageX - this.activeTouch.x, touch.pageY - this.activeTouch.y);
@@ -364,42 +305,17 @@ class CutoutWindow extends HTMLElement {
 	}
 
 	moveCrop(deltaX, deltaY) {
-		console.log('moveCrop', deltaX, deltaY);
-		console.log('Cutout', this.cutout);
-		console.log('Source', this.source);
-		console.log('Screenspace scale', this.screenSpaceScale);
-
 		// normalize screenspace coordinates
 		const scaledDeltaX = deltaX / this.screenSpaceScale;
 		const scaledDeltaY = deltaY / this.screenSpaceScale;
 
-		// Scale to fit (if we want to)
-		if (this.cutout.height > this.source.height) {
-			const scaleDownFactor = this.source.height / this.cutout.height;
-
-			this.cutout.height *= scaleDownFactor;
-			this.cutout.width *= scaleDownFactor;
-		} else if (this.cutout.width > this.source.width) {
-			const scaleDownFactor = this.source.width / this.cutout.width;
-
-			this.cutout.height *= scaleDownFactor;
-			this.cutout.width *= scaleDownFactor;
-		}
-
-		// normalize cutout to source size
-		// const scaledCutoutX = this.cutout.x * this.cutoutScale;
-		// const scaledCutoutY = this.cutout.y * this.cutoutScale;
-
-		// // normalized position
+		// add delta to current coordinates
 		const x = this.cutout.x + scaledDeltaX;
 		const y = this.cutout.y + scaledDeltaY;
 
-		// console.log('Normalized position from screenspace', scaledCutoutX, scaledCutoutY);
-
+		// avoid cutout outside of source dimensions
 		this.cutout.x = clamp(x, 0, this.source.width - this.cutout.width);
 		this.cutout.y = clamp(y, 0, this.source.height - this.cutout.height);
-
-		// console.log('Clamped within source boundaries', this.cutout.x, this.cutout.y);
 
 		this.setFrameSizeAndPosition();
 		this.emitMoveEvent();
@@ -417,5 +333,34 @@ class CutoutWindow extends HTMLElement {
 		);
 	}
 }
-
 customElements.define(tagName, CutoutWindow);
+
+function calcCutoutToSourceScale(cutout, source) {
+	if (!source) {
+		console.warn('Unable to calculate cutout to source scale, source data missing');
+	}
+	if (!cutout) {
+		console.warn('Unable to calculate cutout to source scale, cutout data missing');
+	}
+
+	const yDiff = source.height - cutout.height;
+	const xDiff = source.width - cutout.width;
+
+	// We're doing greedy cutouts, meaning that we want as much image data as
+	// possible. Therefore one of the cutout dimensions (either width or
+	// height) should stretch to the corresponding boundary of the source.
+	// We must however still ensure that the cutout doesn't exceed any
+	// source boundary.
+	// If the cutout is bigger than the source it must be scaled down
+	// In that case we must use the highest negative diff to ensure
+	// the cutout doesn't exceed source dimensions. This means using
+	// the lowest value diff.
+	// If the cutout is smaller than the source it must be scaled up.
+	// In that case we use the closest distance to ensure that
+	// the upscaled cutout ends up being bigger than the source
+
+	// no matter the situation yDiff < xDiff means using height/height
+	// so this can be simplified.
+
+	return yDiff < xDiff ? source.height / cutout.height : source.width / cutout.width;
+}
