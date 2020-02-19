@@ -13,7 +13,8 @@
 #### CasparCG
 
 This tool is intended to be run along with the [NRK-version of CasparCG](https://github.com/nrkno/tv-automation-casparcg-server/releases)
-CasparCG should be set up with 2 channels, one for Program output, and one for the image-provider, see below.
+
+CasparCG should be set up with 2 channels, one for program output, and one for the image-provider, see below.
 
 #### CasparCG-image-provider
 
