@@ -22,7 +22,7 @@ const classNames = {
 };
 
 const attributeNames = {
-	SOURCE_ID: 'data-source-id'
+	CUTOUT_ID: 'data-cutout-id'
 };
 
 const eventNames = {
@@ -57,7 +57,7 @@ class VideoCropper extends HTMLElement {
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		switch (name) {
-			case attributeNames.SOURCE_ID:
+			case attributeNames.CUTOUT_ID:
 				if (newValue) {
 					this.updateId(newValue);
 				}
@@ -66,8 +66,8 @@ class VideoCropper extends HTMLElement {
 	}
 
 	connectedCallback() {
-		if (this.hasAttribute(attributeNames.SOURCE_ID)) {
-			this.updateId(this.getAttribute(attributeNames.SOURCE_ID));
+		if (this.hasAttribute(attributeNames.CUTOUT_ID)) {
+			this.updateId(this.getAttribute(attributeNames.CUTOUT_ID));
 		}
 
 		this.addEventListener(videoDisplayEventNames.STREAM_PLAYING, () => {

@@ -6,7 +6,11 @@ import {
 	eventNames as videoCropperEventNames
 } from '../../components/video/video-cropper.js';
 
-import { eventNames as sourceSelectorEventNames } from '../../components/video/source-selector.js';
+import {
+	tagName as sourceSelectorTagName,
+	eventNames as sourceSelectorEventNames,
+	attributeNames as sourceSelectorAttributeNames
+} from '../../components/video/source-selector.js';
 import { get as getConfigValue } from '../../lib/config.js';
 
 export { init };
@@ -47,7 +51,12 @@ function init(logger, document) {
 
 			if (cutoutId) {
 				const preview = document.querySelector(`${videoCropperTagName}.preview`);
-				preview.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutId);
+				preview.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutId);
+
+				document.querySelectorAll(sourceSelectorTagName).forEach((sourceSelector) => {
+					sourceSelector.setAttribute(sourceSelectorAttributeNames.PREVIEW_ID, id);
+				});
+
 				ipcRenderer.send('preview', cutoutId);
 			} else {
 				logger.warn('Unable to find or create a cutout for source', id);
@@ -60,7 +69,7 @@ function init(logger, document) {
 			const { cutoutId, cutout } = detail;
 			if (cutoutId && cutout) {
 				triggerSendUpdate(cutoutId, cutout);
-				document.cutouts[cutoutId] = cutout;
+				document.fullConfig.cutouts[cutoutId] = cutout;
 			}
 		}
 	});
@@ -69,12 +78,20 @@ function init(logger, document) {
 		if (target.classList.contains('take-control--button')) {
 			const preview = document.querySelector(`${videoCropperTagName}.preview`);
 			const program = document.querySelector(`${videoCropperTagName}.program`);
-			const cutoutOnPreviewId = preview.getAttribute(videoCropperAttributeNames.SOURCE_ID);
-			const cutoutOnProgramId = program.getAttribute(videoCropperAttributeNames.SOURCE_ID);
+			const cutoutOnPreviewId = preview.getAttribute(videoCropperAttributeNames.CUTOUT_ID);
+			const cutoutOnProgramId = program.getAttribute(videoCropperAttributeNames.CUTOUT_ID);
 
 			if (cutoutOnPreviewId) {
-				program.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutOnPreviewId);
-				preview.setAttribute(videoCropperAttributeNames.SOURCE_ID, cutoutOnProgramId);
+				program.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnPreviewId);
+				preview.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnProgramId);
+
+				const programSourceId = getCutoutSourceId(cutoutOnPreviewId);
+				const previewSourceId = getCutoutSourceId(cutoutOnProgramId);
+
+				document.querySelectorAll(sourceSelectorTagName).forEach((sourceSelector) => {
+					sourceSelector.setAttribute(sourceSelectorAttributeNames.PREVIEW_ID, previewSourceId);
+					sourceSelector.setAttribute(sourceSelectorAttributeNames.PROGRAM_ID, programSourceId);
+				});
 
 				ipcRenderer.send('take', cutoutOnPreviewId);
 			}
@@ -111,7 +128,7 @@ function createCutoutFromSource(sourceId, logger) {
 
 	return {
 		width: 720,
-		height: 1280,
+		height: 720,
 		outputRotation: 0,
 		source: sourceId,
 		x: 0,
@@ -128,4 +145,10 @@ function findCutoutIdFromSourceId(sourceId, logger) {
 	}
 
 	return undefined;
+}
+
+function getCutoutSourceId(cutoutId) {
+	const cutout = getConfigValue(`cutouts.${cutoutId}`);
+
+	return cutout ? cutout.source : null;
 }

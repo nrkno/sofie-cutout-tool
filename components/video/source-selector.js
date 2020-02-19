@@ -4,19 +4,24 @@ import {
 } from './source-thumbnail.js';
 import { get as getConfigValue } from '../../lib/config.js';
 
-export { tagName, classNames, eventNames };
+export { tagName, classNames, eventNames, attributeNames };
 
 const tagName = 'source-selector';
 
 const classNames = {
 	SOURCES_LIST: 'input-source-list',
 	SOURCES_LIST_ITEM: 'input-source-list--item',
+	SOURCES_LIST_ITEM_OVERLAY: 'input-source-list--item--overlay',
 	SRC_THUMB: 'input-source-list--item--thumbnail',
-	SRC_TITLE: 'input-source-list--item--title'
+	SRC_TITLE: 'input-source-list--item--title',
+	PREVIEW_SOURCE: 'input-source-list--current-preview',
+	PROGRAM_SOURCE: 'input-source-list--current-program'
 };
 
 const attributeNames = {
-	SOURCE_ID: 'data-source-id'
+	SOURCE_ID: 'data-source-id',
+	PREVIEW_ID: 'data-preview-id',
+	PROGRAM_ID: 'data-program-id'
 };
 
 const eventNames = {
@@ -29,6 +34,10 @@ const innerHtml = `
 `;
 
 class SourceSelector extends HTMLElement {
+	static get observedAttributes() {
+		return [attributeNames.PREVIEW_ID, attributeNames.PROGRAM_ID];
+	}
+
 	constructor() {
 		super();
 
@@ -61,6 +70,19 @@ class SourceSelector extends HTMLElement {
 		this.updateSources();
 	}
 
+	attributeChangedCallback(name, oldValue, newValue) {
+		switch (name) {
+			case attributeNames.PREVIEW_ID:
+				this.previewId = newValue;
+				this.renderSourceSelectors();
+				break;
+			case attributeNames.PROGRAM_ID:
+				this.programId = newValue;
+				this.renderSourceSelectors();
+				break;
+		}
+	}
+
 	updateSources() {
 		const sources = getConfigValue('sources');
 		if (sources) {
@@ -70,18 +92,34 @@ class SourceSelector extends HTMLElement {
 	}
 
 	renderSourceSelectors() {
-		this.sourceListElement.innerHTML = '';
 		const ids = Object.keys(this.sources);
-		ids.forEach((id) => {
-			const source = this.sources[id];
+		const listItems = ids
+			.map((id) => {
+				const source = this.sources[id];
+				try {
+					const listItem = createListItem(source, id);
+					if (id === this.previewId) {
+						listItem.classList.add(classNames.PREVIEW_SOURCE);
+						const overlay = document.createElement('div');
+						overlay.classList.add(classNames.SOURCES_LIST_ITEM_OVERLAY);
+						listItem.appendChild(overlay);
+					}
+					if (id === this.programId) {
+						listItem.classList.add(classNames.PROGRAM_SOURCE);
+						const overlay = document.createElement('div');
+						overlay.classList.add(classNames.SOURCES_LIST_ITEM_OVERLAY);
+						listItem.appendChild(overlay);
+					}
+					return listItem;
+				} catch (error) {
+					console.warn(`Unable to create source preview for ${id}`, error);
+					return null;
+				}
+			})
+			.filter((item) => item !== null);
 
-			try {
-				const listElement = createListItem(source, id);
-				this.sourceListElement.appendChild(listElement);
-			} catch (error) {
-				console.warn(`Unable to create source preview for ${id}`, error);
-			}
-		});
+		this.sourceListElement.innerHTML = '';
+		this.sourceListElement.append(...listItems);
 	}
 }
 

@@ -11,6 +11,7 @@
 	padding: 0 16px 16px;
 	width: 256px;
 	cursor: pointer;
+	position: relative;
 }
 
 .input-source-list--item--thumbnail {
@@ -23,4 +24,20 @@
 	color: var(--text-main);
 	text-decoration: none;
 	line-height: 1.5em;
+}
+
+.input-source-list--item--overlay {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.input-source-list--current-preview .input-source-list--item--overlay {
+	background-color: rgba(255, 255, 0, 0.7);
+}
+
+.input-source-list--current-program .input-source-list--item--overlay {
+	background-color: rgba(255, 0, 0, 0.7);
 }
