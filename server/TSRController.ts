@@ -273,7 +273,6 @@ export class TSRController {
 		_.each(this.timeline, (tlObj, i) => {
 			if (!tlObj.id) tlObj.id = 'Unnamed' + i;
 		});
-		console.log('update timeline');
 
 		// Send mappings and timeline to TSR:
 		this.tsr.setMapping(this.mappings);
@@ -391,7 +390,7 @@ export class TSRController {
 	private _casparTransformTransition(useTransition: boolean): Mixer {
 		if (!useTransition) return {};
 		// tmp: disable transition
-		return {}
+		return {};
 		/*
 		return {
 			inTransition: {
