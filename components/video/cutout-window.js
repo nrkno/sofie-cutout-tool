@@ -241,21 +241,18 @@ class CutoutWindow extends HTMLElement {
 		});
 
 		this.shadowRoot.addEventListener('touchmove', (event) => {
-			console.log('touchmove', event.target);
 			if (event.target.isSameNode(this.frame)) {
 				this.moveCropFromTouch(event);
 			}
 		});
 
 		this.shadowRoot.addEventListener('touchstart', (event) => {
-			console.log('touchstart', event.target);
 			if (event.target.isSameNode(this.frame)) {
 				this.moveCropFromTouch(event);
 			}
 		});
 
 		this.shadowRoot.addEventListener('touchend', (event) => {
-			console.log('touchend', event.target);
 			if (event.target.isSameNode(this.frame)) {
 				this.moveCropFromTouch(event);
 			}

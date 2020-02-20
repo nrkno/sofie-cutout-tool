@@ -6,6 +6,7 @@
 	height: 100%;
 	opacity: 60%;
 	position: relative;
+	touch-action: none;
 }
 
 .cutout-window--container.crop916src169 {
