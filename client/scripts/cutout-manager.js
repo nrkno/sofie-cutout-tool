@@ -81,7 +81,8 @@ function init(logger, document) {
 			const cutoutOnPreviewId = preview.getAttribute(videoCropperAttributeNames.CUTOUT_ID);
 			const cutoutOnProgramId = program.getAttribute(videoCropperAttributeNames.CUTOUT_ID);
 
-			if (cutoutOnPreviewId) {
+			const cutouts = getConfigValue('cutouts');
+			if (cutoutOnPreviewId && cutouts[cutoutOnPreviewId]) {
 				program.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnPreviewId);
 				preview.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnProgramId);
 
