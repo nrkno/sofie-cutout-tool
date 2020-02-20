@@ -8,7 +8,8 @@
 .input-source-list--item {
 	display: flex;
 	flex-direction: column;
-	padding: 0 16px 16px;
+	padding: 0;
+	margin: 0 16px 16px;
 	width: 256px;
 	cursor: pointer;
 	position: relative;
@@ -34,10 +35,26 @@
 	height: 100%;
 }
 
+.input-source-list--item--overlay::before {
+	background-color: rgba(0, 0, 0, 0.6);
+	line-height: 1.5em;
+	width: 100%;
+	text-align: center;
+	display: block;
+}
+
 .input-source-list--current-preview .input-source-list--item--overlay {
-	background-color: rgba(255, 255, 0, 0.7);
+	background-color: rgba(255, 255, 0, 0.5);
+}
+
+.input-source-list--current-preview .input-source-list--item--overlay::before {
+	content: 'PREVIEW';
 }
 
 .input-source-list--current-program .input-source-list--item--overlay {
-	background-color: rgba(255, 0, 0, 0.7);
+	background-color: rgba(255, 0, 0, 0.5);
+}
+
+.input-source-list--current-program .input-source-list--item--overlay::before {
+	content: 'PROGRAM';
 }

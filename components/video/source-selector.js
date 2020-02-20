@@ -59,6 +59,11 @@ class SourceSelector extends HTMLElement {
 				return;
 			}
 
+			if (id === this.previewId || id === this.programId) {
+				// block current preview and program for preview
+				return;
+			}
+
 			const event = new CustomEvent(eventNames.SOURCE_SELECTED, {
 				bubbles: true,
 				composed: true,
