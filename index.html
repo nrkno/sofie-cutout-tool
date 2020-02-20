@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8" />
-		<title>Hello World!</title>
+		<title>Sofie Cutout Tool</title>
 		<!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
 		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
 		<link rel="stylesheet" href="client/index.css" />
@@ -24,14 +24,6 @@
 				<video-cropper class="program"></video-cropper>
 			</div>
 		</section>
-		<h2>Tech tests</h2>
-		We are using <span class="message"></span>.
-		<script>
-			const { node, chrome, electron } = process.versions;
-			document.querySelector(
-				'.message'
-			).textContent = `node ${node}, Chrome ${chrome} and Electron ${electron}`;
-		</script>
 		<script src="client/index.js" type="module"></script>
 		<script src="components/components.js" type="module"></script>
 	</body>
