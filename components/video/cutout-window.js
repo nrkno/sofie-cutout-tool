@@ -97,6 +97,8 @@ class CutoutWindow extends HTMLElement {
 			this.setSource();
 			this.setFrameSizeAndPosition();
 		} catch (error) {
+			this.cutout = null;
+			this.source = null;
 			console.warn(`Unable to set cutout from attribute value ${attributeValue}`, error);
 		}
 	}
@@ -120,6 +122,9 @@ class CutoutWindow extends HTMLElement {
 
 	setFrameSizeAndPosition() {
 		if (!this.cutout) {
+			this.frame.style.width = 0;
+			this.frame.style.height = 0;
+			this.container.classList.remove(...Object.values(containerArClassnames));
 			return;
 		}
 		this.setFrameSize();
@@ -257,7 +262,6 @@ class CutoutWindow extends HTMLElement {
 		});
 
 		this.addEventListener(eventNames.UPDATE_FRAME_SIZE, () => {
-			console.log(`<${tagName}>`, eventNames.UPDATE_FRAME_SIZE);
 			this.setFrameSizeAndPosition();
 		});
 	}
@@ -322,6 +326,9 @@ class CutoutWindow extends HTMLElement {
 	}
 
 	emitMoveEvent() {
+		if (!this.cutout) {
+			return;
+		}
 		const { width, height, x, y, source } = this.cutout;
 
 		this.dispatchEvent(

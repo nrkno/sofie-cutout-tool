@@ -99,6 +99,15 @@ class VideoCropper extends HTMLElement {
 		const sources = getConfigValue('sources');
 		const sourceReferenceLayers = getConfigValue('sourceReferenceLayers');
 
+		if (!cutouts[id]) {
+			this.cutoutId = null;
+			this.source = null;
+			this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, '');
+			this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, '');
+			this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, '');
+			return;
+		}
+
 		this.cutoutId = id;
 		this.cutout = Object.assign({}, cutouts[id]);
 		const sourceId = this.cutout.source;

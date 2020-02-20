@@ -87,15 +87,18 @@ class VideoDisplay extends HTMLElement {
 	}
 
 	loadStream() {
+		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
+
 		if (!this.streamChannel || !this.streamLayer) {
 			console.warn(
 				`Unable to load stream, missing data: channel: ${this.streamChannel}, layer: ${this.streamLayer}`
 			);
+			img.src = 'data:,'; // could use a placeholder?
+			img.setAttribute('alt', '');
 			return;
 		}
 
 		const imageProviderLocation = getImageProviderLocation();
-		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
 		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);
 		const streamUrl = `${imageProviderLocation}/channel/${this.streamChannel}/${this.streamLayer}/stream`;
