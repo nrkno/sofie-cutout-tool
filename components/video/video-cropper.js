@@ -74,7 +74,7 @@ class VideoCropper extends HTMLElement {
 			this.cropTool.dispatchEvent(new CustomEvent(cropToolEventNames.UPDATE_FRAME_SIZE));
 		});
 
-		document.addEventListener(cropToolEventNames.MOVE, (event) => {
+		this.addEventListener(cropToolEventNames.MOVE, (event) => {
 			event.stopPropagation();
 			const { width, height, x, y } = event.detail;
 			const centeredPosition = transformTopLeftToCenterOrigo({ x, y, width, height }, this.source);
