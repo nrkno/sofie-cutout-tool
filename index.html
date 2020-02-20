@@ -12,11 +12,17 @@
 		<source-selector></source-selector>
 		<br />
 		<section id="cropper-container" style="display:grid; grid-template-columns: 1fr 200px 1fr;">
-			<video-cropper class="preview"></video-cropper>
+			<div class="cutout-channel">
+				<h2 class="title">PREVIEW</h2>
+				<video-cropper class="preview"></video-cropper>
+			</div>
 			<div class="take-control--container">
 				<button class="take-control--button">TAKE</button>
 			</div>
-			<video-cropper class="program"></video-cropper>
+			<div class="cutout-channel">
+				<h2 class="title">PROGRAM</h2>
+				<video-cropper class="program"></video-cropper>
+			</div>
 		</section>
 		<h2>Tech tests</h2>
 		We are using <span class="message"></span>.
