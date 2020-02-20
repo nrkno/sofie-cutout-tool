@@ -37,8 +37,8 @@
   "eslint-config-prettier": "^6.9.0",
   "eslint-plugin-prettier": "^3.1.2",
   "esm": "^3.2.25",
-  "husky": "^4.0.9",
-  "lint-staged": "^9.5.0",
+  "husky": "^4.2.3",
+  "lint-staged": "^10.0.7",
   "nodemon": "^2.0.0",
   "prettier": "^1.19.1",
   "trash-cli": "^3.0.0",
@@ -52,12 +52,10 @@
  },
  "lint-staged": {
   "*.{js,css,json,md}": [
-   "prettier --write",
-   "git add"
+   "prettier --write"
   ],
   "*.{ts}": [
-   "npm run lint:fix --",
-   "git add"
+   "npm run lint:fix --"
   ]
  }
 }

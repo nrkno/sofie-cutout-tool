@@ -1,16 +1,5 @@
 {
 	"sources": {
-		"source_AMB": {
-			"title": "Caspar Test Loop",
-			"width": 1920,
-			"height": 1080,
-			"rotation": 0,
-			"input": {
-				"type": "media",
-				"file": "AMB",
-				"loop": true
-			}
-		},
 		"source_A": {
 			"title": "Overturisme",
 			"width": 1920,
@@ -30,17 +19,6 @@
 			"input": {
 				"type": "media",
 				"file": "9-16-test-frp-liveu",
-				"loop": true
-			}
-		},
-		"source_C": {
-			"title": "Ulvedemo LiveU",
-			"width": 1920,
-			"height": 1080,
-			"rotation": 0,
-			"input": {
-				"type": "media",
-				"file": "LiveU-lot-ulv-220120_15_226442_5060-1",
 				"loop": true
 			}
 		},
