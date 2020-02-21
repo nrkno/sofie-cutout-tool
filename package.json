@@ -41,6 +41,7 @@
   "lint-staged": "^10.0.7",
   "nodemon": "^2.0.0",
   "prettier": "^1.19.1",
+  "trash": "^6.1.1",
   "trash-cli": "^3.0.0",
   "ts-node": "^8.5.3",
   "typescript": "^3.7.2"
