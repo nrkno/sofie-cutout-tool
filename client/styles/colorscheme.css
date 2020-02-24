@@ -1,7 +1,7 @@
 :root {
-  --bg-main: #111;
-  --bg-light: #1b263b;
-  --text-main: #fff;
-  --frame-dark: rgba(255, 0, 0, 0.5);
-  --frame-light: #778da9;
+	--bg-main: #444444;
+	--bg-dark: #292929;
+	--text-main: #fff;
+	--control-dark: #c4c4c4;
+	--control-light: #f0f0f0;
 }

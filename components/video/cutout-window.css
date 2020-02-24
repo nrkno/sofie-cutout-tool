@@ -18,7 +18,15 @@
 }
 
 .cutout-window--frame {
-	outline: 1px solid red;
+	outline: 1px solid;
 	height: 100%;
 	position: absolute;
+}
+
+.preview .cutout-window--frame {
+	outline-color: yellow;
+}
+
+.program .cutout-window--frame {
+	outline-color: red;
 }

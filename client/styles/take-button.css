@@ -7,13 +7,24 @@
 }
 
 .take-control--button {
-	border: transparent;
-	border-radius: 5%;
-	width: 80%;
-	height: 3.5em;
-	bottom: 0;
-	font-size: 3em;
-	background: var(--frame-dark);
-	color: var(--text-main);
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	background-image: url('../../assets/right.svg');
+
+	border: 4px solid var(--control-light);
+	border-radius: 100%;
+	color: var(--control-light);
+
 	position: absolute;
+	bottom: 0;
+	width: 80%;
+
+	height: 3.5em;
+	font-size: 3em;
+}
+
+.take-control--button .label {
+	visibility: hidden;
 }
