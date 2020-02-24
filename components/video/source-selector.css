@@ -7,10 +7,11 @@
 
 .input-source-list--item {
 	display: flex;
+	flex: 1;
 	flex-direction: column;
 	padding: 0;
 	margin: 0 16px 16px;
-	width: 256px;
+	/* width: 256px; */
 	cursor: pointer;
 	position: relative;
 }
