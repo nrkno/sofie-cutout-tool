@@ -18,7 +18,7 @@ import {
 	getCutoutSourceId
 } from '../../lib/cutouts.js';
 
-import { get as getConfigValue } from '../../lib/config.js';
+import * as config from '../../lib/config.js';
 
 export { init };
 
@@ -67,7 +67,8 @@ function init(logger, document) {
 			const { cutoutId, cutout } = detail;
 			if (cutoutId && cutout) {
 				triggerSendUpdate(cutoutId, cutout);
-				document.fullConfig.cutouts[cutoutId] = cutout;
+
+				config.set(`cutouts.${cutoutId}`, cutout);
 			}
 		}
 	});
@@ -79,7 +80,7 @@ function init(logger, document) {
 			const cutoutOnPreviewId = preview.getAttribute(videoCropperAttributeNames.CUTOUT_ID);
 			const cutoutOnProgramId = program.getAttribute(videoCropperAttributeNames.CUTOUT_ID);
 
-			const cutouts = getConfigValue('cutouts');
+			const cutouts = config.get('cutouts');
 			if (cutoutOnPreviewId && cutouts[cutoutOnPreviewId]) {
 				program.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnPreviewId);
 				preview.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnProgramId);
