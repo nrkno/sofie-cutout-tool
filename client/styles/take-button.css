@@ -19,10 +19,11 @@
 
 	position: absolute;
 	bottom: 0;
-	width: 80%;
 
-	height: 3.5em;
-	font-size: 3em;
+	width: 80%;
+	height: 0;
+	padding-bottom: 80%;
+	margin: auto;
 }
 
 .take-control--button .label {

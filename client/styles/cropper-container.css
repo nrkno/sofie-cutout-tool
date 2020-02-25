@@ -1,0 +1,5 @@
+.cropper-container {
+	display: grid;
+	grid-template-columns: 16fr 3fr 16fr;
+	width: 100%;
+}

@@ -62,6 +62,12 @@ class VideoDisplay extends HTMLElement {
 		});
 
 		this.loadStream();
+
+		// https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API
+		const resizeObserver = new ResizeObserver(() => {
+			this.resize();
+		});
+		resizeObserver.observe(this);
 	}
 
 	attributeChangedCallback(name, oldValue, currentValue) {
@@ -99,8 +105,6 @@ class VideoDisplay extends HTMLElement {
 		}
 
 		const imageProviderLocation = getImageProviderLocation();
-		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
-		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);
 		const streamUrl = `${imageProviderLocation}/channel/${this.streamChannel}/${this.streamLayer}/stream`;
 
 		fetch(streamUrl)
@@ -113,31 +117,41 @@ class VideoDisplay extends HTMLElement {
 					throw new Error(`Region for channel ${this.streamChannel} not found using ${streamUrl}`);
 				}
 
+				this.region = region;
 				const stream = streamInfo.streams.find((s) => s.id == region.streamId);
 				if (!stream) {
 					throw new Error(`Stream ${region.streamId} not found`);
 				}
 
 				const srcUrl = imageProviderLocation + stream.url;
-				const scale = calcTransformScale(this.shadowRoot.host, region);
-
-				const containerDimensions = {
-					width: Math.round(region.width * scale),
-					height: Math.round(region.height * scale)
-				};
-
-				container.style.width = containerDimensions.width;
-				arPlaceholder.style.paddingBottom = `${containerDimensions.height}px`;
-
 				if (img.src !== srcUrl) {
 					img.src = srcUrl;
 				} else {
 					this.dispatchStreamPlaying();
 				}
 
-				img.style.transform = getCSSTransformString(scale, region);
+				this.resize();
 			})
 			.catch(console.error);
+	}
+
+	resize() {
+		if (!this.region) {
+			return;
+		}
+
+		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`);
+		const container = this.shadowRoot.querySelector(`.${classNames.CONTAINER}`);
+		const arPlaceholder = this.shadowRoot.querySelector(`.${classNames.AR_PLACEHOLDER}`);
+		const scale = calcTransformScale(this.shadowRoot.host, this.region);
+		const containerDimensions = {
+			width: Math.round(this.region.width * scale),
+			height: Math.round(this.region.height * scale)
+		};
+
+		img.style.transform = getCSSTransformString(scale, this.region);
+		container.style.width = containerDimensions.width;
+		arPlaceholder.style.paddingBottom = `${containerDimensions.height}px`;
 	}
 }
 

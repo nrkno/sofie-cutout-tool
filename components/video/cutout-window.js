@@ -57,6 +57,12 @@ class CutoutWindow extends HTMLElement {
 	connectedCallback() {
 		this.setupEventListeners();
 		this.updateCutoutFromAttribute();
+
+		const resizeObserver = new ResizeObserver(() => {
+			this.calcScreenspaceScale();
+			this.setFrameSizeAndPosition();
+		});
+		resizeObserver.observe(this);
 	}
 
 	attributeChangedCallback(name) {
