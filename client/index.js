@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-import { init as cutoutManagerInit } from './scripts/cutout-manager.js';
+import CutoutManager from './scripts/cutout-manager.js';
 import { write } from '../lib/config.js';
 
 /* using console.log from inside init for some reason doesn't work,
@@ -14,7 +14,7 @@ const logger = {
 	info: (args) => console.info(args)
 };
 
-cutoutManagerInit(logger, document);
+const cutoutManager = new CutoutManager(ipcRenderer);
 
 ipcRenderer.on('new-config', (event, newFullConfig) => {
 	// A new config is received from the backend.
