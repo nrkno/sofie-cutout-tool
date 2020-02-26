@@ -2,6 +2,10 @@
 	--handlebar-height: 128px;
 }
 
+:host([data-cutout='']) {
+	visibility: hidden;
+}
+
 .cutout-window--container {
 	background-color: transparent;
 	background-repeat: no-repeat;

@@ -1,5 +1,9 @@
 @import '../../client/styles/colorscheme.css';
 
+:host(.program:not([data-cutout-id])) {
+	visibility: hidden;
+}
+
 .video-cropper--container {
 	display: grid;
 	grid-template-areas: 'video-cropper';
