@@ -1,3 +1,7 @@
+:host {
+	--handlebar-height: 128px;
+}
+
 .cutout-window--container {
 	background-color: transparent;
 	background-repeat: no-repeat;
@@ -18,15 +22,10 @@
 }
 
 .cutout-window--frame {
-	outline: 1px solid;
+	outline: 1px solid red;
 	height: 100%;
 	position: absolute;
-}
-
-.preview .cutout-window--frame {
-	outline-color: yellow;
-}
-
-.program .cutout-window--frame {
-	outline-color: red;
+	border-bottom-style: solid;
+	border-bottom-width: var(--handlebar-height);
+	border-bottom-color: var(--control-dark);
 }

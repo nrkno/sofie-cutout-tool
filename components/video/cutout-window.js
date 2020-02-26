@@ -184,8 +184,11 @@ class CutoutWindow extends HTMLElement {
 		const xPos = this.cutout.x * this.screenSpaceScale - backgroundOffsetX;
 		const yPos = this.cutout.y * this.screenSpaceScale - backgroundOffsetY;
 
+		// adjust for handlebars! subtract on axis border width?
+
 		this.container.style.backgroundPositionX = `${xPos}px`;
-		this.container.style.backgroundPositionY = `${yPos}px`;
+		// hack that only works for 1:1 or 9:16 from 16:9 sources
+		this.container.style.backgroundPositionY = `calc(${yPos}px + var(--handlebar-height))`;
 	}
 
 	setFrameSize() {
