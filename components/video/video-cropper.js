@@ -10,6 +10,7 @@ import {
 	eventNames as cropToolEventNames
 } from './cutout-window.js';
 import { get as getConfigValue } from '../../lib/config.js';
+import { EventNames } from '../../shared/events.js';
 
 export { tagName, attributeNames, eventNames };
 
@@ -87,7 +88,7 @@ class VideoCropper extends HTMLElement {
 			this.triggerSendUpdate();
 		});
 
-		document.addEventListener('new-config', () => {
+		document.addEventListener(EventNames.UPDATE_CONFIG, () => {
 			if (this.cutoutId) {
 				this.updateId(this.cutoutId);
 			}

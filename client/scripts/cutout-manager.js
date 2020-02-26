@@ -16,6 +16,8 @@ import {
 	getCutoutSourceId
 } from '../../lib/cutouts.js';
 
+import { EventNames as applicationEvents } from '../../shared/events.js';
+
 import * as config from '../../lib/config.js';
 
 export default class CutoutManager {
@@ -24,21 +26,17 @@ export default class CutoutManager {
 
 		this.setupEventListeners();
 
-		this.ipcRenderer.on('backend-ready', () => {
+		this.ipcRenderer.on(applicationEvents.BACKEND_READY, () => {
 			const sourceIds = Object.keys(config.get('sources'));
 			if (sourceIds[0]) {
 				this.selectSource(sourceIds[0]);
 			}
 		});
 
-		this.ipcRenderer.send('initialize');
+		this.ipcRenderer.send(applicationEvents.BACKEND_INITIALIZE);
 	}
 
 	setupEventListeners() {
-		document.addEventListener('cutout-move', (event) => {
-			this.moveCutout(event.detail);
-		});
-
 		document.addEventListener(sourceSelectorEventNames.SOURCE_SELECTED, ({ detail }) => {
 			this.selectSource(detail.id);
 		});
@@ -64,10 +62,6 @@ export default class CutoutManager {
 		}
 	}
 
-	moveCutout({ source, x, y, width, height }) {
-		this.ipcRenderer.send('cutout-move', { source, x, y, width, height });
-	}
-
 	selectSource(id) {
 		let cutoutId = findCutoutIdFromSourceId(id);
 
@@ -75,7 +69,7 @@ export default class CutoutManager {
 			const cutout = createCutoutFromSource(id);
 			if (cutout) {
 				cutoutId = `cutout_${id}`;
-				this.ipcRenderer.send('update-cutout', cutoutId, cutout);
+				this.ipcRenderer.send(applicationEvents.UPDATE_CUTOUT, cutoutId, cutout);
 			}
 		}
 
@@ -88,7 +82,7 @@ export default class CutoutManager {
 				.querySelector(sourceSelectorTagName)
 				.setAttribute(sourceSelectorAttributeNames.PREVIEW_ID, id);
 
-			this.ipcRenderer.send('preview', cutoutId);
+			this.ipcRenderer.send(applicationEvents.SET_PREVIEW, cutoutId);
 		}
 	}
 
@@ -112,7 +106,7 @@ export default class CutoutManager {
 				sourceSelector.setAttribute(sourceSelectorAttributeNames.PROGRAM_ID, programSourceId);
 			});
 
-			this.ipcRenderer.send('take', cutoutOnPreviewId);
+			this.ipcRenderer.send(applicationEvents.TAKE, cutoutOnPreviewId);
 		}
 	}
 
@@ -121,7 +115,7 @@ export default class CutoutManager {
 			this.sendUpdateTimeout = setTimeout(() => {
 				this.sendUpdateTimeout = null;
 
-				this.ipcRenderer.send('update-cutout', cutoutId, cutout);
+				this.ipcRenderer.send(applicationEvents.UPDATE_CUTOUT, cutoutId, cutout);
 			}, 40);
 		}
 	}

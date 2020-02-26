@@ -3,6 +3,7 @@ import {
 	attributeNames as thumbnailAttributeNames
 } from './source-thumbnail.js';
 import { get as getConfigValue } from '../../lib/config.js';
+import { EventNames } from '../../shared/events.js';
 
 export { tagName, classNames, eventNames, attributeNames };
 
@@ -49,7 +50,7 @@ class SourceSelector extends HTMLElement {
 	}
 
 	connectedCallback() {
-		document.addEventListener('new-config', () => {
+		document.addEventListener(EventNames.UPDATE_CONFIG, () => {
 			this.updateSources();
 		});
 
