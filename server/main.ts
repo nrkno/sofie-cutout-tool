@@ -89,6 +89,7 @@ export default class Main {
 				});
 
 				event.reply('new-config', fullConfigClient);
+				event.reply('backend-ready');
 			});
 		});
 		ipcMain.on('update-cutout', (event, cutoutId: string, cutout: Cutout) => {

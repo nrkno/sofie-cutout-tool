@@ -98,6 +98,15 @@ function init(logger, document) {
 		}
 	});
 
+	ipcRenderer.on('backend-ready', () => {
+		const sourceIds = Object.keys(config.get('sources'));
+		if (sourceIds.length) {
+			document.dispatchEvent(
+				new CustomEvent(sourceSelectorEventNames.SOURCE_SELECTED, { detail: { id: sourceIds[0] } })
+			);
+		}
+	});
+
 	ipcRenderer.send('initialize');
 	return;
 }
