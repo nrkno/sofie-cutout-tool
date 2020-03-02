@@ -26,6 +26,10 @@
 	margin: auto;
 }
 
+.take-control--button:focus {
+	outline: none;
+}
+
 .take-control--button .label {
 	visibility: hidden;
 }
