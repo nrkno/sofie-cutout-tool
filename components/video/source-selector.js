@@ -5,6 +5,8 @@ import {
 import { get as getConfigValue } from '../../lib/config.js';
 import { EventNames } from '../../shared/events.js';
 
+const html = String.raw;
+
 export { tagName, classNames, eventNames, attributeNames };
 
 const tagName = 'source-selector';
@@ -29,9 +31,9 @@ const eventNames = {
 	SOURCE_SELECTED: 'source-selected'
 };
 
-const innerHtml = `
-<link rel="stylesheet" href="./components/video/source-selector.css">
-<ul class="${classNames.SOURCES_LIST}"></ul>
+const template = html`
+	<link rel="stylesheet" href="./components/video/source-selector.css" />
+	<ul class="${classNames.SOURCES_LIST}"></ul>
 `;
 
 class SourceSelector extends HTMLElement {
@@ -45,7 +47,7 @@ class SourceSelector extends HTMLElement {
 		this.sources = {};
 
 		const shadowRoot = this.attachShadow({ mode: 'open' });
-		shadowRoot.innerHTML = innerHtml;
+		shadowRoot.innerHTML = template;
 		this.sourceListElement = shadowRoot.querySelector(`.${classNames.SOURCES_LIST}`);
 	}
 

@@ -1,6 +1,8 @@
 import { getElementWidth } from '../../lib/dimensions.js';
 import { getImageProviderLocation } from '../../lib/config.js';
 
+const html = String.raw;
+
 export { tagName, attributeNames, eventNames };
 
 const tagName = 'video-display';
@@ -24,12 +26,12 @@ const eventNames = {
 	STREAM_PLAYING: 'stream-playing'
 };
 
-const innerHtml = `
-<link rel="stylesheet" href="./components/video/video-display.css" />
-<div class="${classNames.CONTAINER}">
-<div class="${classNames.AR_PLACEHOLDER}"></div>
-<img class="${classNames.IMG}" />
-</div>
+const template = html`
+	<link rel="stylesheet" href="./components/video/video-display.css" />
+	<div class="${classNames.CONTAINER}">
+		<div class="${classNames.AR_PLACEHOLDER}"></div>
+		<img class="${classNames.IMG}" />
+	</div>
 `;
 
 /**
@@ -46,7 +48,7 @@ class VideoDisplay extends HTMLElement {
 		super();
 
 		const shadowRoot = this.attachShadow({ mode: 'open' });
-		shadowRoot.innerHTML = innerHtml;
+		shadowRoot.innerHTML = template;
 
 		this.streamChannel = this.getAttribute(attributeNames.STREAM_CHANNEL);
 		this.streamLayer = this.getAttribute(attributeNames.STREAM_LAYER);

@@ -12,6 +12,8 @@ import {
 import { get as getConfigValue } from '../../lib/config.js';
 import { EventNames } from '../../shared/events.js';
 
+const html = String.raw;
+
 export { tagName, attributeNames, eventNames };
 
 const tagName = 'video-cropper';
@@ -30,8 +32,9 @@ const eventNames = {
 	CROP_MOVE: 'crop-move'
 };
 
-const innerHTML = `<link rel="stylesheet" href="./components/video/video-cropper.css" />
-<div class="${classNames.CONTAINER}"></div>
+const template = html`
+	<link rel="stylesheet" href="./components/video/video-cropper.css" />
+	<div class="${classNames.CONTAINER}"></div>
 `;
 
 class VideoCropper extends HTMLElement {
@@ -39,7 +42,7 @@ class VideoCropper extends HTMLElement {
 		super();
 
 		const shadowRoot = this.attachShadow({ mode: 'open' });
-		shadowRoot.innerHTML = innerHTML;
+		shadowRoot.innerHTML = template;
 
 		this.container = shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 

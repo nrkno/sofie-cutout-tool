@@ -3,6 +3,8 @@ import { getElementHeight, getElementWidth } from '../../lib/dimensions.js';
 import { aspectRatios, calcAspectRatio } from '../../lib/aspect-ratios.js';
 import { get } from '../../lib/config.js';
 
+const html = String.raw;
+
 export { tagName, attributeNames, eventNames };
 
 const tagName = 'cutout-window';
@@ -27,11 +29,11 @@ const eventNames = {
 	UPDATE_FRAME_SIZE: 'update-frame-size'
 };
 
-const innerHtml = `
-<link rel="stylesheet" href="./components/video/cutout-window.css" />
-<div class="${classNames.CONTAINER}">
-	<div class="${classNames.CROP_FRAME}"></div>
-</div>
+const template = html`
+	<link rel="stylesheet" href="./components/video/cutout-window.css" />
+	<div class="${classNames.CONTAINER}">
+		<div class="${classNames.CROP_FRAME}"></div>
+	</div>
 `;
 
 class CutoutWindow extends HTMLElement {
@@ -43,7 +45,7 @@ class CutoutWindow extends HTMLElement {
 		super();
 
 		const shadowRoot = this.attachShadow({ mode: 'open' });
-		shadowRoot.innerHTML = innerHtml;
+		shadowRoot.innerHTML = template;
 
 		this.container = shadowRoot.querySelector(`.${classNames.CONTAINER}`);
 		this.frame = shadowRoot.querySelector(`.${classNames.CROP_FRAME}`);

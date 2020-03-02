@@ -4,6 +4,8 @@ import {
 } from './video-display.js';
 import { get as getConfigValue } from '../../lib/config.js';
 
+const html = String.raw;
+
 export { tagName, attributeNames };
 
 const tagName = 'source-thumbnail';
@@ -16,12 +18,16 @@ const classNames = {
 	VIDEO_DISPLAY: 'source-thumbnail--video'
 };
 
+const template = html`
+	<link rel="stylesheet" href="./components/video/source-thumbnail.css" />
+`;
+
 class SourceThumbnail extends HTMLElement {
 	constructor() {
 		super();
 
 		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = `<link rel="stylesheet" href="./components/video/source-thumbnail.css">`;
+		this.shadowRoot.innerHTML = template;
 	}
 
 	connectedCallback() {
