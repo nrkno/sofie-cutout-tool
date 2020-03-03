@@ -1,0 +1,11 @@
+.vscode
+scratch
+.*ignore
+.*rc.json
+*.ts
+*.lock
+*-lock.*
+nodemon.json
+package.json
+tsconfig.json
+scripts
