@@ -11,7 +11,7 @@
 		"Jonas Hummelstrand <jonas@hummelstrand.com> (https://superfly.tv/)",
 		"Ola Christian Gundelsby <ola.christian.gundelsby@nrk.no> (https://nrk.no)"
 	],
-	"main": "dist/app.js",
+	"main": "build/app.js",
 	"scripts": {
 		"build": "tsc",
 		"prestart": "npm run build",
