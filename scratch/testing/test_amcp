@@ -8,7 +8,7 @@ ADD 1-99 STREAM http://127.0.0.1:3000/ -f mpjpeg -multiple_requests 1
 PLAY 2-1 route://1-1
 MIXER 2-1 FILL -0.388888 0 1.7777777 1
 PLAY 2-5 [HTML] https://nora.nrk.no/render/nyheter-next?group=malxsofietest03&channel=gfx1
-ADD 2-99 STREAM "rtmp://NRK_RTMP20:Z4e6Mkmmxg2dWN@nrkhd-rtmp-in1.netwerk.no:1934/live/stream-159586_1" -f flv -codec:v libx264 -filter:v "scale=out_range=full,fps=25,format=yuv420p,setsar=1:1,setdar=1:1" -profile:v high -level:v 3.2 -g 50 -preset fast -tune fastdecode -crf 18 -maxrate 2.5M -bufsize 1.5M -codec:a aac -b:a 160k
+ADD 2-99 STREAM "rtmp://<user>:<password>Z4e6Mkmmxg2dWN@nrkhd-rtmp-in1.netwerk.no:1934/live/stream-159586_1" -f flv -codec:v libx264 -filter:v "scale=out_range=full,fps=25,format=yuv420p,setsar=1:1,setdar=1:1" -profile:v high -level:v 3.2 -g 50 -preset fast -tune fastdecode -crf 18 -maxrate 2.5M -bufsize 1.5M -codec:a aac -b:a 160k
 
 PLAY 3-1 route://2
 MIXER 3-1 FILL 0.21875 0 0.5625 1
