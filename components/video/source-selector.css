@@ -47,7 +47,7 @@
 }
 
 .input-source-list--current-preview .input-source-list--item--overlay {
-	background-color: rgba(255, 255, 0, 0.5);
+	outline: 1px solid yellow;
 }
 
 .input-source-list--current-preview .input-source-list--item--overlay::before {
@@ -55,7 +55,7 @@
 }
 
 .input-source-list--current-program .input-source-list--item--overlay {
-	background-color: rgba(255, 0, 0, 0.5);
+	outline: 1px solid red;
 }
 
 .input-source-list--current-program .input-source-list--item--overlay::before {
