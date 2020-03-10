@@ -9,3 +9,4 @@ nodemon.json
 package.json
 tsconfig.json
 scripts
+*-test.js
