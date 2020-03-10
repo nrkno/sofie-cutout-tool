@@ -1,4 +1,3 @@
 @import './styles/base-layout.css';
 @import './styles/cropper-container.css';
-@import './styles/cutout-channel.css';
-@import './styles/take-button.css';
+@import './styles/take-controls.css';

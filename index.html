@@ -12,19 +12,20 @@
 		<source-selector></source-selector>
 		<br />
 		<section class="cropper-container">
-			<div class="cutout-channel">
-				<h2 class="title">PREVIEW</h2>
-				<video-cropper class="preview"></video-cropper>
-			</div>
-			<div class="take-control--container">
-				<button class="take-control--button" title="Take">
+			<h2 class="crop-channel--title">PREVIEW</h2>
+			<div></div>
+			<h2 class="crop-channel--title">PROGRAM</h2>
+
+			<video-cropper class="preview"></video-cropper>
+			<div class="take-controls--container">
+				<button is="direct-take-toggle" class="take-controls--button direct-mode-toggle">
+					<span class="label">Direkte Take</span>
+				</button>
+				<button class="take-controls--button take" title="Take">
 					<span class="label">Take</span>
 				</button>
 			</div>
-			<div class="cutout-channel">
-				<h2 class="title">PROGRAM</h2>
-				<video-cropper class="program"></video-cropper>
-			</div>
+			<video-cropper class="program"></video-cropper>
 		</section>
 		<script src="client/index.js" type="module"></script>
 		<script src="components/components.js" type="module"></script>
