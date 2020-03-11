@@ -28,8 +28,7 @@
 	},
 	"dependencies": {
 		"chokidar": "^3.3.0",
-		"remove": "^0.1.5",
-		"timeline-state-resolver": "^3.17.0",
+		"timeline-state-resolver": "^3.18.0",
 		"transformation-matrix": "^2.2.0",
 		"tslib": "^1.10.0",
 		"underscore": "^1.9.1"

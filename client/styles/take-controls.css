@@ -1,0 +1,47 @@
+@import './colorscheme.css';
+
+.take-controls--container {
+	position: relative;
+	height: 100%;
+}
+
+.take-controls--button {
+	width: 100%;
+	margin: auto;
+}
+
+.take-controls--button:focus {
+	outline: none;
+}
+
+.take-controls--button.take {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	background-image: url('../../assets/right.svg');
+
+	border: 4px solid var(--control-light);
+	border-radius: 100%;
+	color: var(--control-light);
+
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 0;
+	padding-bottom: 100%;
+}
+
+.take-controls--button.take .label {
+	visibility: hidden;
+}
+
+[is='direct-take-toggle'].take-controls--button {
+	font-size: 2.5em;
+	background-color: rgba(255, 191, 0, 0.7);
+}
+
+[is='direct-take-toggle'].take-controls--button.armed {
+	font-size: 2.5em;
+	background-color: red;
+}

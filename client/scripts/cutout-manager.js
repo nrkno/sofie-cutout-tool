@@ -19,6 +19,7 @@ import {
 import { EventNames as applicationEvents } from '../../shared/events.js';
 
 import * as config from '../../lib/config.js';
+import { eventNames as directTakeToggleEvents } from '../../components/ui/direct-take-toggle.js';
 
 export default class CutoutManager {
 	constructor(ipcRenderer) {
@@ -34,6 +35,8 @@ export default class CutoutManager {
 		});
 
 		this.ipcRenderer.send(applicationEvents.BACKEND_INITIALIZE);
+
+		this.directTakeMode = false;
 	}
 
 	setupEventListeners() {
@@ -48,9 +51,17 @@ export default class CutoutManager {
 		});
 
 		document.addEventListener('click', ({ target }) => {
-			if (target.classList.contains('take-control--button')) {
+			if (target.classList.contains('take-controls--button') && target.classList.contains('take')) {
 				this.take();
 			}
+		});
+
+		document.addEventListener(directTakeToggleEvents.ACTIVATE, () => {
+			this.directTakeMode = true;
+		});
+
+		document.addEventListener(directTakeToggleEvents.DEACTIVATE, () => {
+			this.directTakeMode = false;
 		});
 	}
 
@@ -74,15 +85,11 @@ export default class CutoutManager {
 		}
 
 		if (cutoutId) {
-			document
-				.querySelector(`${videoCropperTagName}.preview`)
-				.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutId);
-
-			document
-				.querySelector(sourceSelectorTagName)
-				.setAttribute(sourceSelectorAttributeNames.PREVIEW_ID, id);
-
-			this.ipcRenderer.send(applicationEvents.SET_PREVIEW, cutoutId);
+			if (this.directTakeMode === true) {
+				this.setProgram(cutoutId);
+			} else {
+				this.setPreview(cutoutId);
+			}
 		}
 	}
 
@@ -95,19 +102,33 @@ export default class CutoutManager {
 
 		const cutouts = config.get('cutouts');
 		if (cutoutOnPreviewId && cutouts[cutoutOnPreviewId]) {
-			program.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnPreviewId);
-			preview.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutOnProgramId);
-
-			const programSourceId = getCutoutSourceId(cutoutOnPreviewId);
-			const previewSourceId = getCutoutSourceId(cutoutOnProgramId);
-
-			document.querySelectorAll(sourceSelectorTagName).forEach((sourceSelector) => {
-				sourceSelector.setAttribute(sourceSelectorAttributeNames.PREVIEW_ID, previewSourceId);
-				sourceSelector.setAttribute(sourceSelectorAttributeNames.PROGRAM_ID, programSourceId);
-			});
-
-			this.ipcRenderer.send(applicationEvents.TAKE, cutoutOnPreviewId);
+			this.setProgram(cutoutOnPreviewId);
+			this.setPreview(cutoutOnProgramId);
 		}
+	}
+
+	setPreview(cutoutId) {
+		const preview = document.querySelector(`${videoCropperTagName}.preview`);
+		const sourceId = getCutoutSourceId(cutoutId);
+
+		preview.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutId);
+		document.querySelectorAll(sourceSelectorTagName).forEach((sourceSelector) => {
+			sourceSelector.setAttribute(sourceSelectorAttributeNames.PREVIEW_ID, sourceId);
+		});
+
+		this.ipcRenderer.send(applicationEvents.SET_PREVIEW, cutoutId);
+	}
+
+	setProgram(cutoutId) {
+		const program = document.querySelector(`${videoCropperTagName}.program`);
+		const sourceId = getCutoutSourceId(cutoutId);
+
+		program.setAttribute(videoCropperAttributeNames.CUTOUT_ID, cutoutId);
+		document.querySelectorAll(sourceSelectorTagName).forEach((sourceSelector) => {
+			sourceSelector.setAttribute(sourceSelectorAttributeNames.PROGRAM_ID, sourceId);
+		});
+
+		this.ipcRenderer.send(applicationEvents.TAKE, cutoutId);
 	}
 
 	triggerSendUpdate(cutoutId, cutout) {

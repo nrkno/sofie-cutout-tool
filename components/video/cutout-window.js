@@ -11,7 +11,8 @@ const tagName = 'cutout-window';
 
 const classNames = {
 	CONTAINER: 'cutout-window--container',
-	CROP_FRAME: 'cutout-window--frame'
+	CROP_FRAME: 'cutout-window--frame',
+	CROP_FRAME_BOTTOM_BAR: 'cutout-window--frame--handlebar-bottom'
 };
 
 const containerArClassnames = {
@@ -32,7 +33,9 @@ const eventNames = {
 const template = html`
 	<link rel="stylesheet" href="./components/video/cutout-window.css" />
 	<div class="${classNames.CONTAINER}">
-		<div class="${classNames.CROP_FRAME}"></div>
+		<div class="${classNames.CROP_FRAME}">
+			<div class="${classNames.CROP_FRAME_BOTTOM_BAR}"></div>
+		</div>
 	</div>
 `;
 
@@ -186,11 +189,7 @@ class CutoutWindow extends HTMLElement {
 		const xPos = this.cutout.x * this.screenSpaceScale - backgroundOffsetX;
 		const yPos = this.cutout.y * this.screenSpaceScale - backgroundOffsetY;
 
-		// adjust for handlebars! subtract on axis border width?
-
-		this.container.style.backgroundPositionX = `${xPos}px`;
-		// hack that only works for 1:1 or 9:16 from 16:9 sources
-		this.container.style.backgroundPositionY = `calc(${yPos}px + var(--handlebar-height))`;
+		this.container.style.backgroundPosition = `${xPos}px ${yPos}px`;
 	}
 
 	setFrameSize() {

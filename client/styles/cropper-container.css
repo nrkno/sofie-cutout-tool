@@ -1,5 +1,10 @@
 .cropper-container {
 	display: grid;
 	grid-template-columns: 16fr 3fr 16fr;
-	width: 100%;
+	column-gap: 16px;
+	padding: 0 16px;
+}
+
+.cropper-container .crop-channel--title {
+	text-align: center;
 }
