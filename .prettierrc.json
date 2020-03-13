@@ -6,5 +6,6 @@
 	"jsxBracketSameLine": true,
 	"printWidth": 100,
 	"useTabs": true,
-	"endOfLine": "crlf"
+	"endOfLine": "lf",
+	"semi": false
 }
