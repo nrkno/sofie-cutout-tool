@@ -11,6 +11,13 @@
 		"Jonas Hummelstrand <jonas@hummelstrand.com> (https://superfly.tv/)",
 		"Ola Christian Gundelsby <ola.christian.gundelsby@nrk.no> (https://nrk.no)"
 	],
+	"os": [
+		"win32",
+		"darwin"
+	],
+	"cpu": [
+		"x64"
+	],
 	"main": "app.js",
 	"scripts": {
 		"build": "rimraf build && tsc",

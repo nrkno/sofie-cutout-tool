@@ -10,6 +10,8 @@ const dirs = {
 	CONFIG: 'config'
 }
 
+const projectConfig = JSON.parse(readFileSync('./package.json', 'utf-8'))
+
 const ignoreGlobs = readFileSync('./.packageignore', 'utf-8')
 	.split(/\r?\n/)
 	.map((glob) => glob.trim())
@@ -22,21 +24,19 @@ const options = {
 			callback()
 		}
 	],
+	arch: projectConfig.cpu,
 	asar: {
 		unpackDir: dirs.CONFIG
 	},
 	dir: '.',
 	icon: 'assets/sofie_logo',
 	ignore: (fileName) => {
-		if (isMatch(fileName.substring(1), ignoreGlobs, { basename: false })) {
-			console.log('Ignored', fileName)
-			return true
-		}
-
-		return false
+		// filenames sent in starts with /, which confuses the matcher
+		return isMatch(fileName.substring(1), ignoreGlobs, { basename: false })
 	},
 	out: dirs.DIST,
 	overwrite: true,
+	platform: projectConfig.os,
 	prune: true,
 	quiet: false
 }
