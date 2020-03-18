@@ -1,6 +1,6 @@
 import packager from 'electron-packager'
 import { readFileSync } from 'fs'
-import { makeRe, isMatch } from 'micromatch'
+import { isMatch } from 'micromatch'
 import rimraf from 'rimraf'
 import cpr from 'cpr'
 
@@ -13,18 +13,27 @@ const dirs = {
 const ignoreGlobs = readFileSync('./.packageignore', 'utf-8')
 	.split(/\r?\n/)
 	.map((glob) => glob.trim())
-	.filter((glob) => glob !== '')
-
-console.log('ignores', ignoreGlobs.join('\n'))
+	.filter((glob) => glob !== '' || glob.startsWith('#'))
 
 const options = {
-	// asar: {
-	// 	unpackDir: dirs.CONFIG
-	// }
-	dir: dirs.BUILD,
+	afterCopy: [
+		async (buildPath, version, platform, arch, callback) => {
+			await copyCompiledTypescriptFiles(buildPath)
+			callback()
+		}
+	],
+	asar: {
+		unpackDir: dirs.CONFIG
+	},
+	dir: '.',
 	icon: 'assets/sofie_logo',
 	ignore: (fileName) => {
-		return isMatch(fileName, ignoreGlobs, { basename: true })
+		if (isMatch(fileName.substring(1), ignoreGlobs, { basename: false })) {
+			console.log('Ignored', fileName)
+			return true
+		}
+
+		return false
 	},
 	out: dirs.DIST,
 	overwrite: true,
@@ -35,21 +44,21 @@ const options = {
 console.log('Packaging app bundles...')
 
 wipeDir(dirs.DIST)
-	.then(() => {
-		return copyNodeModules(dirs.BUILD)
-	})
-	.then(() => {
-		return copyFrontendFiles(dirs.BUILD)
-	})
-	.then(() => {
-		return copyConfigFiles(dirs.BUILD)
-	})
-	.then(() => {
-		return packager(options)
+	.then(async () => {
+		try {
+			const appPaths = packager(options)
+			return appPaths
+		} catch (err) {
+			console.log('Error while packaging:', err)
+			throw new Error(err)
+		}
 	})
 	.then((appPaths) => {
 		console.log('Created bundles:', appPaths.join('\n'))
 		return true
+	})
+	.catch((error) => {
+		console.log('Packaging failed:', error)
 	})
 
 async function wipeDir(dirName) {
@@ -59,6 +68,7 @@ async function wipeDir(dirName) {
 			if (err) {
 				console.error('Directory wipe failed!')
 				reject(err)
+				return false
 			}
 
 			console.log(`${dirName} wiped.`)
@@ -67,63 +77,22 @@ async function wipeDir(dirName) {
 	})
 }
 
-async function copyNodeModules(targetDir) {
-	console.log(`Copying node_modules to ${targetDir}`)
+async function copyCompiledTypescriptFiles(targetDir) {
+	console.log(`Copying compiled TypeScript from ${dirs.BUILD} to ${targetDir}`)
 
 	return new Promise((resolve, reject) => {
 		cpr(
-			'node_modules',
-			`${targetDir}/node_modules`,
-			{ deleteFirst: true, overwrite: true, confirm: true },
-			(err) => {
+			dirs.BUILD,
+			`${targetDir}/.`,
+			{ deleteFirst: false, overwrite: true, confirm: true },
+			(err, files) => {
 				if (err) {
 					reject(err)
+					return false
 				}
 
-				resolve()
-			}
-		)
-	})
-}
-
-async function copyFrontendFiles(targetDir) {
-	const dirsToCopy = ['assets', 'client', 'components', 'lib', 'shared']
-	console.log(`Copying ${dirsToCopy.join(',')} to ${targetDir}`)
-
-	return Promise.all(
-		dirsToCopy.map((dirName) => {
-			return new Promise((resolve, reject) => {
-				cpr(
-					dirName,
-					`${targetDir}/${dirName}`,
-					{ deleteFirst: true, overwrite: true, confirm: true },
-					(err) => {
-						if (err) {
-							reject(err)
-						}
-
-						resolve()
-					}
-				)
-			})
-		})
-	)
-}
-
-async function copyConfigFiles(targetDir) {
-	console.log(`Copying config files to ${targetDir}`)
-
-	return new Promise((resolve, reject) => {
-		cpr(
-			'config',
-			`${targetDir}/config`,
-			{ deleteFirst: true, overwrite: true, confirm: true },
-			(err) => {
-				if (err) {
-					reject(err)
-				}
-
-				resolve()
+				console.log(`Copied ${files.length} files`)
+				resolve(files)
 			}
 		)
 	})

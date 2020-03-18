@@ -1,12 +1,27 @@
+# defaults, see https://github.com/electron/electron-packager/blob/master/docs/api.md#ignore
+node_modules/.bin
+node_modules/electron
+node_modules/electron-prebuilt
+node_modules/electron-prebuilt-compile
+.git
+./**/*.o
+./**/*.obj
+
+# Project files and configuration
 .vscode
-scratch
 .*ignore
 .*rc.json
-*.ts
 *.lock
 *-lock.*
 nodemon.json
-package.json
 tsconfig.json
-scripts
-*-test.js
+.gitattributes
+
+# Typescript, dev scripts and tests
+./**/*.ts
+{,!(node_modules)/**/}*-test.js
+serverOnly.js
+
+# Temp files
+build
+scratch

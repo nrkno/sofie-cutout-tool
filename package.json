@@ -11,7 +11,7 @@
 		"Jonas Hummelstrand <jonas@hummelstrand.com> (https://superfly.tv/)",
 		"Ola Christian Gundelsby <ola.christian.gundelsby@nrk.no> (https://nrk.no)"
 	],
-	"main": "build/app.js",
+	"main": "app.js",
 	"scripts": {
 		"build": "rimraf build && tsc",
 		"prestart": "npm run build",
@@ -52,7 +52,6 @@
 		"lint-staged": "^10.0.7",
 		"micromatch": "^4.0.2",
 		"mocha": "^7.0.0",
-		"ncp": "^2.0.0",
 		"node-gyp": "^6.1.0",
 		"nodemon": "^2.0.2",
 		"prettier": "^1.19.1",
