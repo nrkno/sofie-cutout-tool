@@ -6,6 +6,7 @@ import { Cutout, FullConfigClient } from './api';
 import { DataHandler } from './dataHandler';
 import { TSRController, RunTimeData } from './TSRController';
 import _ from 'underscore';
+import { StreamController } from './streamController';
 
 export default class Main {
 	static mainWindow: Electron.BrowserWindow | null;
@@ -14,6 +15,7 @@ export default class Main {
 
 	static tsrController: TSRController;
 	static dataHandler: DataHandler;
+	static streamController: StreamController;
 
 	static runtimeData: RunTimeData = {};
 
@@ -55,6 +57,8 @@ export default class Main {
 				return Main.tsrController.init(Main.dataHandler.getConfig());
 			})
 			.catch(console.error);
+
+		Main.streamController.init()
 
 		ipcMain.on('initialize', (event) => {
 			console.log('Initializing...');
@@ -132,5 +136,6 @@ export default class Main {
 
 		Main.tsrController = new TSRController();
 		Main.dataHandler = new DataHandler(app.getAppPath());
+		Main.streamController = new StreamController(Main.dataHandler)
 	}
 }
