@@ -1,64 +1,84 @@
 {
- "name": "electron-test",
- "version": "1.0.0",
- "description": "",
- "main": "dist/app.js",
- "scripts": {
-  "build": "tsc",
-  "prestart": "npm run build",
-  "start": "electron .",
-  "lint": "eslint . --ext .js,.ts",
-  "lint:fix": "npm run lint -- --fix",
-  "watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
-  "watch-server": "nodemon serverOnly.ts --ignore \"config/**\"",
-  "test": "mocha \"./{,!(node_modules)/**/}*-test.js\"",
-  "test:watch": "npm run test -- -w --reporter min",
-  "postinstall": "node -r esm scripts/remove-serialport.js && electron-rebuild"
- },
- "author": "",
- "license": "MIT",
- "dependencies": {
-  "chokidar": "^3.3.0",
-  "timeline-state-resolver": "^3.18.0",
-  "transformation-matrix": "^2.2.0",
-  "tslib": "^1.10.0",
-  "underscore": "^1.9.1"
- },
- "devDependencies": {
-  "@sinonjs/referee": "^4.0.0",
-  "@types/chokidar": "^2.1.3",
-  "@types/underscore": "^1.9.4",
-  "@typescript-eslint/eslint-plugin": "^2.16.0",
-  "@typescript-eslint/parser": "^2.16.0",
-  "deep-freeze-es6": "^1.3.1",
-  "electron": "^7.1.13",
-  "electron-rebuild": "^1.8.8",
-  "eslint": "^6.8.0",
-  "eslint-config-prettier": "^6.9.0",
-  "eslint-plugin-prettier": "^3.1.2",
-  "esm": "^3.2.25",
-  "husky": "^4.2.3",
-  "lint-staged": "^10.0.7",
-  "mocha": "^7.0.0",
-  "node-gyp": "^6.1.0",
-  "nodemon": "^2.0.2",
-  "prettier": "^1.19.1",
-  "trash": "^6.1.1",
-  "trash-cli": "^3.0.0",
-  "ts-node": "^8.5.3",
-  "typescript": "^3.8.2"
- },
- "husky": {
-  "hooks": {
-   "pre-commit": "lint-staged"
-  }
- },
- "lint-staged": {
-  "*.{js,css,json,md}": [
-   "prettier --write"
-  ],
-  "*.{ts}": [
-   "npm run lint:fix --"
-  ]
- }
+	"name": "tv-automation-cutout-tool",
+	"productName": "Sofie Cutout Tool",
+	"version": "1.0.0",
+	"description": "",
+	"homepage": "https://github.com/nrkno/tv-automation-cutout-tool/blob/master/README.md",
+	"license": "MIT",
+	"repository": "github.com:nrkno/tv-automation-cutout-tool",
+	"contributors": [
+		"Johan Nyman <johan@nytamin.se> (https://superfly.tv/)",
+		"Jonas Hummelstrand <jonas@hummelstrand.com> (https://superfly.tv/)",
+		"Ola Christian Gundelsby <ola.christian.gundelsby@nrk.no> (https://nrk.no)"
+	],
+	"os": [
+		"win32",
+		"darwin"
+	],
+	"cpu": [
+		"x64"
+	],
+	"main": "app.js",
+	"scripts": {
+		"build": "rimraf build && tsc",
+		"prestart": "npm run build",
+		"start": "electron .",
+		"lint": "eslint . --ext .js,.ts",
+		"lint:fix": "npm run lint -- --fix",
+		"watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
+		"watch-server": "nodemon serverOnly.ts --ignore \"config/**\"",
+		"test": "mocha \"./{,!(node_modules)/**/}*-test.js\"",
+		"test:watch": "npm run test -- -w --reporter min",
+		"postinstall": "node -r esm scripts/remove-serialport.js && electron-rebuild",
+		"prepackage": "npm run build",
+		"package": "node -r esm scripts/package.js"
+	},
+	"dependencies": {
+		"chokidar": "^3.3.0",
+		"timeline-state-resolver": "^3.18.0",
+		"transformation-matrix": "^2.2.0",
+		"tslib": "^1.10.0",
+		"underscore": "^1.9.1"
+	},
+	"devDependencies": {
+		"@sinonjs/referee": "^4.0.0",
+		"@types/chokidar": "^2.1.3",
+		"@types/underscore": "^1.9.4",
+		"@typescript-eslint/eslint-plugin": "^2.16.0",
+		"@typescript-eslint/parser": "^2.16.0",
+		"cpr": "^3.0.1",
+		"deep-freeze-es6": "^1.3.1",
+		"electron": "^7.1.13",
+		"electron-packager": "^14.2.1",
+		"electron-rebuild": "^1.8.8",
+		"eslint": "^6.8.0",
+		"eslint-config-prettier": "^6.9.0",
+		"eslint-plugin-prettier": "^3.1.2",
+		"esm": "^3.2.25",
+		"husky": "^4.2.3",
+		"lint-staged": "^10.0.7",
+		"micromatch": "^4.0.2",
+		"mocha": "^7.0.0",
+		"node-gyp": "^6.1.0",
+		"nodemon": "^2.0.2",
+		"prettier": "^1.19.1",
+		"rimraf": "^3.0.2",
+		"trash": "^6.1.1",
+		"trash-cli": "^3.0.0",
+		"ts-node": "^8.5.3",
+		"typescript": "^3.8.2"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{js,css,json,md}": [
+			"prettier --write"
+		],
+		"*.{ts}": [
+			"npm run lint:fix --"
+		]
+	}
 }
