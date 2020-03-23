@@ -145,4 +145,6 @@ export interface StreamOutput {
 	streamUri: string;
 	/** Parameters to set for the output stream, e.g. FFmpeg parameters. */
 	streamParams: string;
+	/** Time to wait between each RTMP connection check (ms). Default 10000ms. */
+	checkInterval?: number;
 }

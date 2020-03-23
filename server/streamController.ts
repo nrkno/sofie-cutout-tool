@@ -9,6 +9,9 @@ export class StreamController {
 	private streamUri: string = ''
 	private streamParams: string = '-f flv'
 	private connection: CasparCG
+	private connected: boolean = false
+	private checkInterval: number = 10000
+	private watchdog: NodeJS.Timer
 
 	constructor(private dataHandler: DataHandler) { }
 
@@ -23,16 +26,36 @@ export class StreamController {
 			this.streamUri = fullConfig.settings.stream.streamUri
 			this.streamParams = fullConfig.settings.stream.streamParams
 			this.streamId = fullConfig.settings.stream.streamId
+			this.checkInterval = fullConfig.settings.stream.checkInterval || 1000
 		}
 		this.connection = new CasparCG(this.host, this.port)
 		return this
 	}
 
-	async connect(): Promise<Command.IAMCPCommand> {
+	private makeConnection () {
 		return this.connection.addStream(this.channel, this.streamUri, this.streamParams, this.streamId)
 	}
 
+	async connect(): Promise<Command.IAMCPCommand> {
+		console.log('Requesting connection')
+		this.connected = true
+		this.watchdog = setInterval(async () => {
+			let currentlyConnected = await this.isConnected()
+			if (this.connected && !currentlyConnected) {
+				console.log('Found RTMP stream disconnected when it should be connected. Attempting reconnect.')
+				this.makeConnection().then(
+					() => { console.log('Stream reconnected.') },
+					e => { console.error('Failed to reconnect stream.', e) }
+				)
+			}
+		}, this.checkInterval)
+		return this.makeConnection()
+	}
+
 	async disconnect(): Promise<Command.IAMCPCommand> {
+		console.log('Requesting disconnection')
+		this.connected = false
+		clearInterval(this.watchdog)
 		return this.connection.remove(this.channel, this.streamId)
 	}
 
@@ -41,14 +64,3 @@ export class StreamController {
 		return channelInfo.response.raw.indexOf(`<index>${this.streamId}</index>`) >= 0
 	}
 }
-
-let connection = new CasparCG()
-let streamAdd = connection.addStream(
-	2,
-	'rtmp://NRK_RTMP20:Z4e6Mkmmxg2dWN@nrkhd-rtmp-in1.netwerk.no:1934/live/stream-159586_1',
-	' -codec:v libx264 -filter:v "scale=out_range=full,fps=25,format=yuv420p,setsar=1:1,setdar=1:1" -profile:v high -level:v 3.2 -g 50 -preset fast -tune fastdecode -crf 18 -maxrate 2.5M -bufsize 1.5M -codec:a aac -b:a 160k -f flv',
-	99)
-
-connection.remove(2, 99)
-
-streamAdd.then(console.log, console.error)

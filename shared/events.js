@@ -22,5 +22,11 @@ const EventNames = {
 	UPDATE_CONFIG: 'new-config',
 
 	/** Update cutout size and position */
-	UPDATE_CUTOUT: 'update-cutout'
+	UPDATE_CUTOUT: 'update-cutout',
+
+	/** Connect an RTMP stream. */
+	CONNECT: 'connect',
+
+	/** Disconnect an RTMP stream. */
+	DISCONNECT: 'disconnect'
 };

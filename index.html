@@ -6,6 +6,7 @@
 		<!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
 		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
 		<link rel="stylesheet" href="client/index.css" />
+		<link rel="stylesheet" href="components/ui/stream-control-switch.css" />
 	</head>
 	<body>
 		<h1>Sofie cutout tool</h1>
@@ -21,6 +22,11 @@
 				<button is="direct-take-toggle" class="take-controls--button direct-mode-toggle">
 					<span class="label">Direkte Take</span>
 				</button>
+				<label for="stream-connect">On-air</label>
+				<label class="switch" id="stream-connect">
+					<input type="checkbox" is="stream-control-switch" class="stream-control--switch slider round">
+					<span class="slider round"></span>
+				</label>
 				<button class="take-controls--button take" title="Take">
 					<span class="label">Take</span>
 				</button>

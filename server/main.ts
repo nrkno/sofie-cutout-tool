@@ -56,9 +56,10 @@ export default class Main {
 			.then(() => {
 				return Main.tsrController.init(Main.dataHandler.getConfig());
 			})
+			.then(() => {
+				Main.streamController.init()
+			})
 			.catch(console.error);
-
-		Main.streamController.init()
 
 		ipcMain.on('initialize', (event) => {
 			console.log('Initializing...');
@@ -113,6 +114,18 @@ export default class Main {
 
 			Main.updateTimeline();
 		});
+		ipcMain.on('connect', (event) => {
+			console.log('CONNECT');
+			Main.streamController.connect().catch(e => {
+				console.log(`Error when trying to connect stream`, e);
+			});
+		});
+		ipcMain.on('disconnect', (event) => {
+			console.log('DISCONNECT');
+			Main.streamController.disconnect().catch(e => {
+				console.log(`Error when trying to disconnect stream`, e);
+			});
+		})
 	}
 
 	private static updateTimeline(): void {
