@@ -83,8 +83,8 @@ async function copyCompiledTypescriptFiles(targetDir) {
 	return new Promise((resolve, reject) => {
 		cpr(
 			dirs.BUILD,
-			`${targetDir}/.`,
-			{ deleteFirst: false, overwrite: true, confirm: true },
+			`${targetDir}/${dirs.BUILD}`,
+			{ deleteFirst: true, overwrite: true, confirm: true },
 			(err, files) => {
 				if (err) {
 					reject(err)
