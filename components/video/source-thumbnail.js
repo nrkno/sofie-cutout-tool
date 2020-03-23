@@ -43,8 +43,6 @@ class SourceThumbnail extends HTMLElement {
 		if (isDefined(contentId)) {
 			const video = document.createElement(videoDisplayTagName)
 			video.setAttribute(videoDisplayAttributeNames.STREAM_CONTENT_ID, contentId)
-			// video.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
-			// video.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
 			video.classList.add(classNames.VIDEO_DISPLAY)
 			this.shadowRoot.appendChild(video)
 		} else {

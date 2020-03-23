@@ -8,9 +8,7 @@ export { tagName, attributeNames, eventNames }
 const tagName = 'video-display'
 
 const attributeNames = {
-	STREAM_CONTENT_ID: 'data-stream-channel'
-	// STREAM_CHANNEL: 'data-stream-channel',
-	// STREAM_LAYER: 'data-stream-layer'
+	STREAM_CONTENT_ID: 'data-stream-content-id'
 }
 
 /*
@@ -52,8 +50,6 @@ class VideoDisplay extends HTMLElement {
 		shadowRoot.innerHTML = template
 
 		this.streamContentId = this.getAttribute(attributeNames.STREAM_CONTENT_ID)
-		// this.streamChannel = this.getAttribute(attributeNames.STREAM_CHANNEL);
-		// this.streamLayer = this.getAttribute(attributeNames.STREAM_LAYER);
 	}
 
 	connectedCallback() {
@@ -75,25 +71,11 @@ class VideoDisplay extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, currentValue) {
-		switch (name) {
-			case attributeNames.STREAM_CONTENT_ID:
-				if (this.streamContentId !== currentValue) {
-					this.streamContentId = currentValue
-					this.loadStream()
-				}
-				break
-			// case attributeNames.STREAM_CHANNEL:
-			// 	if (this.streamChannel !== currentValue) {
-			// 		this.streamChannel = currentValue;
-			// 		this.loadStream();
-			// 	}
-			// 	break;
-			// case attributeNames.STREAM_LAYER:
-			// 	if (this.streamLayer !== currentValue) {
-			// 		this.streamLayer = currentValue;
-			// 		this.loadStream();
-			// 	}
-			// 	break;
+		if (name === attributeNames.STREAM_CONTENT_ID) {
+			if (this.streamContentId !== currentValue) {
+				this.streamContentId = currentValue
+				this.loadStream()
+			}
 		}
 	}
 
@@ -105,7 +87,6 @@ class VideoDisplay extends HTMLElement {
 	loadStream() {
 		const img = this.shadowRoot.querySelector(`img.${classNames.IMG}`)
 
-		// if (!this.streamChannel || !this.streamLayer) {
 		if (!this.streamContentId) {
 			console.warn(`Unable to load stream, missing data: streamContentId: ${this.streamContentId}`)
 			img.src = 'data:,' // could use a placeholder?
@@ -114,23 +95,19 @@ class VideoDisplay extends HTMLElement {
 		}
 
 		const imageProviderLocation = getImageProviderLocation()
-		// const streamUrl = `${imageProviderLocation}/channel/${this.streamChannel}/${this.streamLayer}/stream`;
 		const streamUrl = `${imageProviderLocation}/info`
 
 		fetch(streamUrl)
 			.then((response) => response.json())
 			.then((streamInfo) => {
-				// const region = streamInfo.regions.find(
-				// 	(r) => r.layer === this.streamLayer && r.channel === this.streamChannel
-				// );
 				const region = streamInfo.regions.find((r) => r.contentId === this.streamContentId)
 				if (!region) {
 					throw new Error(
 						`Region for contentId ${this.streamContentId} not found using ${streamUrl}`
 					)
 				}
-
 				this.region = region
+
 				const stream = streamInfo.streams.find((s) => s.id == region.streamId)
 				if (!stream) {
 					throw new Error(`Stream ${region.streamId} not found`)

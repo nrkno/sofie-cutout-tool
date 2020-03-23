@@ -108,8 +108,6 @@ class VideoCropper extends HTMLElement {
 			this.source = null
 			this.cropTool.setAttribute(cropToolAttributeNames.CUTOUT, '')
 			this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CONTENT_ID, '')
-			// this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, '');
-			// this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, '');
 			return
 		}
 
@@ -124,8 +122,6 @@ class VideoCropper extends HTMLElement {
 
 		const { contentId } = sourceReferenceLayers[sourceId]
 		this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CONTENT_ID, contentId)
-		// this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_CHANNEL, channel);
-		// this.videoDisplay.setAttribute(videoDisplayAttributeNames.STREAM_LAYER, layer);
 	}
 
 	triggerSendUpdate() {
