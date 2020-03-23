@@ -22,7 +22,6 @@ import { Matrix, applyToPoint, compose, rotateDEG, scale, translate } from 'tran
 
 import { CasparReferrer } from './CasparReferrer'
 import _ from 'underscore'
-import querystring from 'querystring'
 import { getImageProviderLocation } from './imageProvider'
 import axios from 'axios'
 

@@ -1,6 +1,6 @@
 import { Settings } from './api'
 
-export function getImageProviderLocation(settings: Settings) {
+export function getImageProviderLocation(settings: Settings): string {
 	const protocol = settings.imageProvider.protocol ? `${settings.imageProvider.protocol}://` : ''
 	const port = settings.imageProvider.port ? `:${settings.imageProvider.port}` : ''
 

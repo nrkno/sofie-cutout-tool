@@ -5,11 +5,11 @@
 		"channelForRoutesStartLayer": 900,
 
 		"casparCG": {
-			"hostname": "sacaspar03",
+			"hostname": "127.0.0.1",
 			"port": 5250
 		},
 		"imageProvider": {
-			"hostname": "sacaspar03",
+			"hostname": "127.0.0.1",
 			"port": 5255,
 			"protocol": "http"
 		},
