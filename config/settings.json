@@ -1,5 +1,6 @@
 {
 	"settings": {
+		"useImageProviderForRoutes": true,
 		"channelForRoutes": 1,
 		"channelForRoutesStartLayer": 900,
 

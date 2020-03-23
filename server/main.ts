@@ -1,27 +1,27 @@
-import * as chokidar from 'chokidar';
+import * as chokidar from 'chokidar'
 
-import { BrowserWindow, ipcMain } from 'electron';
-import { Cutout, FullConfigClient } from './api';
+import { BrowserWindow, ipcMain } from 'electron'
+import { Cutout, FullConfigClient } from './api'
 
-import { DataHandler } from './dataHandler';
-import { TSRController, RunTimeData } from './TSRController';
-import _ from 'underscore';
+import { DataHandler } from './dataHandler'
+import { TSRController, RunTimeData } from './TSRController'
+import _ from 'underscore'
 
 export default class Main {
-	static mainWindow: Electron.BrowserWindow | null;
-	static application: Electron.App;
-	static BrowserWindow: typeof BrowserWindow;
+	static mainWindow: Electron.BrowserWindow | null
+	static application: Electron.App
+	static BrowserWindow: typeof BrowserWindow
 
-	static tsrController: TSRController;
-	static dataHandler: DataHandler;
+	static tsrController: TSRController
+	static dataHandler: DataHandler
 
-	static runtimeData: RunTimeData = {};
+	static runtimeData: RunTimeData = {}
 
 	private static onWindowAllClosed(): void {
 		// On macOS it is common for applications and their menu bar
 		// to stay active until the user quits explicitly with Cmd + Q
 		if (process.platform !== 'darwin') {
-			Main.application.quit();
+			Main.application.quit()
 		}
 	}
 
@@ -29,9 +29,9 @@ export default class Main {
 		// Dereference the window object, usually you would store windows
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
-		Main.mainWindow = null;
+		Main.mainWindow = null
 
-		Main.tsrController.destroy().catch(console.error);
+		Main.tsrController.destroy().catch(console.error)
 	}
 
 	private static onReady(): void {
@@ -41,96 +41,91 @@ export default class Main {
 			webPreferences: {
 				nodeIntegration: true
 			}
-		});
-		Main.mainWindow.loadFile('index.html');
-		Main.mainWindow.on('closed', Main.onClose);
+		})
+		Main.mainWindow.loadFile('index.html')
+		Main.mainWindow.on('closed', Main.onClose)
 
 		chokidar.watch('/config.json').on('all', (event, path) => {
-			console.log(event, path);
-		});
+			console.log(event, path)
+		})
 
 		Main.dataHandler
 			.updateConfig()
 			.then(() => {
-				return Main.tsrController.init(Main.dataHandler.getConfig());
+				return Main.tsrController.init(Main.dataHandler.getConfig())
 			})
-			.catch(console.error);
+			.catch(console.error)
 
 		ipcMain.on('initialize', (event) => {
-			console.log('Initializing...');
+			console.log('Initializing...')
 
 			Main.dataHandler.onConfigChanged(() => {
-				console.log('config changed, reloading..');
+				console.log('config changed, reloading..')
 
-				Main.updateTimeline();
+				Main.updateTimeline()
+					.then(() => {
+						const fullConfig = Main.dataHandler.getConfig()
 
-				const fullConfig = Main.dataHandler.getConfig();
+						const fullConfigClient: FullConfigClient = _.extend(
+							{
+								sourceReferenceLayers: {}
+							},
+							fullConfig
+						)
 
-				const fullConfigClient: FullConfigClient = _.extend(
-					{
-						sourceReferenceLayers: {}
-					},
-					fullConfig
-				);
-
-				// Find where the sources have been mapped up in CasparCG, so we know which layers to fetch the images from in the UI:
-				_.each(fullConfig.sources, (source, sourceId) => {
-					const refId = Main.tsrController.refer.getSourceRef(source.input);
-					const ref = Main.tsrController.refer.getRef(refId, '');
-					if (ref) {
-						const mapping = Main.tsrController.mappings[ref.content.mappedLayer];
-						if (mapping) {
+						// Find where the sources have been mapped up in CasparCG, so we know which layers to fetch the images from in the UI:
+						_.each(fullConfig.sources, (_source, sourceId) => {
 							fullConfigClient.sourceReferenceLayers[sourceId] = {
-								channel: mapping.channel,
-								layer: mapping.layer
-							};
-						}
-					}
-				});
-
-				event.reply('new-config', fullConfigClient);
-				event.reply('backend-ready');
-			});
-		});
+								contentId: sourceId
+							}
+						})
+						event.reply('new-config', fullConfigClient)
+						event.reply('backend-ready')
+					})
+					.catch(console.error)
+			})
+		})
 		ipcMain.on('update-cutout', (event, cutoutId: string, cutout: Cutout) => {
-			// console.log('update-cutout handler', cutoutId, cutout);
 			Main.dataHandler
 				.setConfigCutout(cutoutId, cutout)
 				.then(() => {
 					// const fullConfig = Main.dataHandler.getConfig();
 					// console.log('fullConfig.cutouts', fullConfig.cutouts);
-					Main.updateTimeline();
+					Main.triggerUpdateTimeline()
 				})
-				.catch(console.error);
-		});
+				.catch(console.error)
+		})
 		ipcMain.on('take', (event, cutoutId: string) => {
-			console.log('TAKE', cutoutId);
-			Main.runtimeData.pgmCutout = cutoutId;
+			console.log('TAKE', cutoutId)
+			Main.runtimeData.pgmCutout = cutoutId
 
-			Main.updateTimeline();
-		});
+			Main.triggerUpdateTimeline()
+		})
 	}
 
-	private static updateTimeline(): void {
-		Main.tsrController.updateTimeline(Main.dataHandler.getConfig(), Main.runtimeData);
+	private static triggerUpdateTimeline(): void {
+		Main.updateTimeline().catch(console.error)
+	}
+	private static updateTimeline(): Promise<void> {
+		return Main.tsrController.triggerUpdateTimeline(Main.dataHandler.getConfig(), Main.runtimeData)
 	}
 
 	// On macOS it's common to re-create a window in the app when the
 	// dock icon is clicked and there are no other windows open.
 	private static onActivate(): void {
 		if (Main.mainWindow === null) {
-			Main.onReady();
+			Main.onReady()
 		}
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow): void {
-		Main.BrowserWindow = browserWindow;
-		Main.application = app;
-		Main.application.on('window-all-closed', Main.onWindowAllClosed);
-		Main.application.on('ready', Main.onReady);
-		Main.application.on('activate', Main.onActivate);
+		Main.BrowserWindow = browserWindow
+		Main.application = app
+		Main.application.on('window-all-closed', Main.onWindowAllClosed)
+		Main.application.on('ready', Main.onReady)
+		Main.application.on('activate', Main.onActivate)
 
-		Main.tsrController = new TSRController();
-		Main.dataHandler = new DataHandler(app.getAppPath());
+		Main.tsrController = new TSRController()
+		Main.dataHandler = new DataHandler(app.getAppPath())
 	}
 }
