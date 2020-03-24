@@ -10,6 +10,9 @@
 
 ### External dependencies
 
+This project uses [yarn](https://classic.yarnpkg.com/en/) for dependency management and running tasks. It should be installed globally prior to doing anything else. Note that this also goes for CI servers/containers.
+If you already have Node/npm installed: `npm install -g yarn@1`
+
 #### CasparCG
 
 This tool is intended to be run along with the [NRK-version of CasparCG](https://github.com/nrkno/tv-automation-casparcg-server/releases)
