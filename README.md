@@ -4,7 +4,7 @@
 
 ### Installation
 
-- `yarn`
+- `yarn install --ignore-optional`
 
 ### Usage
 
@@ -29,8 +29,6 @@ The image provider app needs an extra (empty) channel in CasparCG in order to st
 Run app locally (for development purposes)
 `yarn watch`
 
-<!--
-## Pack into executable
+## Pack redistributable electron apps
 
-`yarn dist`
--->
+`yarn package`
