@@ -1,5 +1,5 @@
-import { BrowserWindow, app } from 'electron';
+import { BrowserWindow, app } from 'electron'
 
-import Main from './server/main';
+import Main from './server/main'
 
-Main.main(app, BrowserWindow);
+Main.main(app, BrowserWindow)

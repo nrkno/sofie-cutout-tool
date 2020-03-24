@@ -1,4 +1,4 @@
-export { EventNames };
+export { EventNames }
 
 /**
  * Application event names used for communication between the back and front ends.
@@ -23,4 +23,4 @@ const EventNames = {
 
 	/** Update cutout size and position */
 	UPDATE_CUTOUT: 'update-cutout'
-};
+}
