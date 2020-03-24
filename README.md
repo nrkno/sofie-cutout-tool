@@ -4,7 +4,7 @@
 
 ### Installation
 
-- `npm install --no-optional`
+- `yarn`
 
 ### Usage
 
@@ -27,10 +27,10 @@ The image provider app needs an extra (empty) channel in CasparCG in order to st
 ### Development
 
 Run app locally (for development purposes)
-`npm run watch`
+`yarn watch`
 
 <!--
 ## Pack into executable
 
-`npm run dist`
+`yarn dist`
 -->
