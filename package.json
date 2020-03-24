@@ -21,16 +21,16 @@
 	"main": "build/app.js",
 	"scripts": {
 		"build": "rimraf build && tsc",
-		"prestart": "npm run build",
+		"prestart": "yarn build",
 		"start": "electron .",
 		"lint": "eslint . --ext .js,.ts",
-		"lint:fix": "npm run lint -- --fix",
+		"lint:fix": "yarn lint -- --fix",
 		"watch": "nodemon --verbose --watch server/** --ignore dist/**/* --exec \"tsc && electron .\"",
 		"watch-server": "nodemon serverOnly.ts --ignore \"config/**\"",
 		"test": "mocha \"./{,!(node_modules)/**/}*-test.js\"",
-		"test:watch": "npm run test -- -w --reporter min",
+		"test:watch": "yarn test -- -w --reporter min",
 		"postinstall": "node -r esm scripts/remove-serialport.js && electron-rebuild",
-		"prepackage": "npm run build",
+		"prepackage": "yarn build",
 		"package": "node -r esm scripts/package.js"
 	},
 	"dependencies": {
@@ -78,7 +78,7 @@
 			"prettier --write"
 		],
 		"*.{ts}": [
-			"npm run lint:fix --"
+			"yarn lint:fix --"
 		]
 	}
 }

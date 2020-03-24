@@ -4,11 +4,14 @@
 
 ### Installation
 
-- `npm install --no-optional`
+- `yarn install --ignore-optional`
 
 ### Usage
 
 ### External dependencies
+
+This project uses [yarn](https://classic.yarnpkg.com/en/) for dependency management and running tasks. It should be installed globally prior to doing anything else. Note that this also goes for CI servers/containers.
+If you already have Node/npm installed: `npm install -g yarn@1`
 
 #### CasparCG
 
@@ -29,10 +32,8 @@ Additionally, you must set a full path to the media folder in the CasparCG confi
 ### Development
 
 Run app locally (for development purposes)
-`npm run watch`
+`yarn watch`
 
-<!--
-## Pack into executable
+## Pack redistributable electron apps
 
-`npm run dist`
--->
+`yarn package`
