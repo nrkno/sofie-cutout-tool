@@ -27,9 +27,16 @@
 
 .cutout-window--frame {
 	outline: 1px solid red;
+	outline-offset: -1px;
 	height: 100%;
 	position: absolute;
-	border-bottom-style: solid;
-	border-bottom-width: var(--handlebar-height);
-	border-bottom-color: var(--control-dark);
+}
+
+.cutout-window--frame--handlebar-bottom {
+	background: url('../../assets/dot.svg') round;
+	width: 100%;
+	height: var(--handlebar-height);
+
+	position: absolute;
+	bottom: calc(0px - var(--handlebar-height));
 }
