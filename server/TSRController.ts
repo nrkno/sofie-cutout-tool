@@ -382,7 +382,7 @@ export class TSRController {
 					device: DeviceType.CASPARCG,
 					deviceId: CASPARCG_DEVICE_ID,
 					channel: output.casparChannel,
-					layer: 10
+					layer: 300
 				}
 
 				let mixer: Mixer = {}
