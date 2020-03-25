@@ -48,6 +48,7 @@ export enum SourceInputType {
 export interface SourceInputDecklink extends SourceInputBase {
 	type: SourceInputType.DECKLINK
 	format: ChannelFormat
+	filter?: string
 	device: number
 }
 export interface SourceInputMedia extends SourceInputBase {

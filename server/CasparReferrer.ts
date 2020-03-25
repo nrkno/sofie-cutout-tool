@@ -22,7 +22,7 @@ export class CasparReferrer {
 		if (input.type === SourceInputType.MEDIA) {
 			return this.mediaRef(input.file)
 		} else if (input.type === SourceInputType.DECKLINK) {
-			return this.inputRef('decklink', input.device, input.format)
+			return this.inputRef('decklink', input.device, input.format, input.filter)
 		} else if (input.type === SourceInputType.HTML_PAGE) {
 			return this.htmlPageRef(input.url)
 		} else {
@@ -34,7 +34,7 @@ export class CasparReferrer {
 		if (input.type === SourceInputType.MEDIA) {
 			return this.media(layer, input.file, mixer)
 		} else if (input.type === SourceInputType.DECKLINK) {
-			return this.input(layer, 'decklink', input.device, input.format, mixer)
+			return this.input(layer, 'decklink', input.device, input.format, input.filter, mixer)
 		} else if (input.type === SourceInputType.HTML_PAGE) {
 			return this.htmlPage(layer, input.url, mixer)
 		} else {
@@ -64,17 +64,18 @@ export class CasparReferrer {
 		this.setRef(refId, layer)
 		return o
 	}
-	inputRef(inputType: string, device: number, deviceFormat: ChannelFormat): string {
-		return 'input_' + inputType + '_' + device + '_' + deviceFormat
+	inputRef(inputType: string, device: number, deviceFormat: ChannelFormat, filter: string): string {
+		return 'input_' + inputType + '_' + device + '_' + deviceFormat + '_' + filter
 	}
 	input(
 		layer: string,
 		inputType: string,
 		device: number,
 		deviceFormat: ChannelFormat,
+		filter: string,
 		mixer?: Mixer
 	): TimelineObjCCGInput | TimelineObjCCGRoute {
-		const refId = this.inputRef(inputType, device, deviceFormat)
+		const refId = this.inputRef(inputType, device, deviceFormat, filter)
 		const ref = this.getRef(refId, layer, mixer)
 		if (ref) return ref
 		const o: TimelineObjCCGInput = {
@@ -86,6 +87,7 @@ export class CasparReferrer {
 				type: TimelineContentTypeCasparCg.INPUT,
 				device: device,
 				deviceFormat: deviceFormat,
+				filter: filter,
 				inputType: inputType,
 				mixer: mixer
 			}
