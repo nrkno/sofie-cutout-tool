@@ -53,6 +53,7 @@ export interface SourceInputDecklink extends SourceInputBase {
 export interface SourceInputMedia extends SourceInputBase {
 	type: SourceInputType.MEDIA
 	file: string
+	loop?: boolean
 }
 export interface SourceInputHtmlPage extends SourceInputBase {
 	type: SourceInputType.HTML_PAGE
@@ -125,6 +126,10 @@ export interface Settings {
 
 	casparCG: NetworkResource
 	imageProvider: NetworkResource
+
+	ui: {
+		inputJitterCutoff: number
+	}
 }
 
 export interface NetworkResource {

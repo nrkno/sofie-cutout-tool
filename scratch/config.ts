@@ -115,5 +115,8 @@ const settings: Settings = {
 		hostname: '160.67.52.144',
 		port: 5255,
 		protocol: 'http'
+	},
+	ui: {
+		inputJitterCutoff: 2
 	}
 };

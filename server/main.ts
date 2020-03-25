@@ -126,6 +126,18 @@ export default class Main {
 		Main.application.on('activate', Main.onActivate)
 
 		Main.tsrController = new TSRController()
-		Main.dataHandler = new DataHandler(app.getAppPath())
+
+		let appPath: string = app.getPath('exe')
+		if (appPath.match(/electron\.exe/)) {
+			// We're running in dev mode:
+			appPath = app.getAppPath()
+		} else {
+			// We're running in a packaged executable
+			appPath = appPath.replace(/(.+?)([^/\\]+)$/, '$1') // only keep the path, not the file
+		}
+
+		console.log('appPath', appPath)
+
+		Main.dataHandler = new DataHandler(appPath)
 	}
 }

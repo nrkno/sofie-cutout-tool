@@ -4,9 +4,12 @@ import * as path from 'path'
 import * as util from 'util'
 
 import { Cutout, Cutouts, FullConfig, Outputs, Sources, Settings } from './api'
+import { defaultCutouts, defaultOutputs, defaultSources, defaultSettings } from './defaultConfig'
 
 const fsReadFile = util.promisify(fs.readFile)
 const fsWriteFile = util.promisify(fs.writeFile)
+const fsExists = util.promisify(fs.exists)
+const fsMkdir = util.promisify(fs.mkdir)
 
 export class DataHandler {
 	private _onConfigChangedTimeout?: NodeJS.Timeout
@@ -69,26 +72,51 @@ export class DataHandler {
 	}
 	private async _getConfigCutouts(): Promise<Cutouts> {
 		// TODO: add data verifications here..
-		return (await this._getConfig('cutouts.json')).cutouts as Cutouts
+		return (await this._getConfig('cutouts.json', defaultCutouts)).cutouts as Cutouts
 	}
 	private async _getConfigOutputs(): Promise<Outputs> {
 		// TODO: add data verifications here..
-		return (await this._getConfig('outputs.json')).outputs as Outputs
+		return (await this._getConfig('outputs.json', defaultOutputs)).outputs as Outputs
 	}
 	private async _getConfigSources(): Promise<Sources> {
 		// TODO: add data verifications here..
-		return (await this._getConfig('sources.json')).sources as Sources
+		return (await this._getConfig('sources.json', defaultSources)).sources as Sources
 	}
 	private async _getConfigSettings(): Promise<Settings> {
 		// TODO: add data verifications here..
-		return (await this._getConfig('settings.json')).settings as Settings
+		return (await this._getConfig('settings.json', defaultSettings)).settings as Settings
 	}
 
-	private async _getConfig(fileName: string): Promise<any> {
-		const text = await fsReadFile(this._getConfigPath(fileName), {
-			encoding: 'utf-8'
-		})
-		return JSON.parse(text)
+	private async _getConfig(fileName: string, defaultConfig: any): Promise<any> {
+		const pathDirectory = this._getConfigPath('/')
+		const pathFile = this._getConfigPath(fileName)
+
+		// check if directory exists:
+		if (!(await fsExists(pathDirectory))) {
+			console.log(`Creating directory ${pathDirectory}`)
+			try {
+				await fsMkdir(pathDirectory)
+			} catch (error) {
+				if (!(error + '').match(/EEXIST/)) {
+					// ignore "already exist" errors
+					console.error('Failed creating directory')
+					console.error(error)
+					throw error
+				}
+			}
+		}
+
+		if (await fsExists(pathFile)) {
+			const text = await fsReadFile(pathFile, {
+				encoding: 'utf-8'
+			})
+			return JSON.parse(text)
+		} else {
+			console.log(`Creating default config file "${fileName}"`)
+			// create a default file:
+			await fsWriteFile(pathFile, JSON.stringify(defaultConfig, null, 2), 'utf8')
+			return defaultConfig
+		}
 	}
 	private async _storeConfig(fileName: string, data: Record<string, any>): Promise<void> {
 		await fsWriteFile(this._getConfigPath(fileName), JSON.stringify(data, null, 2), {
