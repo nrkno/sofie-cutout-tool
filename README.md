@@ -25,9 +25,7 @@ To get in-app video for the sources you will also need to run the [Caspar CG Ima
 
 ##### Extra CasparCG setup for the image provider
 
-The image provider app needs an extra (empty) channel in CasparCG.
-
-Additionally, you must set a full path to the media folder in the CasparCG configuration. Relative paths (typically `/media`) won't suffice.
+The image provider app needs an extra (empty) channel in CasparCG in order to stream previews to the web app.
 
 ### Development
 

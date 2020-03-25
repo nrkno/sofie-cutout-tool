@@ -1,4 +1,4 @@
-export { EventNames };
+export { EventNames }
 
 /**
  * Application event names used for communication between the back and front ends.
@@ -29,4 +29,4 @@ const EventNames = {
 
 	/** Disconnect an RTMP stream. */
 	DISCONNECT: 'disconnect'
-};
+}

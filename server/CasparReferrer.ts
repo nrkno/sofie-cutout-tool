@@ -8,47 +8,47 @@ import {
 	TimelineObjCCGInput,
 	TimelineObjCCGMedia,
 	TimelineObjCCGRoute
-} from 'timeline-state-resolver';
-import { SourceInputAny, SourceInputType } from './api';
+} from 'timeline-state-resolver'
+import { SourceInputAny, SourceInputType } from './api'
 
-import { DecklinkInputRefs } from './TSRController';
+import { DecklinkInputRefs } from './TSRController'
 
 export class CasparReferrer {
-	decklingInputRefs: DecklinkInputRefs = {};
+	decklingInputRefs: DecklinkInputRefs = {}
 	reset(): void {
-		this.decklingInputRefs = {};
+		this.decklingInputRefs = {}
 	}
 	getSourceRef(input: SourceInputAny): string {
 		if (input.type === SourceInputType.MEDIA) {
-			return this.mediaRef(input.file);
+			return this.mediaRef(input.file)
 		} else if (input.type === SourceInputType.DECKLINK) {
-			return this.inputRef('decklink', input.device, input.format);
+			return this.inputRef('decklink', input.device, input.format)
 		} else if (input.type === SourceInputType.HTML_PAGE) {
-			return this.htmlPageRef(input.url);
+			return this.htmlPageRef(input.url)
 		} else {
-			const { type } = input;
-			throw new Error(`Unknown input.type "${type}"`);
+			const { type } = input
+			throw new Error(`Unknown input.type "${type}"`)
 		}
 	}
 	getSource(input: SourceInputAny, layer: string, mixer: Mixer): TSRTimelineObj {
 		if (input.type === SourceInputType.MEDIA) {
-			return this.media(layer, input.file, mixer);
+			return this.media(layer, input.file, mixer)
 		} else if (input.type === SourceInputType.DECKLINK) {
-			return this.input(layer, 'decklink', input.device, input.format, mixer);
+			return this.input(layer, 'decklink', input.device, input.format, mixer)
 		} else if (input.type === SourceInputType.HTML_PAGE) {
-			return this.htmlPage(layer, input.url, mixer);
+			return this.htmlPage(layer, input.url, mixer)
 		} else {
-			const { type } = input;
-			throw new Error(`Unknown input.type "${type}"`);
+			const { type } = input
+			throw new Error(`Unknown input.type "${type}"`)
 		}
 	}
 	mediaRef(file: string): string {
-		return 'media_' + file;
+		return 'media_' + file
 	}
 	media(layer: string, file: string, mixer?: Mixer): TimelineObjCCGMedia | TimelineObjCCGRoute {
-		const refId = this.mediaRef(file);
-		const ref = this.getRef(refId, layer, mixer);
-		if (ref) return ref;
+		const refId = this.mediaRef(file)
+		const ref = this.getRef(refId, layer, mixer)
+		if (ref) return ref
 		const o: TimelineObjCCGMedia = {
 			id: '',
 			layer: layer,
@@ -60,12 +60,12 @@ export class CasparReferrer {
 				loop: true,
 				mixer: mixer
 			}
-		};
-		this.setRef(refId, layer);
-		return o;
+		}
+		this.setRef(refId, layer)
+		return o
 	}
 	inputRef(inputType: string, device: number, deviceFormat: ChannelFormat): string {
-		return 'input_' + inputType + '_' + device + '_' + deviceFormat;
+		return 'input_' + inputType + '_' + device + '_' + deviceFormat
 	}
 	input(
 		layer: string,
@@ -74,9 +74,9 @@ export class CasparReferrer {
 		deviceFormat: ChannelFormat,
 		mixer?: Mixer
 	): TimelineObjCCGInput | TimelineObjCCGRoute {
-		const refId = this.inputRef(inputType, device, deviceFormat);
-		const ref = this.getRef(refId, layer, mixer);
-		if (ref) return ref;
+		const refId = this.inputRef(inputType, device, deviceFormat)
+		const ref = this.getRef(refId, layer, mixer)
+		if (ref) return ref
 		const o: TimelineObjCCGInput = {
 			id: '',
 			layer: layer,
@@ -89,21 +89,21 @@ export class CasparReferrer {
 				inputType: inputType,
 				mixer: mixer
 			}
-		};
-		this.setRef(refId, layer);
-		return o;
+		}
+		this.setRef(refId, layer)
+		return o
 	}
 	htmlPageRef(url: string): string {
-		return 'htmlpage_' + url;
+		return 'htmlpage_' + url
 	}
 	htmlPage(
 		layer: string,
 		url: string,
 		mixer?: Mixer
 	): TimelineObjCCGHTMLPage | TimelineObjCCGRoute {
-		const refId = this.htmlPageRef(url);
-		const ref = this.getRef(refId, layer, mixer);
-		if (ref) return ref;
+		const refId = this.htmlPageRef(url)
+		const ref = this.getRef(refId, layer, mixer)
+		if (ref) return ref
 		const o: TimelineObjCCGHTMLPage = {
 			id: '',
 			layer: layer,
@@ -114,12 +114,12 @@ export class CasparReferrer {
 				url: url,
 				mixer: mixer
 			}
-		};
-		this.setRef(refId, layer);
-		return o;
+		}
+		this.setRef(refId, layer)
+		return o
 	}
 	getRef(refId: string, layer: string, mixer?: Mixer): TimelineObjCCGRoute | undefined {
-		const ref = this.decklingInputRefs[refId];
+		const ref = this.decklingInputRefs[refId]
 		if (ref) {
 			return {
 				id: '',
@@ -131,10 +131,10 @@ export class CasparReferrer {
 					mappedLayer: ref,
 					mixer: mixer
 				}
-			};
+			}
 		}
 	}
 	private setRef(refId, layer): void {
-		this.decklingInputRefs[refId] = layer;
+		this.decklingInputRefs[refId] = layer
 	}
 }
