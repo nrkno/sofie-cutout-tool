@@ -155,7 +155,7 @@ export default class Main {
 		}
 
 		console.log('appPath', appPath)
-		Main.dataHandler = new DataHandler(app.getAppPath())
-		Main.streamController = new StreamController(Main.dataHandler)
+
+		Main.dataHandler = new DataHandler(appPath)
 	}
 }
