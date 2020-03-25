@@ -4,7 +4,8 @@ import {
 	DeviceOptionsAny,
 	DeviceType,
 	Mixer,
-	TSRTimeline
+	TSRTimeline,
+	TimelineContentTypeCasparCg
 } from 'timeline-state-resolver'
 import {
 	Cutout,
@@ -69,7 +70,7 @@ export class TSRController {
 		// this.tsr.on('timelineCallback', (_time, _objId, _callbackName, _data) => {})
 	}
 	async init(fullConfig: FullConfig): Promise<void> {
-		console.log('TSR init')
+		console.log('Initializing TSR...')
 		await this.tsr.init()
 		let host = '127.0.0.1'
 		let port = 5250
@@ -162,7 +163,7 @@ export class TSRController {
 
 			const mixer: Mixer = {}
 
-			if (!settings.useImageProviderForRoutes) {
+			if (settings.useImageProviderForRoutes) {
 				const url = `${getImageProviderLocation(settings)}/custom/${sourceId}`
 
 				const response = await axios.get(url)
@@ -181,8 +182,6 @@ export class TSRController {
 				mixer.opacity = 0
 				mixer.volume = 0
 			}
-
-			console.log('prepareContentRoute', refId)
 
 			const layer = 'output' + routeLayer + '_content'
 
@@ -216,64 +215,93 @@ export class TSRController {
 		}
 
 		_.each(outputs, (output: OutputAny, outputi: number) => {
+			if (!output.options) output.options = {}
 			if (output.type === OutputType.CUTOUT) {
-				const layer = 'output' + outputi + '_source'
-				this.mappings[layer] = {
-					device: DeviceType.CASPARCG,
-					deviceId: CASPARCG_DEVICE_ID,
-					channel: output.casparChannel,
-					layer: 10
-				}
+				const activeCutoutId: string | undefined = runtimeData.pgmCutout || output.cutout.cutoutId
 
-				const cutoutId: string | undefined = runtimeData.pgmCutout || output.cutout.cutoutId
-				if (cutoutId) {
-					// const cutoutId = output.cutout.cutoutId
-					const cutout = cutouts[cutoutId]
-					if (!cutout) throw Error(`cutout "${cutoutId} not found!`)
-					const source = sources[cutout.source]
-					if (!source) throw Error(`source "${cutout.source} not found!`)
+				let cutouti = 0
+				_.each(cutouts, (cutout, cutoutId) => {
+					cutouti++
 
-					const useTransition = shouldUseTransition(layer, source)
+					const layer = 'output' + outputi + '_cutout' + cutoutId
+					this.mappings[layer] = {
+						device: DeviceType.CASPARCG,
+						deviceId: CASPARCG_DEVICE_ID,
+						channel: output.casparChannel,
+						layer: 200 + cutouti * 10
+					}
 
-					const cutoutInOutput = output.cutout
+					const cutoutIsActive = cutoutId === activeCutoutId
 
-					const sourceTransform = this._sourceTransform(source)
-					const cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout)
+					const useCutout = cutoutIsActive || output.options.audio
 
-					const matrix0 = compose(rotateDEG(cutout.outputRotation, 0, 0))
-					const rotatedCutout = applyToPoint(matrix0, { x: cutout.width, y: cutout.height })
-					const scaleToFill =
-						cutoutInOutput.scale ||
-						Math.min(
-							output.width / Math.abs(rotatedCutout['x']),
-							output.height / Math.abs(rotatedCutout['y'])
+					if (useCutout) {
+						// const cutoutId = output.cutout.cutoutId
+						// const cutout = cutouts[cutoutId]
+						// if (!cutout) throw Error(`cutout "${cutoutId} not found!`)
+						const source = sources[cutout.source]
+						if (!source) throw Error(`source "${cutout.source} not found!`)
+
+						const useTransition = shouldUseTransition(layer, source)
+
+						const cutoutInOutput = output.cutout
+
+						const sourceTransform = this._sourceTransform(source)
+						const cutoutTransform = this._cutoutTransform(source, sourceTransform, cutout)
+
+						const matrix0 = compose(rotateDEG(cutout.outputRotation, 0, 0))
+						const rotatedCutout = applyToPoint(matrix0, { x: cutout.width, y: cutout.height })
+						const scaleToFill =
+							cutoutInOutput.scale ||
+							Math.min(
+								output.width / Math.abs(rotatedCutout['x']),
+								output.height / Math.abs(rotatedCutout['y'])
+							)
+
+						const viewportTransform = compose(
+							translate(0.5, 0.5),
+							scale(1 / output.width, 1 / output.height),
+							translate(cutoutInOutput.x, cutoutInOutput.y),
+							rotateDEG(cutout.outputRotation, 0.5, 0.5),
+							scale(scaleToFill)
+						)
+						const outputTransform = compose(viewportTransform, cutoutTransform)
+
+						const mixerPosition = this._casparTransformPosition(
+							source,
+							outputTransform,
+							useTransition
+						)
+						const mixerClipping = this._casparTransformClip(
+							cutout,
+							viewportTransform,
+							useTransition
 						)
 
-					const viewportTransform = compose(
-						translate(0.5, 0.5),
-						scale(1 / output.width, 1 / output.height),
-						translate(cutoutInOutput.x, cutoutInOutput.y),
-						rotateDEG(cutout.outputRotation, 0.5, 0.5),
-						scale(scaleToFill)
-					)
-					const outputTransform = compose(viewportTransform, cutoutTransform)
+						const mixerActive: Mixer = {
+							opacity: cutoutIsActive ? 1 : 0
+						}
+						if (output.options.audio && output.options.audio.enable) {
+							// ONLY touch the volume settings if this is set
+							const audioOn: boolean =
+								cutout.audioAlwaysOn || (cutoutIsActive && cutout.audioFollowVideo) || false
 
-					const mixerPosition = this._casparTransformPosition(
-						source,
-						outputTransform,
-						useTransition
-					)
-					const mixerClipping = this._casparTransformClip(cutout, viewportTransform, useTransition)
+							mixerActive.volume = audioOn
+								? cutout.audioVolume === undefined
+									? 1
+									: cutout.audioVolume
+								: 0
+						}
 
-					this.timeline.push(
-						this.refer.getSource(source.input, layer, {
-							...mixerPosition,
-							...mixerClipping
-						})
-					)
-				} else {
-					// No cutout on program
-				}
+						this.timeline.push(
+							this.refer.getSource(source.input, layer, {
+								...mixerPosition,
+								...mixerClipping,
+								...mixerActive
+							})
+						)
+					}
+				})
 			} else if (output.type === OutputType.MULTIVIEW) {
 				if (output.background) {
 					const layerMultiviewBg = 'output' + outputi + '_mvbg'
@@ -348,6 +376,28 @@ export class TSRController {
 						)
 					})
 				}
+			} else if (output.type === OutputType.CHANNEL_ROUTE) {
+				const layer = 'output' + outputi + '_channelroute'
+				this.mappings[layer] = {
+					device: DeviceType.CASPARCG,
+					deviceId: CASPARCG_DEVICE_ID,
+					channel: output.casparChannel,
+					layer: 300
+				}
+
+				let mixer: Mixer = {}
+				if (output.options && output.options.mixer) mixer = output.options.mixer
+				this.timeline.push({
+					id: '',
+					layer: layer,
+					enable: { while: 1 },
+					content: {
+						deviceType: DeviceType.CASPARCG,
+						type: TimelineContentTypeCasparCg.ROUTE,
+						channel: output.routeFromChannel,
+						mixer: mixer
+					}
+				})
 			}
 		})
 
@@ -361,8 +411,6 @@ export class TSRController {
 	}
 
 	private _addTSRDevice(deviceId: string, options: DeviceOptionsAny): void {
-		// console.log('Adding device ' + deviceId)
-
 		if (!options.limitSlowSentCommand) options.limitSlowSentCommand = 40
 		if (!options.limitSlowFulfilledCommand) options.limitSlowFulfilledCommand = 100
 

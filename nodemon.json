@@ -1,5 +1,5 @@
 {
-    "events": {
-        "restart": "yarn build"
-    }
+	"events": {
+		"restart": "yarn build"
+	}
 }
