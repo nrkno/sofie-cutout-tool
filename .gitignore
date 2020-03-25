@@ -2,5 +2,6 @@ build
 dist
 node_modules
 .vscode
-yarn.lock
+package-lock.json
+yarn-error.log
 config/

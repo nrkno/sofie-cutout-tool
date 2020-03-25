@@ -2,3 +2,4 @@ node_modules
 dist
 scratch
 build
+package-lock.json
