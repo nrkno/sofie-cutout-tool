@@ -20,6 +20,7 @@ import { EventNames as applicationEvents } from '../../shared/events.js'
 
 import * as config from '../../lib/config.js'
 import { eventNames as directTakeToggleEvents } from '../../components/ui/direct-take-toggle.js'
+import { eventNames as streamControlEvents } from '../../components/ui/stream-control-switch.js'
 
 export default class CutoutManager {
 	constructor(ipcRenderer) {
@@ -37,6 +38,7 @@ export default class CutoutManager {
 		this.ipcRenderer.send(applicationEvents.BACKEND_INITIALIZE)
 
 		this.directTakeMode = false
+		this.streamConnected = false
 	}
 
 	setupEventListeners() {
@@ -52,7 +54,7 @@ export default class CutoutManager {
 
 		document.addEventListener('click', ({ target }) => {
 			if (target.classList.contains('take-controls--button') && target.classList.contains('take')) {
-				this.take()
+				return this.take()
 			}
 		})
 
@@ -62,6 +64,16 @@ export default class CutoutManager {
 
 		document.addEventListener(directTakeToggleEvents.DEACTIVATE, () => {
 			this.directTakeMode = false
+		})
+
+		document.addEventListener(streamControlEvents.CONNECT, () => {
+			this.streamConnected = true
+			this.connect()
+		})
+
+		document.addEventListener(streamControlEvents.DISCONNECT, () => {
+			this.streamConnected = false
+			this.disconnect()
 		})
 	}
 
@@ -139,5 +151,15 @@ export default class CutoutManager {
 				this.ipcRenderer.send(applicationEvents.UPDATE_CUTOUT, cutoutId, cutout)
 			}, 40)
 		}
+	}
+
+	connect() {
+		console.log('Connecting')
+		this.ipcRenderer.send(applicationEvents.CONNECT)
+	}
+
+	disconnect() {
+		console.log('Disconnecting')
+		this.ipcRenderer.send(applicationEvents.DISCONNECT)
 	}
 }

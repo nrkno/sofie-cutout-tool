@@ -6,6 +6,7 @@ import { Cutout, FullConfigClient } from './api'
 import { DataHandler } from './dataHandler'
 import { TSRController, RunTimeData } from './TSRController'
 import _ from 'underscore'
+import { StreamController } from './streamController'
 
 export default class Main {
 	static mainWindow: Electron.BrowserWindow | null
@@ -14,6 +15,7 @@ export default class Main {
 
 	static tsrController: TSRController
 	static dataHandler: DataHandler
+	static streamController: StreamController
 
 	static runtimeData: RunTimeData = {}
 
@@ -53,6 +55,9 @@ export default class Main {
 			.updateConfig()
 			.then(() => {
 				return Main.tsrController.init(Main.dataHandler.getConfig())
+			})
+			.then(() => {
+				Main.streamController.init()
 			})
 			.catch(console.error)
 
@@ -99,6 +104,19 @@ export default class Main {
 			console.log('TAKE', cutoutId)
 			Main.runtimeData.pgmCutout = cutoutId
 
+			Main.updateTimeline()
+		})
+		ipcMain.on('connect', (event) => {
+			console.log('CONNECT')
+			Main.streamController.connect().catch((e) => {
+				console.log(`Error when trying to connect stream`, e)
+			})
+		})
+		ipcMain.on('disconnect', (event) => {
+			console.log('DISCONNECT')
+			Main.streamController.disconnect().catch((e) => {
+				console.log(`Error when trying to disconnect stream`, e)
+			})
 			Main.triggerUpdateTimeline()
 		})
 	}
@@ -137,7 +155,7 @@ export default class Main {
 		}
 
 		console.log('appPath', appPath)
-
-		Main.dataHandler = new DataHandler(appPath)
+		Main.dataHandler = new DataHandler(app.getAppPath())
+		Main.streamController = new StreamController(Main.dataHandler)
 	}
 }

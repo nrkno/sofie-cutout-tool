@@ -1,4 +1,4 @@
-import { Sources, SourceInputType, Cutouts, Outputs, OutputType, Settings } from '../server/api';
+import { Sources, SourceInputType, Cutouts, Outputs, OutputType, Settings } from '../server/api'
 
 const sources: Sources = {
 	caspar: {
@@ -21,7 +21,7 @@ const sources: Sources = {
 			file: 'go1080p25'
 		}
 	}
-};
+}
 
 const cutouts: Cutouts = {
 	casparfull: {
@@ -56,7 +56,7 @@ const cutouts: Cutouts = {
 		height: 720,
 		outputRotation: 0
 	}
-};
+}
 
 const outputs: Outputs = [
 	{
@@ -103,7 +103,8 @@ const outputs: Outputs = [
 		width: 1280,
 		height: 720
 	}
-];
+]
+
 const settings: Settings = {
 	channelForRoutes: 1,
 	channelForRoutesStartLayer: 900,
@@ -116,7 +117,14 @@ const settings: Settings = {
 		port: 5255,
 		protocol: 'http'
 	},
+	stream: {
+		channel: 2,
+		streamId: 99,
+		streamUri: 'rtmp://<user>:<password>@nrkhd-rtmp-in1.netwerk.no:1934/live/stream-159586_1',
+		streamParams:
+			'-codec:v libx264 -filter:v "scale=out_range=full,fps=25,format=yuv420p,setsar=1:1,setdar=1:1" -profile:v high -level:v 3.2 -g 50 -preset fast -tune fastdecode -crf 18 -maxrate 2.5M -bufsize 1.5M -codec:a aac -b:a 160k -f flv'
+	},
 	ui: {
 		inputJitterCutoff: 2
 	}
-};
+}

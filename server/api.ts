@@ -149,11 +149,15 @@ export interface Settings {
 	channelForRoutes: number
 	/** What layer to start on */
 	channelForRoutesStartLayer: number
-
+	/** Connection endpoint for CasparCG . */
 	casparCG: NetworkResource
+	/** Connection endpoint for Image Provider. */
 	imageProvider: NetworkResource
-
+	/** Details of RTMP connection for PGM channel. */
+	stream: StreamOutput
+	/** UI settings meant to be configurable */
 	ui: {
+		/** Works as a minimum amount of pixels moved in order to register an actual move of a cutout */
 		inputJitterCutoff: number
 	}
 }
@@ -162,4 +166,17 @@ export interface NetworkResource {
 	hostname: string
 	port: number
 	protocol?: string
+}
+
+export interface StreamOutput {
+	/** PGM output channel. */
+	channel: number
+	/** Identifier of stream on the channel. */
+	streamId: number
+	/** Path to output stream, for example RTMP URL. */
+	streamUri: string
+	/** Parameters to set for the output stream, e.g. FFmpeg parameters. */
+	streamParams: string
+	/** Time to wait between each RTMP connection check (ms). Default 10000ms. */
+	checkInterval?: number
 }
