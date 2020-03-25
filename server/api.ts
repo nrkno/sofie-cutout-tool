@@ -1,4 +1,4 @@
-import { ChannelFormat } from 'timeline-state-resolver'
+import { ChannelFormat, Mixer } from 'timeline-state-resolver'
 
 export interface FullConfig {
 	cutouts: Cutouts
@@ -78,6 +78,13 @@ export interface Cutout {
 
 	/** How the Cutout will be oriented in the output */
 	outputRotation: number
+
+	/** If true, enables audio follow video on this cutout */
+	audioFollowVideo?: boolean
+	/** If true, keep the sound on for this cutout */
+	audioAlwaysOn?: boolean
+	/** If set, sets the volume for this cutout (1 = 100% = 0dB). Defaults to 1 */
+	audioVolume?: number
 }
 
 export interface CutoutInOutput {
@@ -91,7 +98,7 @@ export interface CutoutInOutput {
 }
 export type Outputs = OutputAny[]
 
-export type OutputAny = OutputCutout | OutputMultiview
+export type OutputAny = OutputCutout | OutputMultiview | OutputChannelRoute
 export interface OutputBase {
 	type: OutputType
 	casparChannel: number
@@ -102,11 +109,19 @@ export interface OutputBase {
 }
 export enum OutputType {
 	CUTOUT = 'cutout',
-	MULTIVIEW = 'multiview'
+	MULTIVIEW = 'multiview',
+	CHANNEL_ROUTE = 'channel_route'
 }
 export interface OutputCutout extends OutputBase {
 	type: OutputType.CUTOUT
 	cutout: CutoutInOutput
+	options?: {
+		routeAllCutouts?: boolean
+		audio?: {
+			/** Needs to be true for Cutout tool to handle any audio. Set to false if audio is handled by Sisyfos */
+			enable?: boolean
+		}
+	}
 }
 export interface OutputMultiview extends OutputBase {
 	type: OutputType.MULTIVIEW
@@ -114,6 +129,16 @@ export interface OutputMultiview extends OutputBase {
 
 	/** Background to put behind the multiview */
 	background?: string
+
+	options?: {}
+}
+export interface OutputChannelRoute extends OutputBase {
+	type: OutputType.CHANNEL_ROUTE
+	casparChannel: number
+	routeFromChannel: number
+	options?: {
+		mixer?: Mixer
+	}
 }
 
 export interface Settings {
