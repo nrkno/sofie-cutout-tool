@@ -157,5 +157,6 @@ export default class Main {
 		console.log('appPath', appPath)
 
 		Main.dataHandler = new DataHandler(appPath)
+		Main.streamController = new StreamController(Main.dataHandler)
 	}
 }
