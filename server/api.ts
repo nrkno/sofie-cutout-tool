@@ -154,7 +154,7 @@ export interface Settings {
 	/** Connection endpoint for Image Provider. */
 	imageProvider: NetworkResource
 	/** Details of RTMP connection for PGM channel. */
-	stream: StreamOutput
+	stream?: StreamOutput
 	/** UI settings meant to be configurable */
 	ui: {
 		/** Works as a minimum amount of pixels moved in order to register an actual move of a cutout */
