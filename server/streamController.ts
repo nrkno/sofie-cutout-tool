@@ -61,6 +61,9 @@ export class StreamController {
 
 	async isConnected(): Promise<boolean> {
 		let channelInfo = await this.connection.info(this.channel)
-		return channelInfo.response.raw.indexOf(`<index>${this.streamId}</index>`) >= 0
+		return (
+			typeof channelInfo.response.data !== 'string' &&
+			channelInfo.response.data.output.consumers.consumer.some(x => x.index === this.streamId)
+		)
 	}
 }
