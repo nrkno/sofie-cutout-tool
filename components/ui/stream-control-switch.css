@@ -1,6 +1,8 @@
 /* The actual visible label */
 .stream-connect--label {
-	line-height: 81px;
+	font-size: 1.625em;
+	line-height: 1.5em;
+	margin-right: var(--standard-gap);
 }
 
 /* The switch - the box around the slider */
