@@ -1,9 +1,25 @@
 .sources {
 	display: grid;
 	grid-template-columns: 4fr 1fr;
+	background-color: var(--bg-sources);
 }
 
 .sources--controls {
 	display: flex;
 	flex-direction: column;
+}
+
+.sources--controls--button {
+	color: var(--text-main);
+	background-color: var(--neutral-control-color);
+	border-radius: 50px;
+	border: none;
+	width: 90%;
+	margin: auto;
+	font-size: 1.625em;
+	line-height: 1.625em;
+}
+
+.sources--controls--button:focus {
+	outline: none;
 }

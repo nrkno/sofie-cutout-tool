@@ -3,7 +3,6 @@
 	flex-wrap: wrap;
 	list-style: none;
 	padding-inline-start: 0;
-	background-color: var(--bg-sources);
 	color: var(--text-main);
 	margin: 0;
 	padding: 16px;
