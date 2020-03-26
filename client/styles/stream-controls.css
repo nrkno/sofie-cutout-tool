@@ -1,0 +1,9 @@
+.stream-controls {
+	display: flex;
+	flex-direction: row-reverse;
+	margin-top: var(--standard-gap);
+	padding: 0 var(--standard-gap);
+}
+
+.stream-control {
+}

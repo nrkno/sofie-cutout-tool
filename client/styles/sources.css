@@ -1,0 +1,9 @@
+.sources {
+	display: grid;
+	grid-template-columns: 4fr 1fr;
+}
+
+.sources--controls {
+	display: flex;
+	flex-direction: column;
+}

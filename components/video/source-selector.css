@@ -3,7 +3,8 @@
 	flex-wrap: wrap;
 	list-style: none;
 	padding-inline-start: 0;
-	background-color: var(--bg-dark);
+	background-color: var(--bg-sources);
+	color: var(--text-main);
 	margin: 0;
 	padding: 16px;
 }
@@ -23,11 +24,12 @@
 }
 
 .input-source-list--item--title {
-	width: 100%;
-	background-color: var(--bg-main);
 	color: var(--text-main);
+	width: 100%;
+	background-color: inherit;
 	text-decoration: none;
 	line-height: 1.5em;
+	text-align: center;
 }
 
 .input-source-list--item--overlay {
@@ -36,11 +38,12 @@
 	padding: 0;
 	width: 100%;
 	height: 100%;
+	line-height: 1.5em;
 }
 
 .input-source-list--item--overlay::before {
-	background-color: rgba(0, 0, 0, 0.6);
-	line-height: 1.5em;
+	background-color: var(--bg-sources);
+	font-size: 1.625em;
 	width: 100%;
 	text-align: center;
 	display: block;

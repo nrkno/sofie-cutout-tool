@@ -10,8 +10,30 @@
 	</head>
 	<body>
 		<h1>Sofie cutout tool</h1>
-		<source-selector></source-selector>
-		<br />
+		<section class="sources">
+			<source-selector></source-selector>
+			<div class="sources--controls">
+				<button is="sources-reconnect">
+					<span class="label">Oppfrisk kilder</span>
+				</button>
+				<button is="direct-take-toggle" class="direct-take-toggle">
+					<span class="label">Direkte Take</span>
+				</button>
+			</div>
+		</section>
+		<section class="stream-controls">
+			<div class="stream-control">
+				<label class="stream-connect--label" for="stream-connect">On-air</label>
+				<label class="switch" id="stream-connect">
+					<input
+						type="checkbox"
+						is="stream-control-switch"
+						class="stream-control--switch slider round"
+					/>
+					<span class="slider round"></span>
+				</label>
+			</div>
+		</section>
 		<section class="cropper-container">
 			<h2 class="crop-channel--title">PREVIEW</h2>
 			<div></div>
@@ -19,14 +41,6 @@
 
 			<video-cropper class="preview"></video-cropper>
 			<div class="take-controls--container">
-				<button is="direct-take-toggle" class="take-controls--button direct-mode-toggle">
-					<span class="label">Direkte Take</span>
-				</button>
-				<label for="stream-connect">On-air</label>
-				<label class="switch" id="stream-connect">
-					<input type="checkbox" is="stream-control-switch" class="stream-control--switch slider round">
-					<span class="slider round"></span>
-				</label>
 				<button class="take-controls--button take" title="Take">
 					<span class="label">Take</span>
 				</button>

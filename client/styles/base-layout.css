@@ -1,4 +1,6 @@
-@import './colorscheme.css';
+:root {
+	--standard-gap: 16px;
+}
 
 body {
 	background: var(--bg-main);
