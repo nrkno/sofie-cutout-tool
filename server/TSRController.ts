@@ -5,7 +5,9 @@ import {
 	DeviceType,
 	Mixer,
 	TSRTimeline,
-	TimelineContentTypeCasparCg
+	TimelineContentTypeCasparCg,
+	Transition,
+	Ease
 } from 'timeline-state-resolver'
 import {
 	Cutout,
@@ -45,6 +47,7 @@ export class TSRController {
 		resolve: (() => void)[]
 		reject: ((e: any) => void)[]
 	}
+	private _previousActiveCutoutId: {[outputi: string]: string } = {}
 
 	constructor() {
 		this.refer = new CasparReferrer()
@@ -232,6 +235,7 @@ export class TSRController {
 					}
 
 					const cutoutIsActive = cutoutId === activeCutoutId
+					const cutoutWasActiveBefore = cutoutId === this._previousActiveCutoutId[outputi + '']
 
 					const useCutout = cutoutIsActive || output.options.audio
 
@@ -242,7 +246,7 @@ export class TSRController {
 						const source = sources[cutout.source]
 						if (!source) throw Error(`source "${cutout.source} not found!`)
 
-						const useTransition = shouldUseTransition(layer, source)
+						// const useTransition = shouldUseTransition(layer, source)
 
 						const cutoutInOutput = output.cutout
 
@@ -267,6 +271,10 @@ export class TSRController {
 						)
 						const outputTransform = compose(viewportTransform, cutoutTransform)
 
+						const useTransition = (
+							cutoutIsActive && cutoutWasActiveBefore
+						)
+
 						const mixerPosition = this._casparTransformPosition(
 							source,
 							outputTransform,
@@ -275,7 +283,7 @@ export class TSRController {
 						const mixerClipping = this._casparTransformClip(
 							cutout,
 							viewportTransform,
-							useTransition
+							false
 						)
 
 						const mixerActive: Mixer = {
@@ -302,6 +310,8 @@ export class TSRController {
 						)
 					}
 				})
+				// Last:
+				this._previousActiveCutoutId[outputi + ''] = activeCutoutId
 			} else if (output.type === OutputType.MULTIVIEW) {
 				if (output.background) {
 					const layerMultiviewBg = 'output' + outputi + '_mvbg'
@@ -519,7 +529,28 @@ export class TSRController {
 	private _casparTransformTransition(useTransition: boolean): Mixer {
 		if (!useTransition) return {}
 		// tmp: disable transition
-		return {}
+		// return {}
+		const hackOptions = JSON.stringify({
+			acceleration: 2 / 1920 / 1000,
+			maxSpeed: 10 / 1920,
+			updateInterval: 1000 / 25,
+			snapDistance: 1 / 1920,
+			linearSpeed: 0.001
+		})
+		return {
+			inTransition: {
+				type: Transition.INTERNAL,
+				duration: 1,
+				easing: Ease.INTERNAL_PHYSICAL,
+				direction: hackOptions
+			},
+			changeTransition: {
+				type: Transition.INTERNAL,
+				duration: 1,
+				easing: Ease.INTERNAL_PHYSICAL,
+				direction: hackOptions
+			}
+		}
 		/*
 		return {
 			inTransition: {
