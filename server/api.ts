@@ -1,4 +1,4 @@
-import { ChannelFormat, Mixer } from 'timeline-state-resolver'
+import { ChannelFormat, Mixer, TimelineObjCasparCGAny } from 'timeline-state-resolver'
 
 export interface FullConfig {
 	cutouts: Cutouts
@@ -121,7 +121,8 @@ export interface OutputCutout extends OutputBase {
 		audio?: {
 			/** Needs to be true for Cutout tool to handle any audio. Set to false if audio is handled by Sisyfos */
 			enable?: boolean
-		}
+		},
+		overlays?: Array<OutputOverlay>
 	}
 }
 export interface OutputMultiview extends OutputBase {
@@ -131,16 +132,20 @@ export interface OutputMultiview extends OutputBase {
 	/** Background to put behind the multiview */
 	background?: string
 
-	options?: {}
+	options?: {
+		overlays?: Array<OutputOverlay>
+	}
 }
 export interface OutputChannelRoute extends OutputBase {
 	type: OutputType.CHANNEL_ROUTE
 	casparChannel: number
 	routeFromChannel: number
 	options?: {
-		mixer?: Mixer
+		mixer?: Mixer,
+		overlays?: Array<OutputOverlay>
 	}
 }
+export type OutputOverlay = TimelineObjCasparCGAny // omitting id, layer & enable
 
 export interface Settings {
 	useImageProviderForRoutes?: boolean

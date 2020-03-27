@@ -39,6 +39,7 @@ export class TSRController {
 
 	public refer: CasparReferrer
 
+	private _previousMappings: any = {}
 	private _memorySources: { [channelLayer: string]: SourceInputAny } = {}
 	private _updateTimelineRunning?: boolean
 	private _nextUpdateTimeline?: {
@@ -409,15 +410,41 @@ export class TSRController {
 					}
 				})
 			}
+			if (output.options.overlays) {
+				_.each(output.options.overlays, (overlay, overlayI) => {
+					const layer = 'output' + outputi + '_overlay' + overlayI
+					this.mappings[layer] = {
+						device: DeviceType.CASPARCG,
+						deviceId: CASPARCG_DEVICE_ID,
+						channel: output.casparChannel,
+						layer: 500 + overlayI
+					}
+	
+					this.timeline.push({
+						...overlay,
+						id: '',
+						layer: layer,
+						enable: { while: 1 },
+					})
+				})
+			}
 		})
 
 		_.each(this.timeline, (tlObj, i) => {
 			if (!tlObj.id) tlObj.id = 'Unnamed' + i
 		})
+		const unModifiedMappings = JSON.parse(JSON.stringify(this.mappings))
+		// Add previous mappings to current mappings as well, so that removed mappings result in a clear
+		_.each(this._previousMappings, (mapping, layer) => {
+			if (!this.mappings[layer]) this.mappings[layer] = mapping
+		})
 
 		// Send mappings and timeline to TSR:
 		this.tsr.setMapping(this.mappings)
 		this.tsr.timeline = this.timeline
+
+		// Last:
+		this._previousMappings = unModifiedMappings
 	}
 
 	private _addTSRDevice(deviceId: string, options: DeviceOptionsAny): void {
