@@ -106,17 +106,21 @@ export default class Main {
 
 			Main.updateTimeline()
 		})
-		ipcMain.on('connect', (event) => {
+		ipcMain.on('connect', () => {
 			console.log('CONNECT')
 			Main.streamController.connect().catch((e) => {
 				console.log(`Error when trying to connect stream`, e)
 			})
 		})
-		ipcMain.on('disconnect', (event) => {
+		ipcMain.on('disconnect', () => {
 			console.log('DISCONNECT')
 			Main.streamController.disconnect().catch((e) => {
 				console.log(`Error when trying to disconnect stream`, e)
 			})
+			Main.triggerUpdateTimeline()
+		})
+		ipcMain.on('trigger-reload', () => {
+			console.log('TRIGGER-RELOAD')
 			Main.triggerUpdateTimeline()
 		})
 	}
