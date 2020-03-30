@@ -93,8 +93,6 @@ export class TSRController {
 			},
 			isMultiThreaded: false
 		})
-
-		// this.updateTimeline()
 	}
 	async destroy(): Promise<void> {
 		await this.tsr.destroy()
@@ -171,8 +169,6 @@ export class TSRController {
 				const url = `${getImageProviderLocation(settings)}/custom/${sourceId}`
 
 				const response = await axios.get(url)
-				// console.log('response.data', response.data);
-				// info.regions
 
 				const data: any = response.data
 				const region = _.find(data.regions as any[], (region) => region.contentId === sourceId)
@@ -241,13 +237,8 @@ export class TSRController {
 					const useCutout = cutoutIsActive || output.options.audio
 
 					if (useCutout) {
-						// const cutoutId = output.cutout.cutoutId
-						// const cutout = cutouts[cutoutId]
-						// if (!cutout) throw Error(`cutout "${cutoutId} not found!`)
 						const source = sources[cutout.source]
 						if (!source) throw Error(`source "${cutout.source} not found!`)
-
-						// const useTransition = shouldUseTransition(layer, source)
 
 						const cutoutInOutput = output.cutout
 
@@ -555,8 +546,6 @@ export class TSRController {
 	}
 	private _casparTransformTransition(useTransition: boolean): Mixer {
 		if (!useTransition) return {}
-		// tmp: disable transition
-		// return {}
 		const hackOptions = JSON.stringify({
 			acceleration: 2 / 1920 / 1000,
 			maxSpeed: 10 / 1920,
