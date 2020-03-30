@@ -79,7 +79,13 @@ export default class CutoutManager {
 		})
 
 		document.addEventListener(sourcesReloadEvents.RELOAD, () => {
-			console.log('Source streams reload requested from UI')
+			// Trigger backend to reload, so that image-provider is (re-) setup
+			// TODO: This event could potentially be done synchrounous
+			this.ipcRenderer.send(applicationEvents.TRIGGER_RELOAD)
+			// TODO: have some sort of visual feedback to the user/disable the UI while reloading
+			setTimeout(() => {
+				window.location.reload()
+			}, 500)
 		})
 	}
 

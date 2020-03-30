@@ -28,5 +28,7 @@ const EventNames = {
 	CONNECT: 'connect',
 
 	/** Disconnect an RTMP stream. */
-	DISCONNECT: 'disconnect'
+	DISCONNECT: 'disconnect',
+
+	TRIGGER_RELOAD: 'trigger-reload'
 }
