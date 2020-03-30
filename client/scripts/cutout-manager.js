@@ -1,12 +1,12 @@
 import {
 	attributeNames as videoCropperAttributeNames,
 	tagName as videoCropperTagName,
-	eventNames as videoCropperEventNames
+	eventNames as videoCropperEvents
 } from '../../components/video/video-cropper.js'
 
 import {
 	tagName as sourceSelectorTagName,
-	eventNames as sourceSelectorEventNames,
+	eventNames as sourceSelectorEvents,
 	attributeNames as sourceSelectorAttributeNames
 } from '../../components/video/source-selector.js'
 
@@ -15,6 +15,8 @@ import {
 	findCutoutIdFromSourceId,
 	getCutoutSourceId
 } from '../../lib/cutouts.js'
+
+import { eventNames as sourcesReloadEvents } from '../../components/ui/sources-reload-control.js'
 
 import { EventNames as applicationEvents } from '../../shared/events.js'
 
@@ -42,11 +44,11 @@ export default class CutoutManager {
 	}
 
 	setupEventListeners() {
-		document.addEventListener(sourceSelectorEventNames.SOURCE_SELECTED, ({ detail }) => {
+		document.addEventListener(sourceSelectorEvents.SOURCE_SELECTED, ({ detail }) => {
 			this.selectSource(detail.id)
 		})
 
-		document.addEventListener(videoCropperEventNames.CROP_MOVE, ({ detail }) => {
+		document.addEventListener(videoCropperEvents.CROP_MOVE, ({ detail }) => {
 			if (detail) {
 				this.moveCrop(detail)
 			}
@@ -74,6 +76,10 @@ export default class CutoutManager {
 		document.addEventListener(streamControlEvents.DISCONNECT, () => {
 			this.streamConnected = false
 			this.disconnect()
+		})
+
+		document.addEventListener(sourcesReloadEvents.RELOAD, () => {
+			console.log('Source streams reload requested from UI')
 		})
 	}
 
