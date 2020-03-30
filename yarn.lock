@@ -4523,10 +4523,10 @@ timed-out@^4.0.0:
   resolved "https://registry.yarnpkg.com/timed-out/-/timed-out-4.0.1.tgz#f32eacac5a175bea25d7fab565ab3ed8741ef56f"
   integrity sha1-8y6srFoXW+ol1/q1Zas+2HQe9W8=
 
-timeline-state-resolver@^3.19.0:
-  version "3.19.0"
-  resolved "https://registry.yarnpkg.com/timeline-state-resolver/-/timeline-state-resolver-3.19.0.tgz#360b8d8f16747feb35115092e70b32a7dbffc51a"
-  integrity sha512-iUvV++hjG7wFkQx3IHYwxncocVN69Mq5yuQYE3770/wv98rmiiKTtEMj0FcyaTP04pCcGIa5vbpjSe9NvS/MMQ==
+timeline-state-resolver@3.20.0-nightly-feature-smooth-casparcg-transitions-20200327-073602-c424637b.0:
+  version "3.20.0-nightly-feature-smooth-casparcg-transitions-20200327-073602-c424637b.0"
+  resolved "https://registry.yarnpkg.com/timeline-state-resolver/-/timeline-state-resolver-3.20.0-nightly-feature-smooth-casparcg-transitions-20200327-073602-c424637b.0.tgz#86320d4790fa0bf4b749fd0b7b253a56bd7604dc"
+  integrity sha512-amYCCN05NST1jiEK2LHgRbek9/nw5dOgNI1NN+qSnEjdLtqN4LYkI8eh1zfGXl7x7QKNN3RgGShD49Gl253f1g==
   dependencies:
     atem-connection "1.1.0"
     atem-state "^0.9.0"
