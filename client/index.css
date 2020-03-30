@@ -11,6 +11,3 @@
 /* Preview, take and program section */
 @import './styles/cropper-container.css';
 @import './styles/take-controls.css';
-
-/* Component styling */
-@import '../components/components.css';

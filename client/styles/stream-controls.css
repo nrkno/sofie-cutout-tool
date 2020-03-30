@@ -4,9 +4,3 @@
 	margin-top: var(--standard-gap);
 	padding: 0 var(--standard-gap);
 }
-
-/* TODO: this should be a part of the actual slider component */
-.stream-control {
-	display: flex;
-	align-items: center;
-}

@@ -9,13 +9,16 @@
 	flex-direction: column;
 }
 
+.sources--controls--control {
+	width: 90%;
+	margin: auto;
+}
+
 .sources--controls--button {
 	color: var(--text-main);
 	background-color: var(--neutral-control-color);
 	border-radius: 50px;
 	border: none;
-	width: 90%;
-	margin: auto;
 	font-size: 1.625em;
 	line-height: 1.625em;
 }

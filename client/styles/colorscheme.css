@@ -8,4 +8,7 @@
 	--preview-color: green;
 	--program-color: red;
 	--neutral-control-color: #007c84;
+
+	--slider-toggle-deactivated: #666666;
+	--slider-toggle-activated: red;
 }

@@ -1,7 +1,0 @@
-[is='direct-take-toggle'] {
-	background-color: rgba(255, 191, 0, 0.7);
-}
-
-[is='direct-take-toggle'].armed {
-	background-color: red;
-}
