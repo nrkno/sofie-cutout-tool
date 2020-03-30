@@ -1,10 +1,14 @@
 :root {
-	--bg-main: #444444;
-	--bg-dark: #292929;
+	--bg-main: #000;
+	--bg-sources: #292929;
 	--text-main: #fff;
 	--control-dark: #c4c4c4;
 	--control-light: #f0f0f0;
 
 	--preview-color: green;
 	--program-color: red;
+	--neutral-control-color: #007c84;
+
+	--slider-toggle-deactivated: #666666;
+	--slider-toggle-activated: red;
 }

@@ -1,0 +1,66 @@
+/* The actual visible label */
+.slider-toggle--label {
+	font-size: 1.625em;
+	line-height: 1.625em;
+	margin-right: var(--standard-gap);
+}
+
+/* The switch - the box around the slider */
+.slider-toggle--slider-container {
+	position: relative;
+	display: inline-block;
+	width: 81px;
+	height: 46px;
+}
+
+/* Hide default HTML checkbox */
+.slider-toggle--slider-container .slider-toggle--checkbox {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+/* The slider */
+.slider-toggle--slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--slider-toggle-deactivated);
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+
+.slider-toggle--slider:before {
+	position: absolute;
+	content: '';
+	height: 36px;
+	width: 36px;
+	left: 5px;
+	bottom: 5px;
+	background-color: white;
+	transition: 0.4s;
+}
+
+.slider-toggle--checkbox:checked + .slider-toggle--slider {
+	background-color: var(--slider-toggle-activated);
+}
+
+.slider-toggle--checkbox:focus + .slider-toggle--slider {
+	box-shadow: 0 0 1px #2196f3;
+}
+
+.slider-toggle--checkbox:checked + .slider-toggle--slider:before {
+	transform: translate3d(35px, 0, 0);
+}
+
+/* Rounded sliders */
+.slider-toggle--slider.round {
+	border-radius: 50px;
+}
+
+.slider-toggle--slider.round:before {
+	border-radius: 50%;
+}

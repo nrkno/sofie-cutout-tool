@@ -6,12 +6,25 @@
 		<!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
 		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
 		<link rel="stylesheet" href="client/index.css" />
-		<link rel="stylesheet" href="components/ui/stream-control-switch.css" />
 	</head>
 	<body>
 		<h1>Sofie cutout tool</h1>
-		<source-selector></source-selector>
-		<br />
+		<section class="sources">
+			<source-selector></source-selector>
+			<div class="sources--controls">
+				<button is="sources-reconnect" class="sources--controls--control sources--controls--button">
+					<span class="label">Oppfrisk kilder</span>
+				</button>
+				<direct-take-toggle
+					class="sources--controls--control sources--controls--slider"
+				></direct-take-toggle>
+			</div>
+		</section>
+		<section class="stream-controls">
+			<div class="stream-control">
+				<stream-control-switch></stream-control-switch>
+			</div>
+		</section>
 		<section class="cropper-container">
 			<h2 class="crop-channel--title">PREVIEW</h2>
 			<div></div>
@@ -19,14 +32,6 @@
 
 			<video-cropper class="preview"></video-cropper>
 			<div class="take-controls--container">
-				<button is="direct-take-toggle" class="take-controls--button direct-mode-toggle">
-					<span class="label">Direkte Take</span>
-				</button>
-				<label for="stream-connect">On-air</label>
-				<label class="switch" id="stream-connect">
-					<input type="checkbox" is="stream-control-switch" class="stream-control--switch slider round">
-					<span class="slider round"></span>
-				</label>
 				<button class="take-controls--button take" title="Take">
 					<span class="label">Take</span>
 				</button>

@@ -1,43 +1,46 @@
-export { tagName, eventNames, classNames };
+import {
+	tagName as toggleTagName,
+	attributeNames as toggleAttributeNames,
+	eventNames as toggleEventNames
+} from './slider-toggle.js'
 
-const tagName = 'stream-control-switch';
+export { tagName, eventNames }
+
+const tagName = 'stream-control-switch'
 
 const eventNames = {
 	CONNECT: 'stream-control-connect',
 	DISCONNECT: 'stream-control-disconnect'
-};
+}
 
-const classNames = {
-	CONNECTED: 'connected'
-};
-
-class StreamControlSwitch extends HTMLInputElement {
+class StreamControlSwitch extends HTMLElement {
 	constructor() {
-		super();
+		super()
+
+		const toggle = document.createElement(toggleTagName)
+		toggle.setAttribute(toggleAttributeNames.LABEL_TEXT, 'On Air')
+
+		this.attachShadow({ mode: 'open' }).appendChild(toggle)
 	}
 
 	connectedCallback() {
-		this.addEventListener('input', () => {
-			this.handleInput();
-		});
-	}
+		this.addEventListener(toggleEventNames.TOGGLE_ON, (event) => {
+			event.stopImmediatePropagation()
+			this.connect()
+		})
 
-	handleInput() {
-		if (this.classList.contains(classNames.CONNECTED)) {
-			this.disconnect();
-		} else {
-			this.connect();
-		}
+		this.addEventListener(toggleEventNames.TOGGLE_OFF, (event) => {
+			event.stopImmediatePropagation()
+			this.disconnect()
+		})
 	}
 
 	connect() {
-		this.classList.add(classNames.CONNECTED);
-		this.dispatchEvent(new CustomEvent(eventNames.CONNECT, { composed: true, bubbles: true }));
+		this.dispatchEvent(new CustomEvent(eventNames.CONNECT, { composed: true, bubbles: true }))
 	}
 
 	disconnect() {
-		this.classList.remove(classNames.CONNECTED);
-		this.dispatchEvent(new CustomEvent(eventNames.DISCONNECT, { composed: true, bubbles: true }));
+		this.dispatchEvent(new CustomEvent(eventNames.DISCONNECT, { composed: true, bubbles: true }))
 	}
 }
-customElements.define(tagName, StreamControlSwitch, { extends: 'input' });
+customElements.define(tagName, StreamControlSwitch)

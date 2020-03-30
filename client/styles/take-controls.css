@@ -1,8 +1,5 @@
-@import './colorscheme.css';
-
 .take-controls--container {
-	position: relative;
-	height: 100%;
+	display: flex;
 }
 
 .take-controls--button {
@@ -25,23 +22,10 @@
 	border-radius: 100%;
 	color: var(--control-light);
 
-	position: absolute;
-	left: 0;
-	bottom: 0;
 	height: 0;
 	padding-bottom: 100%;
 }
 
 .take-controls--button.take .label {
 	visibility: hidden;
-}
-
-[is='direct-take-toggle'].take-controls--button {
-	font-size: 2.5em;
-	background-color: rgba(255, 191, 0, 0.7);
-}
-
-[is='direct-take-toggle'].take-controls--button.armed {
-	font-size: 2.5em;
-	background-color: red;
 }
