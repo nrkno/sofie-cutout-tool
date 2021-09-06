@@ -1,3 +1,6 @@
 node_modules
 test
 dist
+assets
+crash.log
+.vscode

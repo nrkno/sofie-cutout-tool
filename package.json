@@ -1,34 +1,46 @@
 {
-    "name": "tensorflow-test",
-    "version": "1.0.0",
-    "main": "dist/index.js",
-    "license": "MIT",
-    "devDependencies": {
-        "@sofie-automation/code-standard-preset": "^0.4.2",
-        "@types/node": "^14.17.0",
-        "typescript": "^4.3.5"
-    },
-    "scripts": {
-        "build": "tsc -p tsconfig.build.json",
-        "lint": "eslint . --ext .ts --ext .js --ext .tsx --ext .jsx --ignore-pattern dist",
-        "lint-fix": "yarn lint --fix",
-        "license-validate": "yarn sofie-licensecheck"
-    },
-    "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{css,json,md,scss}": [
-            "prettier --write"
-        ],
-        "*.{ts,tsx,js,jsx}": [
-            "yarn lint-fix"
-        ]
-    },
-    "dependencies": {
-        "tslib": "^2.3.0"
-    }
+	"name": "tensorflow-test",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"license": "MIT",
+	"devDependencies": {
+		"@sofie-automation/code-standard-preset": "^0.4.2",
+		"@types/node": "^14.17.0",
+		"jest": "^27.1.0",
+		"typescript": "~4.0.0"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"lint": "eslint . --ext .ts --ext .js --ext .tsx --ext .jsx --ignore-pattern dist",
+		"lint-fix": "yarn lint --fix",
+		"license-validate": "yarn sofie-licensecheck"
+	},
+	"prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{css,json,md,scss}": [
+			"prettier --write"
+		],
+		"*.{ts,tsx,js,jsx}": [
+			"yarn lint-fix"
+		]
+	},
+	"resolutions": {
+		"segfault-handler": "github:Streampunk/node-segfault-handler#8b0814e"
+	},
+	"dependencies": {
+		"@tensorflow-models/blazeface": "^0.0.7",
+		"@tensorflow-models/coco-ssd": "^2.2.2",
+		"@tensorflow/tfjs-node": "^3.8.0",
+		"beamcoder": "^0.6.14",
+		"canvas": "^2.8.0",
+		"grandiose": "github:ianshade/grandiose#95687c2",
+		"redioactive": "^0.0.17",
+		"ts-osc": "^0.3.1",
+		"tslib": "^2.3.0"
+	}
 }
