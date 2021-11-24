@@ -3,6 +3,9 @@
 	"version": "1.0.0",
 	"main": "dist/index.js",
 	"license": "MIT",
+	"engines": {
+		"node": ">=14.16"
+	},
 	"devDependencies": {
 		"@sofie-automation/code-standard-preset": "^0.4.2",
 		"@types/node": "^14.17.0",
@@ -39,6 +42,7 @@
 		"beamcoder": "^0.6.14",
 		"canvas": "^2.8.0",
 		"grandiose": "github:ianshade/grandiose#95687c2",
+		"macadam": "^2.0.16",
 		"redioactive": "^0.0.17",
 		"ts-osc": "^0.3.1",
 		"tslib": "^2.3.0"

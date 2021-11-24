@@ -2151,6 +2151,13 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
+highland@^2.13.5:
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/highland/-/highland-2.13.5.tgz#d55cd8ac3f67a00fad79918668d51493222cfcc2"
+  integrity sha512-dn2flPapIIAa4BtkB2ahjshg8iSJtrJtdhEb9/oiOrS5HMQTR/GuhFpqJ+11YBdtnl3AwWKvbZd1Uxr8uAmA7A==
+  dependencies:
+    util-deprecate "^1.0.2"
+
 hosted-git-info@^2.1.4:
   version "2.8.9"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.9.tgz#dffc0bf9a21c02209090f2aa69429e1414daf3f9"
@@ -3069,6 +3076,15 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
+
+macadam@^2.0.16:
+  version "2.0.16"
+  resolved "https://registry.yarnpkg.com/macadam/-/macadam-2.0.16.tgz#221037d506cfd716f7593b0894bdcb74d4bef9e4"
+  integrity sha512-VcW3ofMUzStrZFd/wi7biK6md3nhGEnNCOy2shxtgB92HGhWGkz3C1qUNw2/m4+qRcZ9oEwZnsTRptSOfecbKg==
+  dependencies:
+    bindings "^1.5.0"
+    highland "^2.13.5"
+    segfault-handler "^1.3.0"
 
 make-dir@^3.0.0, make-dir@^3.1.0:
   version "3.1.0"
@@ -4326,7 +4342,7 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-util-deprecate@~1.0.1:
+util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
