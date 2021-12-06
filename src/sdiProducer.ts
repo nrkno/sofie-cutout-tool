@@ -1,20 +1,23 @@
-import { bmdAudioSampleRate48kHz, bmdAudioSampleType32bitInteger, bmdFormat8BitYUV, bmdModeHD1080i50, capture, CaptureFrame } from 'macadam'
+import { bmdAudioSampleRate48kHz, bmdAudioSampleType16bitInteger, bmdFormat8BitYUV, bmdModeHD1080i50, capture, CaptureFrame } from 'macadam'
 import { Valve, isValue, end, Generator } from 'redioactive'
 import * as Beamcoder from 'beamcoder'
 import { filterer } from 'beamcoder'
+import { endTrace, startTrace } from './trace'
 
 // capture on decklink 1
 const captureChannel = capture({
     deviceIndex: 0,
     channels: 2,
     sampleRate: bmdAudioSampleRate48kHz,
-    sampleType: bmdAudioSampleType32bitInteger,
+    sampleType: bmdAudioSampleType16bitInteger,
     displayMode: bmdModeHD1080i50,
     pixelFormat: bmdFormat8BitYUV
 })
 
 export const provideFrame: Generator<CaptureFrame> = async () => {
+    let t = startTrace('SDI capture')
     const frame = await (await captureChannel).frame()
+    endTrace(t)
 
     if (frame.video.width !== 1920 || frame.video.height !== 1080) {
         throw new Error('Unexpected capture frame size')
@@ -60,7 +63,10 @@ export const sdiFrameToFFmpegFrame: Valve<CaptureFrame, Beamcoder.Frame> = async
             // top_field_first: true,
         })
         
+        let t = startTrace('Filter uyvy -> rgba')
         const filtered = await (await vidFilterer).filter([beamFrame])
+        endTrace(t)
+
         const filteredFrame = filtered[0].frames[0]
         if (!filteredFrame) {
             console.log('skip')
@@ -77,5 +83,13 @@ export const sdiFrameToFFmpegFrame: Valve<CaptureFrame, Beamcoder.Frame> = async
         return filteredFrame
     } else {
         return end
+    }
+}
+
+export const audioFork: Valve<CaptureFrame, CaptureFrame['audio']> = (frame) => {
+    if (isValue(frame)) {
+        return frame.audio
+    } else {
+        return frame
     }
 }

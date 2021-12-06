@@ -1,7 +1,9 @@
 import * as Beamcoder from 'beamcoder'
 import * as Grandiose from 'grandiose'
+import * as Macadam from 'macadam'
 import { Valve, isValue, Spout, isEnd } from 'redioactive'
 import { cropFrame, override } from './reframer'
+import { endTrace, startTrace } from './trace'
 
 const sender = Grandiose.send({ name: 'REFRAME' })
 
@@ -79,6 +81,7 @@ export const ffmpegFrameToNDI: Valve<
 
 export const frameConsumer: Spout<Grandiose.VideoFrame | undefined> = async (frame) => {
     // const wait = new Promise<void>((resolve) => setTimeout(() => resolve(), 40))
+    let t = startTrace('NDI transmit')
 
     const w = 1080
     // const w = 1920
@@ -107,6 +110,54 @@ export const frameConsumer: Spout<Grandiose.VideoFrame | undefined> = async (fra
     }
 
     await (await sender).video(sendFrame)
+    endTrace(t)
     // console.log('send')
     // await wait
+}
+
+export const bmdAudioToNDI: Valve<Macadam.CaptureFrame['audio'], Grandiose.AudioFrame> = (frame) => {
+    if (isValue(frame)) {
+        const sendFrame: Grandiose.AudioFrame = {
+            type: 'audio',
+            audioFormat: Grandiose.AudioFormat.Int16Interleaved,
+            referenceLevel: 0,
+            sampleRate: 48000, // Hz
+            channels: 2,
+            samples: 48000 / 25,
+            channelStrideInBytes: 4,
+            timestamp: [0, 0], // PTP timestamp
+            timecode: [0, 0], // timecode as PTP value
+            data: Buffer.alloc(48000 / 25 * 4)
+        }
+        frame.data.copy(sendFrame.data)
+
+        return sendFrame
+    } else {
+        return frame
+    }
+}
+
+export const audioConsumer: Spout<Grandiose.AudioFrame | undefined> = async (frame) => {
+    const sendFrame: Grandiose.AudioFrame = {
+        type: 'audio',
+        audioFormat: Grandiose.AudioFormat.Int16Interleaved,
+        referenceLevel: 0,
+        sampleRate: 48000, // Hz
+        channels: 2,
+        samples: 48000 / 25,
+        channelStrideInBytes: 4,
+        timestamp: [0, 0], // PTP timestamp
+        timecode: [0, 0], // timecode as PTP value
+        data: Buffer.alloc(48000 / 25 * 4)
+    }
+
+    if (!isEnd(frame) && frame !== undefined) {
+        frame.data.copy(sendFrame.data)
+        sendFrame.data = frame.data
+    } else {
+        console.log('send black')
+        sendFrame.data.fill(0)
+    }
+
+    await (await sender).video(sendFrame as any)
 }

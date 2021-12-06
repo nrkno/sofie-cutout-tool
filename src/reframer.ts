@@ -1,6 +1,7 @@
 import { Valve, isValue } from 'redioactive'
 import * as Beamcoder from 'beamcoder'
 import { analyse, AnalyseResult, AnalysisResultClass } from './analyse'
+import { endTrace, startTrace } from './trace'
 
 export const MAX_FRAMES = 6 // 2 secs at 25fps
 export const override = {
@@ -39,7 +40,9 @@ const detectFilter = Beamcoder.filterer({
 export const analyseFrames: Valve<Beamcoder.Frame[], AnalysisResult> = async (frames) => {
     if (isValue(frames)) {
         // console.log(frames.length)
+        let t = startTrace('Detect scenechange')
         let filt_frames = await (await detectFilter).filter(frames)
+        endTrace(t)
         const result: AnalysisResult = {
             frame: frames[1] || frames[0],
         }
@@ -52,22 +55,23 @@ export const analyseFrames: Valve<Beamcoder.Frame[], AnalysisResult> = async (fr
             if (score && score > 14) {
                 analysis.sceneChange = true
                 frameNo = 0 // force new detection sequence
-                console.log('scene change')
             }
 
-            if (frameNo % 5 === 0) {
+            if (frameNo % 12 === 0) {
                 try {
                     // const { x, w } = { x: 420, w: 0 }
                     // await new Promise<void>((r) => setTimeout(() => r(), 180))
-                    const regions = await analyse(f.data[0].slice(0, 1920 * 1080 * 3))
-                    // const regions = { classesCount: {
-                    //     'FACE': 0,
-                    //     'PARTIAL_FACE': 0,
-                    //     'PERSON': 0,
-                    //     'ANIMAL': 0,
-                    //     'TRANSPORT': 0,
-                    //     'OBJECT': 0,
-                    // }, regions: [] }
+                    // t = startTrace('Frame Analysis')
+                    // const regions = await analyse(f.data[0].slice(0, 1920 * 1080 * 3))
+                    // endTrace(t)
+                    const regions = { classesCount: {
+                        'FACE': 0,
+                        'PARTIAL_FACE': 0,
+                        'PERSON': 0,
+                        'ANIMAL': 0,
+                        'TRANSPORT': 0,
+                        'OBJECT': 0,
+                    }, regions: [] }
                     // console.log(x, f.pts / vidStream.time_base[1])
                     analysis.machineVision = regions
                 } catch (e) {
@@ -140,7 +144,7 @@ const getMaxAccel = (
     let allowedDx = accelObj.dx + Math.min(0 + maxDdx, Math.max(0 - maxNegDdx, attemptedDeltaDx))
     let dx = direction * allowedDx
 
-    if (debug) console.log(direction, attemptedDx, attemptedDeltaDx, allowedDx)
+    // if (debug) console.log(direction, attemptedDx, attemptedDeltaDx, allowedDx)
 
     const stepsToStop = allowedDx / maxNegDdx
     const stepsLeft = attemptedDx / allowedDx // assuming no further acceleration
@@ -302,12 +306,16 @@ export const cropFrame = async (
     if (sFilter) sFilter.priv = { h: Math.min((1080 * 1080) / w, 1080) + '' }
 
     // crop
+    let t = startTrace('Crop')
     const filtered = await filter.filter([frame])
+    endTrace(t)
     const filteredFrame = filtered[0].frames[0]
     if (!filteredFrame) return frame
 
     // crop doesn't give use the cropped buffer yet, so we use an encoder for that
+    t = startTrace('Encode cropped')
     const encodedPacket = await encoder.encode(filteredFrame)
+    endTrace(t)
     const encodedFrame = encodedPacket.packets[0]?.data
     if (!encodedFrame) return frame
 
@@ -328,7 +336,7 @@ export const cropAndBuffer: Valve<
     if (isValue(analysis)) {
         if (analysis.analysis) {
             if (analysis.analysis.sceneChange) {
-                console.log('scene change')
+                // console.log('scene change')
                 const frames: { cropped: Beamcoder.Frame; cropValues: { x: number; w: number }; orig: Beamcoder.Frame }[] = []
                 for (let frame of frameBuffer) {
                     const croppedFrame = await cropFrameFromAnalysis(frame, detectionPoints)

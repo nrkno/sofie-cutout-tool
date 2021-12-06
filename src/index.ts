@@ -3,6 +3,10 @@ import redio, { isValue, Valve } from 'redioactive'
 import { provideFrame as provideSDIFrame, sdiFrameToFFmpegFrame } from './sdiProducer'
 import { analyseFrames, cropAndBuffer, MAX_FRAMES } from './reframer'
 import { ffmpegFrameToNDI, frameConsumer } from './ndiConsumer'
+import { ndiFrameToFFmpegFrame, provideFrame as provideNDIFrame } from './ndiProducer'
+import { audioFork } from './sdiProducer'
+import { bmdAudioToNDI } from './ndiConsumer'
+import { audioConsumer } from './ndiConsumer'
 
 let lastFrame: Beamcoder.Frame
 const pairFrames: Valve<Beamcoder.Frame, Beamcoder.Frame[]> = async (frame) => {
@@ -17,11 +21,22 @@ const pairFrames: Valve<Beamcoder.Frame, Beamcoder.Frame[]> = async (frame) => {
 	}
 }
 
-redio(provideSDIFrame)
-	.valve(sdiFrameToFFmpegFrame)
-	.valve(pairFrames)
+const provider = redio(provideSDIFrame)
+
+provider
+    .fork()
+    .valve(audioFork)
+    .valve(bmdAudioToNDI)
+    .spout(audioConsumer)
+
+provider
+    .fork()
+	.valve(sdiFrameToFFmpegFrame, { bufferSizeMax: 1 })
+// redio(provideNDIFrame)
+// 	.valve(ndiFrameToFFmpegFrame)
+	.valve(pairFrames, { bufferSizeMax: 0 })
 	.valve(analyseFrames, { bufferSizeMax: 2 * 5 })
-	.valve(cropAndBuffer, { oneToMany: true })
+	.valve(cropAndBuffer, { oneToMany: true, bufferSizeMax: 1 })
 	// .valve((res) => {
     //     return {
     //         cropped: res.frame,
@@ -33,4 +48,4 @@ redio(provideSDIFrame)
     //     }
     // })
 	.valve(ffmpegFrameToNDI, { bufferSizeMax: 2 * MAX_FRAMES })
-	.spout(frameConsumer)
+	.spout(frameConsumer, { bufferSizeMax: 1 })
