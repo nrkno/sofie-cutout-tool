@@ -1,4 +1,4 @@
-# Electron test for cutout prototype
+# Electron test for Sofie cutout prototype
 
 ## For Developers
 
