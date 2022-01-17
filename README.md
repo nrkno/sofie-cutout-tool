@@ -1,4 +1,4 @@
-# Electron test for Sofie cutout prototype
+# Sofie: The Modern TV News Studio Automation System (Electron test for Sofie cutout prototype)
 
 ## For Developers
 
