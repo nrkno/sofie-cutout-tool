@@ -3,13 +3,13 @@
 	"productName": "Sofie Cutout Tool",
 	"version": "1.0.0",
 	"description": "",
-	"homepage": "https://github.com/nrkno/tv-automation-cutout-tool/blob/master/README.md",
+	"homepage": "https://github.com/nrkno/sofie-cutout-tool/blob/master/README.md",
 	"license": "MIT",
-	"repository": "github.com:nrkno/tv-automation-cutout-tool",
+	"repository": "github.com:nrkno/sofie-cutout-tool",
 	"contributors": [
 		"Johan Nyman <johan@nytamin.se> (https://superfly.tv/)",
 		"Jonas Hummelstrand <jonas@hummelstrand.com> (https://superfly.tv/)",
-		"Ola Christian Gundelsby <ola.christian.gundelsby@nrk.no> (https://nrk.no)"
+		"Ola Christian Gundelsby <ola.christian.gundelsby@nrk.no> (https://nrk.no/)"
 	],
 	"os": [
 		"win32",
